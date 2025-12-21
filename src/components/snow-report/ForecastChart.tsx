@@ -86,6 +86,13 @@ export default function ForecastChart({ data, unit, loading }: { data: ForecastD
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.value > 0 ? '#3b82f6' : '#475569'} fillOpacity={0.7 + (entry.value / maxValue) * 0.3} />
               ))}
+               <LabelList
+                dataKey="value"
+                position="top"
+                formatter={(v: number) => (v > 0 ? `${v}${unitLabel}` : "")}
+                fill="#e2e8f0"
+                fontSize={10}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
