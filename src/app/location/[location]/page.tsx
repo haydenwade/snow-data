@@ -12,6 +12,7 @@ import ForecastTimeline from "../../../components/snow-report/ForecastTimeline";
 import HistoricTable from "../../../components/snow-report/HistoricTable";
 import ForecastTable from "../../../components/snow-report/ForecastTable";
 import DataNotes from "../../../components/snow-report/DataNotes";
+import CurrentConditions from "../../../components/snow-report/CurrentConditions";
 import {
   type Unit,
   type HistoricDay,
@@ -98,6 +99,9 @@ export default function LocationPage() {
       )}
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        <div className="pb-2">
+          <CurrentConditions locationId={locationId} unit={unit} />
+        </div>
         <section className="grid gap-6 md:grid-cols-3 items-stretch">
           <div className="md:col-span-2 h-full">
             <StationMap location={location}/>
