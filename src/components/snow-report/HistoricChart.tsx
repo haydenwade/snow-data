@@ -14,6 +14,7 @@ export default function HistoricChart({ data, unit, loading }: { data: HistoricD
     displayDate: fmtShort(d.date),
     shortDate: new Date(`${d.date}T00:00:00Z`).toLocaleDateString("en-US", { day: "numeric", timeZone: "UTC" }),
     value: unit === "mm" ? d.derivedSnowfallIn * 25.4 : d.derivedSnowfallIn,
+    startDepthInches: (d as any).startSnowDepth ?? d.snowDepth,
   }));
 
   const unitLabel = unit === "mm" ? "mm" : '"';
@@ -23,11 +24,11 @@ export default function HistoricChart({ data, unit, loading }: { data: HistoricD
     if (active && payload && payload.length) {
       const item = payload[0].payload;
       return (
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-xl">
+          <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-xl">
           <p className="text-sm font-medium text-white">{item.displayDate}</p>
           <p className="text-lg font-bold text-orange-400">{item.value.toFixed(1)}{unitLabel}</p>
-          {item.snowDepth != null && (
-            <p className="text-xs text-slate-400">Snow Depth: {item.snowDepth}"</p>
+          {item.startDepthInches != null && (
+            <p className="text-xs text-slate-400">Snow Depth: {unit === "mm" ? `${Math.round(item.startDepthInches * 25.4)} mm` : `${Math.round(item.startDepthInches)}"`}</p>
           )}
         </div>
       );

@@ -5,6 +5,7 @@ export type HistoricDay = {
   snowDepth: number | null;
   swe: number | null;
   derivedSnowfallIn: number;
+  startSnowDepth?: number | null;
 };
 
 export type SeriesPoint = { start: string; hours: number; value: number };
@@ -151,7 +152,8 @@ export function deriveDailySnowfall(historic: { date: string; snowDepth: number 
       if (dSnwd > 0) derived = dSnwd;
       else if (dSwe > 0) derived = dSwe * 12;
     }
-    out.push({ date: cur.date, snowDepth: cur.snowDepth, swe: cur.swe, derivedSnowfallIn: Number(Math.max(0, derived).toFixed(2)) });
+    const startSnow = prev ? prev.snowDepth ?? null : cur.snowDepth ?? null;
+    out.push({ date: cur.date, snowDepth: cur.snowDepth, swe: cur.swe, derivedSnowfallIn: Number(Math.max(0, derived).toFixed(2)), startSnowDepth: startSnow });
   }
   return out;
 }
