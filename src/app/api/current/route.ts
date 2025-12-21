@@ -18,6 +18,41 @@ function windLabel(mph?: number | null) {
   return "Gale";
 }
 
+function nonEmptyString(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const s = v.trim();
+  return s.length ? s : null;
+}
+
+function cloudLayersToSky(cloudLayers: any[] | undefined): string | null {
+  if (!Array.isArray(cloudLayers) || cloudLayers.length === 0) return null;
+
+  // NWS cloudLayers typically: [{ amount: "SCT"|"BKN"|"OVC"|..., base: {...}}]
+  const amounts = cloudLayers.map((l) => l?.amount).filter(Boolean);
+
+  if (amounts.includes("OVC")) return "Overcast";
+  if (amounts.includes("BKN")) return "Mostly Cloudy";
+  if (amounts.includes("SCT")) return "Partly Cloudy";
+  if (amounts.includes("FEW")) return "Mostly Clear";
+  if (amounts.includes("CLR") || amounts.includes("SKC")) return "Clear";
+
+  return null;
+}
+
+function presentWeatherToSky(presentWeather: any[] | undefined): string | null {
+  if (!Array.isArray(presentWeather) || presentWeather.length === 0)
+    return null;
+
+  // presentWeather items often include "weather" or "rawString" depending on station
+  const first = presentWeather[0];
+  return (
+    nonEmptyString(first?.weather) ??
+    nonEmptyString(first?.rawString) ??
+    nonEmptyString(first?.description) ??
+    null
+  );
+}
+
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
@@ -101,15 +136,27 @@ export async function GET(req: Request) {
     const tempF = typeof tempC === "number" ? Math.round(cToF(tempC)) : null;
 
     const windKph = props.windSpeed?.value;
-    const kphToMphResult = typeof windKph === "number" ? kphToMph(windKph) : null;
-    const windMph = typeof kphToMphResult === "number" ? Math.round(kphToMphResult) : null;
+    const kphToMphResult =
+      typeof windKph === "number" ? kphToMph(windKph) : null;
+    const windMph =
+      typeof kphToMphResult === "number" ? Math.round(kphToMphResult) : null;
     const windDirDeg = props.windDirection?.value ?? null;
 
     const sky =
-      props.textDescription ?? props.weather?.[0]?.description ?? null;
+      nonEmptyString(props.textDescription) ??
+      presentWeatherToSky(props.presentWeather) ??
+      cloudLayersToSky(props.cloudLayers) ??
+      "Unknown";
+
+    if (sky === "Unknown") {
+      //TODO: fallback to another method if needed
+    }
+
+    const observedAt = props.timestamp ?? null;
 
     return NextResponse.json(
       {
+        observedAt,
         temperatureF: tempF,
         wind: {
           speedMph: windMph,

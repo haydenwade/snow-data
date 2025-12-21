@@ -1,10 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Loader2, Wind, Sun, Thermometer } from "lucide-react";
+import { Loader2, Wind, Sun, Thermometer, Cloud, CloudSun, Cloudy, CloudSnow } from "lucide-react";
 import type { Unit } from "./utils";
+function SkyIcon({ sky }: { sky?: string | null }) {
+  const s = (sky ?? "").trim().toLowerCase();
+  if (!s) return <Cloud className="h-4 w-4 text-slate-300" />;
+  if (s === "clear") return <Sun className="h-4 w-4 text-yellow-400" />;
+  if (s === "mostly clear") return <CloudSun className="h-4 w-4 text-yellow-300" />;
+  if (s === "partly cloudy") return <CloudSun className="h-4 w-4 text-yellow-300" />;
+  if (s === "mostly cloudy") return <Cloud className="h-4 w-4 text-slate-300" />;
+  if (s === "overcast") return <Cloudy className="h-4 w-4 text-slate-400" />;
+  if (s.includes("snow")) return <CloudSnow className="h-4 w-4 text-slate-400" />;
+  return <Cloud className="h-4 w-4 text-slate-300" />;
+}
 
 import { degToCompass } from "./utils";
 type CurrentResp = {
+  observedAt?: string | null;
   temperatureF?: number | null;
   wind?: {
     speedMph?: number | null;
@@ -54,6 +66,11 @@ export default function CurrentConditions({
         <div className="flex items-center gap-2">
           <Thermometer className="h-5 w-5 text-red-400" />
           <h2 className="font-semibold text-white">Current Conditions</h2>
+          {data && data.observedAt && (
+            <span className="text-xs text-slate-400 ml-3">
+              Obs: {new Date(data.observedAt).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
+            </span>
+          )}
         </div>
       </div>
       <div className="p-4">
@@ -79,10 +96,12 @@ export default function CurrentConditions({
 
             <div className="flex items-center gap-4 text-sm text-slate-300">
               <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4 text-yellow-400" />
+                <SkyIcon sky={data.sky} />
                 <div>
                   <div className="text-xs text-slate-400">Sky</div>
-                  <div className="font-medium text-slate-200">{data.sky ?? "—"}</div>
+                  <div className="font-medium text-slate-200">
+                    {data.sky ?? "—"}
+                  </div>
                 </div>
               </div>
 
@@ -91,12 +110,19 @@ export default function CurrentConditions({
                 <div>
                   <div className="text-xs text-slate-400">Wind</div>
                   <div className="font-medium text-slate-200">
-                    {data.wind?.speedMph != null && data.wind?.directionDeg != null
+                    {data.wind?.speedMph != null &&
+                    data.wind?.directionDeg != null
                       ? unit === "mm"
-                        ? `${Math.round(data.wind.speedMph * 1.60934)} kph ${degToCompass(data.wind.directionDeg)}`
-                        : `${data.wind.speedMph} mph ${degToCompass(data.wind.directionDeg)}`
+                        ? `${Math.round(
+                            data.wind.speedMph * 1.60934
+                          )} kph ${degToCompass(data.wind.directionDeg)}`
+                        : `${data.wind.speedMph} mph ${degToCompass(
+                            data.wind.directionDeg
+                          )}`
                       : "—"}
-                    <span className="text-xs text-slate-400 ml-2">{data.wind?.windLabel ?? ""}</span>
+                    <span className="text-xs text-slate-400 ml-2">
+                      {data.wind?.windLabel ?? ""}
+                    </span>
                   </div>
                 </div>
               </div>
