@@ -22,37 +22,53 @@ import {
   aggregateForecastToDaily,
 } from "../../../components/snow-report/utils";
 
-// helper imports moved into components/snow-report/utils
-
 // Real data loaders (client-side via API routes)
-async function fetchHistoric(locationId:string, days: number): Promise<HistoricDay[]> {
-  const req = await fetch(`/api/historic?locationId=${locationId}&days=${days}`, { cache: "no-store" });
+async function fetchHistoric(
+  locationId: string,
+  days: number
+): Promise<HistoricDay[]> {
+  const req = await fetch(
+    `/api/historic?locationId=${locationId}&days=${days}`,
+    { cache: "no-store" }
+  );
   if (!req.ok) {
     let detail = "";
-    try { const j = await req.json(); detail = j?.error || JSON.stringify(j); } catch {}
-    throw new Error(`Historic fetch failed: ${req.status}${detail ? ` — ${detail}` : ""}`);
+    try {
+      const j = await req.json();
+      detail = j?.error || JSON.stringify(j);
+    } catch {}
+    throw new Error(
+      `Historic fetch failed: ${req.status}${detail ? ` — ${detail}` : ""}`
+    );
   }
   const res = await req.json();
   return res.data;
 }
 
-async function fetchForecastGrid(locationId:string): Promise<ForecastGridData> {
-  const res = await fetch(`/api/forecast?locationId=${locationId}`, { cache: "no-store" });
+async function fetchForecastGrid(
+  locationId: string
+): Promise<ForecastGridData> {
+  const res = await fetch(`/api/forecast?locationId=${locationId}`, {
+    cache: "no-store",
+  });
   if (!res.ok) {
     let detail = "";
-    try { const j = await res.json(); detail = j?.error || JSON.stringify(j); } catch {}
-    throw new Error(`Forecast fetch failed: ${res.status}${detail ? ` — ${detail}` : ""}`);
+    try {
+      const j = await res.json();
+      detail = j?.error || JSON.stringify(j);
+    } catch {}
+    throw new Error(
+      `Forecast fetch failed: ${res.status}${detail ? ` — ${detail}` : ""}`
+    );
   }
   const j = await res.json();
   return j as ForecastGridData;
 }
 
-// UI components are now split into files under components/snow-report
-
 export default function LocationPage() {
   const params = useParams();
   const locationId = params.location as string;
-  const location = LOCATIONS.find(l => l.id === locationId);
+  const location = LOCATIONS.find((l) => l.id === locationId);
 
   const [unit, setUnit] = useState<Unit>("in");
   const [range, setRange] = useState<15 | 30>(15);
@@ -81,53 +97,67 @@ export default function LocationPage() {
     }
   };
 
-  useEffect(() => { void load(); }, [locationId]);
+  useEffect(() => {
+    void load();
+  }, [locationId]);
 
   // For tables we prefer newest first (descending). Keep charts chronological (ascending).
-  const lastNHistoricDesc = useMemo(() => [...historic.slice(-range)].reverse(), [historic, range]);
+  const lastNHistoricDesc = useMemo(
+    () => [...historic.slice(-range)].reverse(),
+    [historic, range]
+  );
   const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
 
   if (!location) {
-    return <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">Location not found</div>;
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
+        Location not found
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header unit={unit} range={range} onUnit={setUnit} onRange={setRange} location={location} />
+      <Header
+        unit={unit}
+        range={range}
+        onUnit={setUnit}
+        onRange={setRange}
+        location={location}
+      />
       {error && (
-        <div className="max-w-6xl mx-auto px-4 pb-3"><div className="text-xs text-red-400">{error}</div></div>
+        <div className="max-w-6xl mx-auto px-4 pb-3">
+          <div className="text-xs text-red-400">{error}</div>
+        </div>
       )}
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <div className="pb-2">
+        <section className="grid md:grid-cols-2 gap-6">
           <CurrentConditions locationId={locationId} unit={unit} />
-        </div>
+          <ForecastTimeline data={forecast} unit={unit} />
+        </section>
+
+        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
+        <section className="grid md:grid-cols-2 gap-6">
+          <ForecastChart data={forecast} unit={unit} loading={loading} />
+          <ForecastTable data={forecast} unit={unit} />
+        </section>
+
+        <section className="grid md:grid-cols-2 gap-6">
+          <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
+          <HistoricTable data={lastNHistoricDesc} unit={unit} />
+        </section>
+
         <section className="grid gap-6 md:grid-cols-3 items-stretch">
           <div className="md:col-span-2 h-full">
-            <StationMap location={location}/>
+            <StationMap location={location} />
           </div>
           <div className="md:col-span-1 h-full">
             <StationMetadata location={location} />
           </div>
         </section>
 
-        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
-
-        <section className="grid md:grid-cols-2 gap-6">
-          <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
-          <ForecastChart data={forecast} unit={unit} loading={loading} />
-        </section>
-
-        <section>
-          <ForecastTimeline data={forecast} unit={unit} />
-        </section>
-
-        <section className="grid md:grid-cols-2 gap-6">
-          <HistoricTable data={lastNHistoricDesc} unit={unit} />
-          <ForecastTable data={forecast} unit={unit} />
-        </section>
-
-        <DataNotes location={location}/>
+        <DataNotes location={location} />
       </main>
     </div>
   );
