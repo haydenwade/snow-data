@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header unit={unit} range={range} loading={loading} onUnit={setUnit} onRange={setRange} onRefresh={load} station={{ name: "Alta, Utah" }} updatedAt={updatedAt} />
+      <Header unit={unit} range={range} onUnit={setUnit} onRange={setRange} station={{ name: "Alta, Utah" }} />
       {error && (
         <div className="max-w-6xl mx-auto px-4 pb-3"><div className="text-xs text-red-400">{error}</div></div>
       )}
