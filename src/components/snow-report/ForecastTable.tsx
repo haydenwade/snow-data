@@ -21,7 +21,7 @@ export default function ForecastTable({ data, unit }: { data: ForecastDaily[]; u
                 <th className="text-left font-medium py-2 pl-4 text-slate-400">Date</th>
                 <th className="text-right font-medium py-2 text-slate-400">Snow</th>
                 <th className="text-right font-medium py-2 text-slate-400">PoP</th>
-                <th className="text-right font-medium py-2 pr-4 text-slate-400">Temp</th>
+                <th className="text-right font-medium py-2 pr-4 text-slate-400">Temp ({unit === "mm" ? '°C' : '°F'})</th>
               </tr>
             </thead>
             <tbody>
@@ -39,7 +39,13 @@ export default function ForecastTable({ data, unit }: { data: ForecastDaily[]; u
                   <td className="py-2 text-right">
                     <span className={`font-medium ${d.pop >= 70 ? 'text-blue-300' : d.pop >= 40 ? 'text-blue-400' : 'text-slate-500'}`}>{d.pop}%</span>
                   </td>
-                  <td className="py-2 pr-4 text-right text-slate-400 text-sm">{d.tMinF != null && d.tMaxF != null ? `${Math.round(d.tMaxF)}° / ${Math.round(d.tMinF)}°` : "—"}</td>
+                  <td className="py-2 pr-4 text-right text-slate-400 text-sm">
+                    {unit === "mm" ? (
+                      d.tMinC != null && d.tMaxC != null ? `${d.tMaxC}° / ${d.tMinC}°` : "—"
+                    ) : (
+                      d.tMinF != null && d.tMaxF != null ? `${Math.round(d.tMaxF)}° / ${Math.round(d.tMinF)}°` : "—"
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

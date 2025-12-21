@@ -32,8 +32,14 @@ export default function ForecastChart({ data, unit, loading }: { data: ForecastD
           <p className="text-lg font-bold text-blue-400">{item.value.toFixed(1)}{unitLabel}</p>
           <div className="flex items-center gap-4 mt-1">
             <p className="text-xs text-slate-400">PoP: {item.pop}%</p>
-            {item.tMaxF != null && item.tMinF != null && (
-              <p className="text-xs text-slate-400">{Math.round(item.tMaxF)}°/{Math.round(item.tMinF)}°F</p>
+            {unit === "mm" ? (
+              item.tMaxC != null && item.tMinC != null ? (
+                <p className="text-xs text-slate-400">{item.tMaxC}°/{item.tMinC}°C</p>
+              ) : null
+            ) : (
+              item.tMaxF != null && item.tMinF != null ? (
+                <p className="text-xs text-slate-400">{Math.round(item.tMaxF)}°/{Math.round(item.tMinF)}°F</p>
+              ) : null
             )}
           </div>
         </div>

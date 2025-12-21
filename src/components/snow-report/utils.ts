@@ -18,7 +18,8 @@ export type ForecastGridData = {
   snowfallAmount: GridSeries; // mm
   quantitativePrecipitation?: GridSeries; // mm (liquid)
   probabilityOfPrecipitation: GridSeries; // %
-  temperature: GridSeries; // degC
+  maxTemperature?: GridSeries; // degC
+  minTemperature?: GridSeries; // degC
 };
 
 export type ForecastDaily = {
@@ -27,6 +28,8 @@ export type ForecastDaily = {
   pop: number; // % (daily max)
   tMinF?: number;
   tMaxF?: number;
+  tMinC?: number;
+  tMaxC?: number;
 };
 
 export const DENVER_TZ = "America/Denver";
@@ -69,9 +72,9 @@ export function expandToHourly(p: SeriesPoint): Date[] {
 }
 
 export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[] {
-  const dayBuckets: Record<string, { snowIn: number; pops: number[]; tempsF: number[] }> = {};
+  const dayBuckets: Record<string, { snowIn: number; pops: number[]; tMaxF?: number; tMinF?: number; tMaxC?: number; tMinC?: number }> = {};
   const pushDay = (day: string) => {
-    if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [], tempsF: [] };
+    if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [] };
   };
 
   const useQpfFallback = !grid.snowfallAmount?.points?.length && grid.quantitativePrecipitation?.points?.length;
@@ -97,22 +100,42 @@ export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[
     });
   });
 
-  grid.temperature.points.forEach((p) => {
-    const hoursList = expandToHourly(p);
-    hoursList.forEach((h) => {
-      const day = dateKeyDenver(h);
+  // max/min temperature series provide one value per day (start timestamp),
+  // so map each point to its calendar day directly without expanding to hourly slots.
+  function pointMidpointLocalDay(p: SeriesPoint) {
+    const start = isoToDate(p.start);
+    const hours = Math.max(1, p.hours || 1);
+    const mid = new Date(start.getTime() + (hours * 3600_000) / 2);
+    return dateKeyDenver(mid);
+  }
+
+  if (grid.maxTemperature && grid.maxTemperature.points) {
+    grid.maxTemperature.points.forEach((p) => {
+      const day = pointMidpointLocalDay(p);
       pushDay(day);
-      dayBuckets[day].tempsF.push(cToF(p.value));
+      dayBuckets[day].tMaxC = Math.round(p.value);
+      dayBuckets[day].tMaxF = Math.round(cToF(p.value));
     });
-  });
+  }
+
+  if (grid.minTemperature && grid.minTemperature.points) {
+    grid.minTemperature.points.forEach((p) => {
+      const day = pointMidpointLocalDay(p);
+      pushDay(day);
+      dayBuckets[day].tMinC = Math.round(p.value);
+      dayBuckets[day].tMinF = Math.round(cToF(p.value));
+    });
+  }
 
   const days = Object.keys(dayBuckets).sort();
   return days.map((day) => {
     const b = dayBuckets[day];
     const pop = b.pops.length ? Math.round(Math.max(...b.pops)) : 0;
-    const tMinF = b.tempsF.length ? Math.round(Math.min(...b.tempsF)) : undefined;
-    const tMaxF = b.tempsF.length ? Math.round(Math.max(...b.tempsF)) : undefined;
-    return { date: day, snowIn: Number(b.snowIn.toFixed(2)), pop, tMinF, tMaxF };
+    const tMaxF = b.tMaxF;
+    const tMinF = b.tMinF;
+    const tMaxC = b.tMaxC;
+    const tMinC = b.tMinC;
+    return { date: day, snowIn: Number(b.snowIn.toFixed(2)), pop, tMinF, tMaxF, tMinC, tMaxC };
   });
 }
 

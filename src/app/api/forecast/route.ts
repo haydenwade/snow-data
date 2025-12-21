@@ -69,7 +69,8 @@ export async function GET() {
       snowfallAmount: mapSeries("snowfallAmount"),
       quantitativePrecipitation: mapSeries("quantitativePrecipitation"),
       probabilityOfPrecipitation: mapSeries("probabilityOfPrecipitation"),
-      temperature: mapSeries("temperature"),
+      maxTemperature: mapSeries("maxTemperature"),
+      minTemperature: mapSeries("minTemperature"),
     };
 
     return NextResponse.json(payload, { status: 200 });
