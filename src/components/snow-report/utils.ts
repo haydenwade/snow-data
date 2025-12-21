@@ -12,6 +12,10 @@ export type Location = {
   huc: string;
   stationTriplet: string;
   logoUrl?: string;
+  links: {
+    label: string;
+    url: string;
+  }[];
 };
 
 export type HistoricDay = {
@@ -73,7 +77,7 @@ export function cToF(c: number) {
 
 export function degToCompass(deg?: number) {
   if (deg == null || Number.isNaN(deg)) return "";
-  const idx = Math.round(((deg % 360) / 45)) % 8;
+  const idx = Math.round((deg % 360) / 45) % 8;
   return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][idx];
 }
 
@@ -128,7 +132,14 @@ export function aggregateForecastToDaily(
     }
   > = {};
   const pushDay = (day: string) => {
-    if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [], windSpeeds: [], windDirs: [], skyCovers: [] };
+    if (!dayBuckets[day])
+      dayBuckets[day] = {
+        snowIn: 0,
+        pops: [],
+        windSpeeds: [],
+        windDirs: [],
+        skyCovers: [],
+      };
   };
 
   const useQpfFallback =
@@ -231,7 +242,10 @@ export function aggregateForecastToDaily(
     // compute average wind speed: values from grid.windSpeed are treated as km/h
     let windMph: number | undefined = undefined;
     if (b.windSpeeds && b.windSpeeds.length) {
-      const sum = b.windSpeeds.reduce((s, v) => s + (Number.isFinite(v) ? v : 0), 0);
+      const sum = b.windSpeeds.reduce(
+        (s, v) => s + (Number.isFinite(v) ? v : 0),
+        0
+      );
       const avgKph = sum / b.windSpeeds.length;
       // convert km/h to mph
       windMph = Math.round(avgKph * 0.621371);
@@ -240,7 +254,10 @@ export function aggregateForecastToDaily(
     // weighted average wind direction (vector average)
     let windDirDeg: number | undefined = undefined;
     if (b.windDirs && b.windDirs.length) {
-      const dirs = b.windDirs.map((wd, i) => ({ dir: wd.dir, speed: b.windSpeeds[i] ?? 1 }));
+      const dirs = b.windDirs.map((wd, i) => ({
+        dir: wd.dir,
+        speed: b.windSpeeds[i] ?? 1,
+      }));
       let x = 0;
       let y = 0;
       dirs.forEach((d) => {
@@ -257,7 +274,10 @@ export function aggregateForecastToDaily(
 
     let skyCoverPercent: number | undefined = undefined;
     if (b.skyCovers && b.skyCovers.length) {
-      const sum = b.skyCovers.reduce((s, v) => s + (Number.isFinite(v) ? v : 0), 0);
+      const sum = b.skyCovers.reduce(
+        (s, v) => s + (Number.isFinite(v) ? v : 0),
+        0
+      );
       skyCoverPercent = Math.round(sum / b.skyCovers.length);
     }
 
@@ -299,6 +319,24 @@ export const LOCATIONS: Location[] = [
     huc: "160201020101",
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
+    links: [
+       {
+        label: "Resort Info and Lift Status",
+        url: "https://www.parkcitymountain.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/salt-lake",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      },
+      {
+        label: "Traffic Cameras | UDOT",
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
+      }
+    ],
   },
   {
     id: "alta",
@@ -312,6 +350,28 @@ export const LOCATIONS: Location[] = [
     huc: "160202040202",
     logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
+    links: [
+      {
+        label: "Resort Info and Conditions",
+        url: "https://www.alta.com/weather",
+      },
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/salt-lake",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      },
+      {
+        label: "7-day Forecast | NOAA",
+        url: "https://forecast.weather.gov/MapClick.php?lon=-111.63439750671387&lat=40.57318341334175",
+      },
+     {
+        label: "Traffic Cameras | UDOT",
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
+      }
+    ],
   },
   {
     id: "snowbird",
@@ -325,6 +385,28 @@ export const LOCATIONS: Location[] = [
     huc: "160202040202",
     logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
+    links: [
+      {
+        label: "Resort Info and Conditions",
+        url: "https://www.snowbird.com/the-mountain/mountain-report/current-conditions-weather/",
+      },
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/salt-lake",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      },
+      {
+        label: "7-day Forecast | NOAA",
+        url: "https://forecast.weather.gov/MapClick.php?lat=40.582&lon=-111.6562#.YWhkfxDMI1I",
+      },
+      {
+        label: "Traffic Cameras | UDOT",
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
+      }
+    ],
   },
   {
     id: "brighton",
@@ -338,6 +420,24 @@ export const LOCATIONS: Location[] = [
     huc: "160202040201",
     logoUrl: "/brighton-logo.png",
     stationTriplet: "366:UT:SNTL",
+    links: [
+      {
+        label: "Resort Info and Conditions",
+        url: "https://www.brightonresort.com/conditions",
+      },
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/salt-lake",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      },
+      {
+        label: "Traffic Cameras | UDOT",
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
+      }
+    ],
   },
   {
     id: "powdermountain",
@@ -351,6 +451,20 @@ export const LOCATIONS: Location[] = [
     huc: "160102030102",
     logoUrl: "/powdermtn-logo.svg",
     stationTriplet: "1300:UT:SNTL",
+    links: [
+       {
+        label: "Resort Info and Conditions",
+        url: "https://powdermountain.com/conditions",
+      },
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/ogden",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      },
+    ],
   },
   {
     id: "triallake",
@@ -363,6 +477,16 @@ export const LOCATIONS: Location[] = [
     lon: -110.95,
     huc: "160202030102",
     stationTriplet: "828:UT:SNTL",
+    links: [
+       {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/uintas",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      }
+    ],
   },
   {
     id: "wolfcreekpeak",
@@ -375,6 +499,16 @@ export const LOCATIONS: Location[] = [
     lon: -111.04,
     huc: "160202030104",
     stationTriplet: "1164:UT:SNTL",
+    links: [
+        {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/uintas",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      }
+    ],
   },
   {
     id: "strawberrydivide",
@@ -387,5 +521,15 @@ export const LOCATIONS: Location[] = [
     lon: -111.21,
     huc: "140600040103",
     stationTriplet: "795:UT:SNTL",
+    links: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/uintas",
+      },
+      {
+        label: "Doppler Radar | NWS",
+        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      }
+    ],
   },
 ];
