@@ -8,6 +8,7 @@ import StationMetadata from "../../../components/snow-report/StationMetadata";
 import SnowSummaryStrip from "../../../components/snow-report/SnowSummaryStrip";
 import HistoricChart from "../../../components/snow-report/HistoricChart";
 import ForecastChart from "../../../components/snow-report/ForecastChart";
+import ForecastTimeline from "../../../components/snow-report/ForecastTimeline";
 import HistoricTable from "../../../components/snow-report/HistoricTable";
 import ForecastTable from "../../../components/snow-report/ForecastTable";
 import DataNotes from "../../../components/snow-report/DataNotes";
@@ -111,6 +112,10 @@ export default function LocationPage() {
         <section className="grid md:grid-cols-2 gap-6">
           <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
           <ForecastChart data={forecast} unit={unit} loading={loading} />
+        </section>
+
+        <section>
+          <ForecastTimeline data={forecast} unit={unit} />
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">

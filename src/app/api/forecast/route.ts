@@ -85,6 +85,9 @@ export async function GET(request: Request) {
       probabilityOfPrecipitation: mapSeries("probabilityOfPrecipitation"),
       maxTemperature: mapSeries("maxTemperature"),
       minTemperature: mapSeries("minTemperature"),
+      windDirection: mapSeries("windDirection"),
+      windSpeed: mapSeries("windSpeed"),
+      skyCover: mapSeries("skyCover"),
     };
 
     return NextResponse.json(payload, { status: 200 });

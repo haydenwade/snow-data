@@ -106,7 +106,7 @@ export default function ForecastChart({
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">
         <CloudSnow className="h-5 w-5 text-blue-400" />
         <h2 className="font-semibold text-white">7-Day Forecast</h2>
       </div>

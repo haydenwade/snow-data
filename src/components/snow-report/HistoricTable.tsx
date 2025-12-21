@@ -62,7 +62,7 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
       </div>
       <div className="p-0">
         {/* Single table with sticky header to keep columns perfectly aligned */}
-        <div className="overflow-x-auto overflow-y-auto h-80">
+        <div className="overflow-x-auto overflow-y-auto h-100">
           <table className="min-w-full text-sm table-fixed">
             <thead className="sticky top-0 z-10 bg-slate-800/70 backdrop-blur-sm">
               <tr className="border-slate-700/50">

@@ -33,6 +33,9 @@ export type ForecastGridData = {
   probabilityOfPrecipitation: GridSeries; // %
   maxTemperature?: GridSeries; // degC
   minTemperature?: GridSeries; // degC
+  windDirection?: GridSeries; // degrees
+  windSpeed?: GridSeries; // km/h
+  skyCover?: GridSeries; // %
 };
 
 export type ForecastDaily = {
@@ -43,6 +46,11 @@ export type ForecastDaily = {
   tMaxF?: number;
   tMinC?: number;
   tMaxC?: number;
+  // aggregated wind (mph) and direction (degrees)
+  windMph?: number;
+  windDirDeg?: number;
+  // sky cover percent (0-100)
+  skyCoverPercent?: number;
 };
 
 export const DENVER_TZ = "America/Denver";
@@ -61,6 +69,21 @@ export function toInches(mm: number) {
 
 export function cToF(c: number) {
   return (c * 9) / 5 + 32;
+}
+
+export function degToCompass(deg?: number) {
+  if (deg == null || Number.isNaN(deg)) return "";
+  const idx = Math.round(((deg % 360) / 45)) % 8;
+  return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][idx];
+}
+
+export function skyCoverLabel(p?: number) {
+  if (p == null || Number.isNaN(p)) return "—";
+  if (p <= 10) return "Clear";
+  if (p <= 35) return "Mostly Sunny";
+  if (p <= 65) return "Partly Cloudy";
+  if (p <= 90) return "Mostly Cloudy";
+  return "Overcast";
 }
 
 export function parseValidTime(validTime: string): {
@@ -95,6 +118,9 @@ export function aggregateForecastToDaily(
     {
       snowIn: number;
       pops: number[];
+      windSpeeds: number[];
+      windDirs: { dir: number; speed: number }[];
+      skyCovers: number[];
       tMaxF?: number;
       tMinF?: number;
       tMaxC?: number;
@@ -102,7 +128,7 @@ export function aggregateForecastToDaily(
     }
   > = {};
   const pushDay = (day: string) => {
-    if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [] };
+    if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [], windSpeeds: [], windDirs: [], skyCovers: [] };
   };
 
   const useQpfFallback =
@@ -131,6 +157,41 @@ export function aggregateForecastToDaily(
       dayBuckets[day].pops.push(p.value);
     });
   });
+
+  // wind speed/direction and sky cover - expand to hourly and collect
+  if (grid.windSpeed && grid.windSpeed.points) {
+    grid.windSpeed.points.forEach((p) => {
+      const hoursList = expandToHourly(p);
+      hoursList.forEach((h) => {
+        const day = dateKeyDenver(h);
+        pushDay(day);
+        // store raw value for later normalization
+        dayBuckets[day].windSpeeds.push(p.value);
+      });
+    });
+  }
+
+  if (grid.windDirection && grid.windDirection.points) {
+    grid.windDirection.points.forEach((p) => {
+      const hoursList = expandToHourly(p);
+      hoursList.forEach((h) => {
+        const day = dateKeyDenver(h);
+        pushDay(day);
+        dayBuckets[day].windDirs.push({ dir: p.value, speed: 0 });
+      });
+    });
+  }
+
+  if (grid.skyCover && grid.skyCover.points) {
+    grid.skyCover.points.forEach((p) => {
+      const hoursList = expandToHourly(p);
+      hoursList.forEach((h) => {
+        const day = dateKeyDenver(h);
+        pushDay(day);
+        dayBuckets[day].skyCovers.push(p.value);
+      });
+    });
+  }
 
   // max/min temperature series provide one value per day (start timestamp),
   // so map each point to its calendar day directly without expanding to hourly slots.
@@ -167,10 +228,46 @@ export function aggregateForecastToDaily(
     const tMinF = b.tMinF;
     const tMaxC = b.tMaxC;
     const tMinC = b.tMinC;
+    // compute average wind speed: values from grid.windSpeed are treated as km/h
+    let windMph: number | undefined = undefined;
+    if (b.windSpeeds && b.windSpeeds.length) {
+      const sum = b.windSpeeds.reduce((s, v) => s + (Number.isFinite(v) ? v : 0), 0);
+      const avgKph = sum / b.windSpeeds.length;
+      // convert km/h to mph
+      windMph = Math.round(avgKph * 0.621371);
+    }
+
+    // weighted average wind direction (vector average)
+    let windDirDeg: number | undefined = undefined;
+    if (b.windDirs && b.windDirs.length) {
+      const dirs = b.windDirs.map((wd, i) => ({ dir: wd.dir, speed: b.windSpeeds[i] ?? 1 }));
+      let x = 0;
+      let y = 0;
+      dirs.forEach((d) => {
+        const rad = (d.dir * Math.PI) / 180;
+        const w = d.speed || 1;
+        x += Math.cos(rad) * w;
+        y += Math.sin(rad) * w;
+      });
+      if (x !== 0 || y !== 0) {
+        const ang = (Math.atan2(y, x) * 180) / Math.PI;
+        windDirDeg = Math.round((ang + 360) % 360);
+      }
+    }
+
+    let skyCoverPercent: number | undefined = undefined;
+    if (b.skyCovers && b.skyCovers.length) {
+      const sum = b.skyCovers.reduce((s, v) => s + (Number.isFinite(v) ? v : 0), 0);
+      skyCoverPercent = Math.round(sum / b.skyCovers.length);
+    }
+
     return {
       date: day,
       snowIn: Number(b.snowIn.toFixed(2)),
       pop,
+      windMph,
+      windDirDeg,
+      skyCoverPercent,
       tMinF,
       tMaxF,
       tMinC,
