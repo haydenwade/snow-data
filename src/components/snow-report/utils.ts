@@ -11,6 +11,7 @@ export type Location = {
   lon: number;
   huc: string;
   stationTriplet: string;
+  logoUrl?: string;
 };
 
 export type HistoricDay = {
@@ -62,7 +63,10 @@ export function cToF(c: number) {
   return (c * 9) / 5 + 32;
 }
 
-export function parseValidTime(validTime: string): { start: string; hours: number } {
+export function parseValidTime(validTime: string): {
+  start: string;
+  hours: number;
+} {
   const [start, dur] = validTime.split("/");
   let hours = 0;
   const m = /PT(\d+)([HM])/i.exec(dur);
@@ -83,14 +87,30 @@ export function expandToHourly(p: SeriesPoint): Date[] {
   return arr;
 }
 
-export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[] {
-  const dayBuckets: Record<string, { snowIn: number; pops: number[]; tMaxF?: number; tMinF?: number; tMaxC?: number; tMinC?: number }> = {};
+export function aggregateForecastToDaily(
+  grid: ForecastGridData
+): ForecastDaily[] {
+  const dayBuckets: Record<
+    string,
+    {
+      snowIn: number;
+      pops: number[];
+      tMaxF?: number;
+      tMinF?: number;
+      tMaxC?: number;
+      tMinC?: number;
+    }
+  > = {};
   const pushDay = (day: string) => {
     if (!dayBuckets[day]) dayBuckets[day] = { snowIn: 0, pops: [] };
   };
 
-  const useQpfFallback = !grid.snowfallAmount?.points?.length && grid.quantitativePrecipitation?.points?.length;
-  const src = useQpfFallback ? grid.quantitativePrecipitation! : grid.snowfallAmount;
+  const useQpfFallback =
+    !grid.snowfallAmount?.points?.length &&
+    grid.quantitativePrecipitation?.points?.length;
+  const src = useQpfFallback
+    ? grid.quantitativePrecipitation!
+    : grid.snowfallAmount;
   src.points.forEach((p) => {
     const hours = Math.max(1, Math.round(p.hours));
     const inches = useQpfFallback ? toInches(p.value) * 12 : toInches(p.value);
@@ -147,17 +167,42 @@ export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[
     const tMinF = b.tMinF;
     const tMaxC = b.tMaxC;
     const tMinC = b.tMinC;
-    return { date: day, snowIn: Number(b.snowIn.toFixed(2)), pop, tMinF, tMaxF, tMinC, tMaxC };
+    return {
+      date: day,
+      snowIn: Number(b.snowIn.toFixed(2)),
+      pop,
+      tMinF,
+      tMaxF,
+      tMinC,
+      tMaxC,
+    };
   });
 }
 
-
 export function formatDateYYYYMMDD(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 export const LOCATIONS: Location[] = [
+  {
+    id: "parkcity",
+    stationId: "814",
+    name: "Park City, Utah",
+    network: "SNOTEL",
+    county: "Summit",
+    elevation: "9,260 ft",
+    lat: 40.62,
+    lon: -111.53,
+    huc: "160201020101",
+    logoUrl: "/parkcity-logo.png",
+    stationTriplet: "814:UT:SNTL",
+  },
   {
     id: "alta",
     stationId: "1308",
@@ -168,19 +213,8 @@ export const LOCATIONS: Location[] = [
     lat: 40.59,
     lon: -111.64,
     huc: "160202040202",
+    logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
-  },
-  {
-    id: "brighton",
-    stationId: "366",
-    name: "Brighton, Utah",
-    network: "SNOTEL",
-    county: "Salt Lake",
-    elevation: "8,790 ft",
-    lat: 40.6,
-    lon: -111.58,
-    huc: "160202040201",
-    stationTriplet: "366:UT:SNTL",
   },
   {
     id: "snowbird",
@@ -192,19 +226,34 @@ export const LOCATIONS: Location[] = [
     lat: 40.57,
     lon: -111.66,
     huc: "160202040202",
+    logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
   },
   {
-    id: "parkcity",
-    stationId: "814",
-    name: "Park City, Utah",
+    id: "brighton",
+    stationId: "366",
+    name: "Brighton, Utah",
     network: "SNOTEL",
-    county: "Summit",
-    elevation: "9,260 ft",
-    lat: 40.62,
-    lon: -111.53,
-    huc: "160201020101",
-    stationTriplet: "814:UT:SNTL",
+    county: "Salt Lake",
+    elevation: "8,790 ft",
+    lat: 40.6,
+    lon: -111.58,
+    huc: "160202040201",
+    logoUrl: "/brighton-logo.png",
+    stationTriplet: "366:UT:SNTL",
+  },
+  {
+    id: "powdermountain",
+    stationId: "1300",
+    name: "Powder Mountain, Utah",
+    network: "SNOTEL",
+    county: "Cache",
+    elevation: "8,490 ft",
+    lat: 41.37,
+    lon: -111.77,
+    huc: "160102030102",
+    logoUrl: "/powdermtn-logo.svg",
+    stationTriplet: "1300:UT:SNTL",
   },
   {
     id: "triallake",
@@ -242,17 +291,4 @@ export const LOCATIONS: Location[] = [
     huc: "140600040103",
     stationTriplet: "795:UT:SNTL",
   },
-  {
-    id: "powdermountain",
-    stationId: "1300",
-    name: "Powder Mountain, Utah",
-    network: "SNOTEL",
-    county: "Cache",
-    elevation: "8,490 ft",
-    lat: 41.37,
-    lon: -111.77,
-    huc: "160102030102",
-    stationTriplet: "1300:UT:SNTL",
-  },
-  
 ];
