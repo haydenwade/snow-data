@@ -102,7 +102,7 @@ export default function LocationPage() {
             <StationMap location={location}/>
           </div>
           <div className="md:col-span-1 h-full">
-            <StationMetadata station={location} />
+            <StationMetadata location={location} />
           </div>
         </section>
 

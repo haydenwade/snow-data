@@ -1,5 +1,6 @@
 "use client";
 import { useCallback } from "react";
+import Link from "next/link";
 import { Mountain, Snowflake } from "lucide-react";
 import type { Location, Unit } from "./utils";
 
@@ -22,12 +23,12 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
         {/* Top branding row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="relative">
+            <Link href="/" aria-label="Home" className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">
               <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
               <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
                 <Snowflake className="h-8 w-8 text-white" />
               </div>
-            </div>
+            </Link>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 Snow Report | {stationName}

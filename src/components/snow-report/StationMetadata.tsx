@@ -1,24 +1,15 @@
 "use client";
 import { Mountain, Compass, MapPin, Database, Layers, Hash } from "lucide-react";
+import { Location } from "./utils";
 
-type Station = {
-  id: string | number;
-  network: string;
-  county: string;
-  elevation: string;
-  lat: number;
-  lon: number;
-  huc: string;
-};
-
-export default function StationMetadata({ station }: { station: Station }) {
+export default function StationMetadata({ location }: { location: Location }) {
   const items = [
-    { icon: Hash, label: "Station ID", value: station.id },
-    { icon: Database, label: "Network", value: station.network },
-    { icon: MapPin, label: "County", value: station.county },
-    { icon: Mountain, label: "Elevation", value: station.elevation },
-    { icon: Compass, label: "Coordinates", value: `${station.lat}°N, ${Math.abs(station.lon)}°W` },
-    { icon: Layers, label: "HUC", value: station.huc },
+    { icon: Hash, label: "Station ID", value: location.stationId },
+    { icon: Database, label: "Network", value: location.network },
+    { icon: MapPin, label: "County", value: location.county },
+    { icon: Mountain, label: "Elevation", value: location.elevation },
+    { icon: Compass, label: "Coordinates", value: `${location.lat}°N, ${Math.abs(location.lon)}°W` },
+    { icon: Layers, label: "HUC", value: location.huc },
   ];
 
   return (
