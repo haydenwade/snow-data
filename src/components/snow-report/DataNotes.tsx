@@ -1,8 +1,10 @@
 "use client";
 
 import { Info, Database, Cloud } from "lucide-react";
+import { Location } from "./utils";
 
-export default function DataNotes() {
+export default function DataNotes(props:{location:Location}) {
+  const { location } = props;
   return (
     <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/30 p-4">
       <div className="flex items-center gap-2 mb-3">
@@ -20,7 +22,7 @@ export default function DataNotes() {
           </summary>
           <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
             <p>
-              <strong className="text-slate-300">Data Source:</strong> USDA Natural Resources Conservation Service (NRCS) SNOTEL network, Station #1308 at Alta, Utah.
+              <strong className="text-slate-300">Data Source:</strong> USDA Natural Resources Conservation Service (NRCS) SNOTEL network, Station #{location.stationId} at {location.name}.
             </p>
             <p>
               <strong className="text-slate-300">WTEQ (Snow Water Equivalent):</strong> The amount of water contained within the snowpack, measured in inches. This represents how much water would result if the snowpack melted.
@@ -42,7 +44,7 @@ export default function DataNotes() {
           </summary>
           <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
             <p>
-              <strong className="text-slate-300">Data Source:</strong> National Weather Service (NWS) via api.weather.gov, using gridpoint data for coordinates 40.59°N, 111.64°W.
+              <strong className="text-slate-300">Data Source:</strong> National Weather Service (NWS) via api.weather.gov, using gridpoint data for coordinates {location.lat}, {location.lon}.
             </p>
             <p>
               <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snow accumulation from NWS gridpoint data. Original values in millimeters are converted to inches (÷25.4) and aggregated into daily totals.
@@ -51,7 +53,7 @@ export default function DataNotes() {
               <strong className="text-slate-300">PoP (Probability of Precipitation):</strong> The maximum probability of precipitation for each forecast period within the day.
             </p>
             <p>
-              <strong className="text-slate-300">Daily Aggregation:</strong> NWS provides data in variable time windows. These are grouped by calendar day (America/Denver timezone) and summed for daily totals.
+              <strong className="text-slate-300">Daily Aggregation:</strong> NWS provides data in variable time windows. These are grouped by calendar day in local timezone and summed for daily totals.
             </p>
           </div>
         </details>

@@ -1,5 +1,18 @@
 export type Unit = "in" | "mm";
 
+export type Location = {
+  id: string;
+  stationId: string;
+  name: string;
+  network: string;
+  county: string;
+  elevation: string;
+  lat: number;
+  lon: number;
+  huc: string;
+  stationTriplet: string;
+};
+
 export type HistoricDay = {
   date: string;
   derivedSnowfall?: number | null;
@@ -143,3 +156,103 @@ export function formatDateYYYYMMDD(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
   return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 }
+
+export const LOCATIONS: Location[] = [
+  {
+    id: "alta",
+    stationId: "1308",
+    name: "Alta, Utah",
+    network: "SNOTEL",
+    county: "Salt Lake",
+    elevation: "8,750 ft",
+    lat: 40.59,
+    lon: -111.64,
+    huc: "160202040202",
+    stationTriplet: "1308:UT:SNTL",
+  },
+  {
+    id: "brighton",
+    stationId: "366",
+    name: "Brighton, Utah",
+    network: "SNOTEL",
+    county: "Salt Lake",
+    elevation: "8,790 ft",
+    lat: 40.6,
+    lon: -111.58,
+    huc: "160202040201",
+    stationTriplet: "366:UT:SNTL",
+  },
+  {
+    id: "snowbird",
+    stationId: "766",
+    name: "Snowbird, Utah",
+    network: "SNOTEL",
+    county: "Salt Lake",
+    elevation: "9,170 ft",
+    lat: 40.57,
+    lon: -111.66,
+    huc: "160202040202",
+    stationTriplet: "766:UT:SNTL",
+  },
+  {
+    id: "parkcity",
+    stationId: "814",
+    name: "Park City, Utah",
+    network: "SNOTEL",
+    county: "Summit",
+    elevation: "9,260 ft",
+    lat: 40.62,
+    lon: -111.53,
+    huc: "160201020101",
+    stationTriplet: "814:UT:SNTL",
+  },
+  {
+    id: "triallake",
+    stationId: "828",
+    name: "Trial Lake, Utah",
+    network: "SNOTEL",
+    county: "Summit",
+    elevation: "9,970 ft",
+    lat: 40.68,
+    lon: -110.95,
+    huc: "160202030102",
+    stationTriplet: "828:UT:SNTL",
+  },
+  {
+    id: "wolfcreekpeak",
+    stationId: "1164",
+    name: "Wolf Creek Peak, Utah",
+    network: "SNOTEL",
+    county: "Wasatch",
+    elevation: "9,770 ft",
+    lat: 40.48,
+    lon: -111.04,
+    huc: "160202030104",
+    stationTriplet: "1164:UT:SNTL",
+  },
+  {
+    id: "strawberrydivide",
+    stationId: "795",
+    name: "Strawberry Divide, Utah",
+    network: "SNOTEL",
+    county: "Wasatch",
+    elevation: "8,100 ft",
+    lat: 40.16,
+    lon: -111.21,
+    huc: "140600040103",
+    stationTriplet: "795:UT:SNTL",
+  },
+  {
+    id: "powdermountain",
+    stationId: "1300",
+    name: "Powder Mountain, Utah",
+    network: "SNOTEL",
+    county: "Cache",
+    elevation: "8,490 ft",
+    lat: 41.37,
+    lon: -111.77,
+    huc: "160102030102",
+    stationTriplet: "1300:UT:SNTL",
+  },
+  
+];

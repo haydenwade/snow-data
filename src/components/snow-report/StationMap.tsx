@@ -1,8 +1,10 @@
 "use client";
 import { MapPin } from "lucide-react";
+import { Location } from "./utils";
 
-export default function StationMap() {
-  const lat = 40.59, lon = -111.64;
+export default function StationMap(props:{location:Location}) {
+  const { location } = props;
+  const lat = location.lat, lon = location.lon;
   const bbox = `${lon-0.05},${lat-0.03},${lon+0.05},${lat+0.03}`;
   const marker = `${lat},${lon}`;
   const src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${encodeURIComponent(marker)}`;
@@ -14,7 +16,7 @@ export default function StationMap() {
           <h2 className="font-semibold text-white">Station Location</h2>
         </div>
       </div>
-      <iframe className="w-full flex-1 min-h-[16rem]" src={src} title="Alta SNOTEL Map" />
+      <iframe className="w-full flex-1 min-h-[16rem]" src={src} title="SNOTEL Map" />
     </div>
   );
 }

@@ -1,20 +1,20 @@
 "use client";
 import { useCallback } from "react";
 import { Mountain, Snowflake } from "lucide-react";
-import type { Unit } from "./utils";
+import type { Location, Unit } from "./utils";
 
 type HeaderProps = {
   unit: Unit;
   range: 15 | 30;
   onUnit: (u: Unit) => void;
   onRange: (r: 15 | 30) => void;
-  station?: { name?: string };
+  location: Location;
 };
 
-export default function Header({ unit, range, onUnit, onRange, station }: HeaderProps) {
+export default function Header({ unit, range, onUnit, onRange, location }: HeaderProps) {
   const setIn = useCallback(() => onUnit("in"), [onUnit]);
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
-  const stationName = station?.name ?? "Alta, Utah";
+  const stationName = location?.name ?? "Station X";
 
   return (
     <div className="bg-slate-900/70 border-b border-slate-800">
@@ -30,11 +30,11 @@ export default function Header({ unit, range, onUnit, onRange, station }: Header
             </div>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                Alta Snow Report
+                Snow Report | {stationName}
               </h1>
               <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
                 <Mountain className="h-4 w-4" />
-                SNOTEL + NWS Forecast • {stationName}
+                SNOTEL + NWS Forecast Data
               </p>
             </div>
           </div>

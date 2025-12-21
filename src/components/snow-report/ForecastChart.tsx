@@ -1,18 +1,40 @@
 "use client";
 import { CloudSnow } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  LabelList,
+} from "recharts";
 import type { Unit, ForecastDaily } from "./utils";
 
 function fmtDisplay(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 }
 function fmtShort(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
   return d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
 }
 
-export default function ForecastChart({ data, unit, loading }: { data: ForecastDaily[]; unit: Unit; loading?: boolean }) {
+export default function ForecastChart({
+  data,
+  unit,
+  loading,
+}: {
+  data: ForecastDaily[];
+  unit: Unit;
+  loading?: boolean;
+}) {
   const chartData = data.map((d) => ({
     ...d,
     displayDate: fmtDisplay(d.date),
@@ -29,18 +51,23 @@ export default function ForecastChart({ data, unit, loading }: { data: ForecastD
       return (
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-xl">
           <p className="text-sm font-medium text-white">{item.displayDate}</p>
-          <p className="text-lg font-bold text-blue-400">{item.value.toFixed(1)}{unitLabel}</p>
+          <p className="text-lg font-bold text-blue-400">
+            {item.value.toFixed(1)}
+            {unitLabel}
+          </p>
           <div className="flex items-center gap-4 mt-1">
             <p className="text-xs text-slate-400">PoP: {item.pop}%</p>
             {unit === "mm" ? (
               item.tMaxC != null && item.tMinC != null ? (
-                <p className="text-xs text-slate-400">{item.tMaxC}°/{item.tMinC}°C</p>
+                <p className="text-xs text-slate-400">
+                  {item.tMaxC}°/{item.tMinC}°C
+                </p>
               ) : null
-            ) : (
-              item.tMaxF != null && item.tMinF != null ? (
-                <p className="text-xs text-slate-400">{Math.round(item.tMaxF)}°/{Math.round(item.tMinF)}°F</p>
-              ) : null
-            )}
+            ) : item.tMaxF != null && item.tMinF != null ? (
+              <p className="text-xs text-slate-400">
+                {Math.round(item.tMaxF)}°/{Math.round(item.tMinF)}°F
+              </p>
+            ) : null}
           </div>
         </div>
       );
@@ -61,11 +88,19 @@ export default function ForecastChart({ data, unit, loading }: { data: ForecastD
     const { x, y, width, value } = props;
     if (value == null) return null;
     const pop = Number(value);
-    const fill = pop >= 70 ? '#93c5fd' : pop >= 40 ? '#60a5fa' : '#64748b';
-    const textFill = pop >= 40 ? '#dbeafe' : '#94a3b8';
+    const fill = pop >= 70 ? "#93c5fd" : pop >= 40 ? "#60a5fa" : "#64748b";
+    const textFill = pop >= 40 ? "#dbeafe" : "#94a3b8";
     const labelY = Math.min(y - 6, 12);
     return (
-      <text x={x + width / 2} y={labelY} fill={textFill} fontSize={10} textAnchor="middle">{pop}%</text>
+      <text
+        x={x + width / 2}
+        y={labelY}
+        fill={textFill}
+        fontSize={10}
+        textAnchor="middle"
+      >
+        {pop}%
+      </text>
     );
   };
 
@@ -77,16 +112,36 @@ export default function ForecastChart({ data, unit, loading }: { data: ForecastD
       </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
-            <XAxis dataKey="shortDate" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#475569' }} tickLine={false} />
-            <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#475569' }} tickLine={false} tickFormatter={(v) => `${v}${unitLabel}`} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 28, right: 10, left: -10, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="shortDate"
+              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              axisLine={{ stroke: "#475569" }}
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              axisLine={{ stroke: "#475569" }}
+              tickLine={false}
+              tickFormatter={(v) => `${v}${unitLabel}`}
+            />
+            <Tooltip
+              content={<CustomTooltip />}
+              cursor={{ fill: "rgba(255,255,255,0.05)" }}
+            />
             <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={50}>
               <LabelList dataKey="pop" content={<PopLabel />} />
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.value > 0 ? '#3b82f6' : '#475569'} fillOpacity={0.7 + (entry.value / maxValue) * 0.3} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.value > 0 ? "#3b82f6" : "#475569"}
+                  fillOpacity={0.7 + (entry.value / maxValue) * 0.3}
+                />
               ))}
-               <LabelList
+              <LabelList
                 dataKey="value"
                 position="top"
                 formatter={(v: number) => (v > 0 ? `${v}${unitLabel}` : "")}

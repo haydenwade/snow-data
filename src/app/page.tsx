@@ -1,114 +1,32 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import Header from "../components/snow-report/Header";
-import StationMap from "../components/snow-report/StationMap";
-import StationMetadata from "../components/snow-report/StationMetadata";
-import SnowSummaryStrip from "../components/snow-report/SnowSummaryStrip";
-import HistoricChart from "../components/snow-report/HistoricChart";
-import ForecastChart from "../components/snow-report/ForecastChart";
-import HistoricTable from "../components/snow-report/HistoricTable";
-import ForecastTable from "../components/snow-report/ForecastTable";
-import DataNotes from "../components/snow-report/DataNotes";
-import {
-  type Unit,
-  type HistoricDay,
-  type ForecastDaily,
-  type ForecastGridData,
-  aggregateForecastToDaily,
-} from "../components/snow-report/utils";
-
-// helper imports moved into components/snow-report/utils
-
-// Real data loaders (client-side via API routes)
-async function fetchHistoric(days: number): Promise<HistoricDay[]> {
-  const req = await fetch(`/api/historic?days=${days}`, { cache: "no-store" });
-  if (!req.ok) {
-    let detail = "";
-    try { const j = await req.json(); detail = j?.error || JSON.stringify(j); } catch {}
-    throw new Error(`Historic fetch failed: ${req.status}${detail ? ` — ${detail}` : ""}`);
-  }
-  const res = await req.json();
-  return res.data;
-}
-
-async function fetchForecastGrid(): Promise<ForecastGridData> {
-  const res = await fetch(`/api/forecast`, { cache: "no-store" });
-  if (!res.ok) {
-    let detail = "";
-    try { const j = await res.json(); detail = j?.error || JSON.stringify(j); } catch {}
-    throw new Error(`Forecast fetch failed: ${res.status}${detail ? ` — ${detail}` : ""}`);
-  }
-  const j = await res.json();
-  return j as ForecastGridData;
-}
-
-// UI components are now split into files under components/snow-report
+import Link from "next/link";
+import { LOCATIONS } from "../components/snow-report/utils";
 
 export default function Home() {
-  const [unit, setUnit] = useState<Unit>("in");
-  const [range, setRange] = useState<15 | 30>(15);
-  const [historic, setHistoric] = useState<HistoricDay[]>([]);
-  const [forecast, setForecast] = useState<ForecastDaily[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-
-  const load = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const hist = await fetchHistoric(30);
-      const grid = await fetchForecastGrid();
-      const fc = aggregateForecastToDaily(grid);
-      setHistoric(hist);
-      setForecast(fc);
-      setUpdatedAt(new Date());
-    } catch (e) {
-      console.error(e);
-      setError((e as Error)?.message || "Failed to load data");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { void load(); }, []);
-
-  // For tables we prefer newest first (descending). Keep charts chronological (ascending).
-  const lastNHistoricDesc = useMemo(() => [...historic.slice(-range)].reverse(), [historic, range]);
-  const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
-
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header unit={unit} range={range} onUnit={setUnit} onRange={setRange} station={{ name: "Alta, Utah" }} />
-      {error && (
-        <div className="max-w-6xl mx-auto px-4 pb-3"><div className="text-xs text-red-400">{error}</div></div>
-      )}
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <h1 className="text-4xl font-bold text-center mb-8">Snow Data Reports</h1>
+        <p className="text-xl text-center text-slate-300 mb-12">
+          Select a location to view snow conditions, historic data, and forecasts.
+        </p>
 
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <section className="grid gap-6 md:grid-cols-3 items-stretch">
-          <div className="md:col-span-2 h-full">
-            <StationMap />
-          </div>
-          <div className="md:col-span-1 h-full">
-            <StationMetadata station={{ id: "1308", network: "SNOTEL", county: "Salt Lake", elevation: "8,750 ft", lat: 40.59, lon: -111.64, huc: "160202040202" }} />
-          </div>
-        </section>
-
-        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
-
-        <section className="grid md:grid-cols-2 gap-6">
-          <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
-          <ForecastChart data={forecast} unit={unit} loading={loading} />
-        </section>
-
-        <section className="grid md:grid-cols-2 gap-6">
-          <HistoricTable data={lastNHistoricDesc} unit={unit} />
-          <ForecastTable data={forecast} unit={unit} />
-        </section>
-
-        <DataNotes />
-      </main>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {LOCATIONS.map((location) => (
+            <Link
+              key={location.id}
+              href={`/location/${location.id}`}
+              className="block p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
+            >
+              <h2 className="text-xl font-semibold mb-2">{location.name}</h2>
+              <div className="text-sm text-slate-400 space-y-1">
+                <p>Network: {location.network}</p>
+                <p>County: {location.county}</p>
+                <p>Elevation: {location.elevation}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

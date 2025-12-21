@@ -1,4 +1,4 @@
-import { HistoricDay } from "@/components/snow-report/utils";
+import { HistoricDay, LOCATIONS } from "@/components/snow-report/utils";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -55,6 +55,17 @@ export async function GET(
   request: Request
 ): Promise<NextResponse<GetResponseType>> {
   const { searchParams } = new URL(request.url);
+
+  const locationId = searchParams.get("locationId");
+  const location = LOCATIONS.find((l) => l.id === locationId);
+  if (!location) {
+    return NextResponse.json(
+      { error: "No location found matching locationId" },
+      { status: 404 }
+    );
+  }
+
+
   // Allow custom range via query; default to last 30 days through today.
   // Some stations may not have published today's daily value yet; that's fine—AWDB will return what exists.
   const endParam = searchParams.get("endDate");
@@ -74,7 +85,7 @@ export async function GET(
 
   // AWDB endpoint pieces
   const BASE = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data";
-  const stationTriplet = "1308:UT:SNTL";
+  const stationTriplet = location.stationTriplet; // e.g., "1308:SNTL:UT"
   const elements = "SNWD";
   const duration = "DAILY";
   const unitSystem = "ENGLISH";

@@ -1,3 +1,4 @@
+import { LOCATIONS } from "@/components/snow-report/utils";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -17,10 +18,23 @@ function parseValidTime(validTime: string): { start: string; hours: number } {
   return { start, hours };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    
+      const locationId = searchParams.get("locationId");
+      const location = LOCATIONS.find((l) => l.id === locationId);
+      if (!location) {
+        return NextResponse.json(
+          { error: "No location found matching locationId" },
+          { status: 404 }
+        );
+      }
+    
+
+
     // Step 1: grid lookup
-    const pointsRes = await fetch("https://api.weather.gov/points/40.59,-111.64", {
+    const pointsRes = await fetch(`https://api.weather.gov/points/${location.lat},${location.lon}`, {
       headers: {
         // Per api.weather.gov policy, include a descriptive UA with contact info
         "User-Agent": "AltaSnowReport/1.0 (snow-data dev; contact: support@alta-snow.local)",
