@@ -37,8 +37,8 @@ export default function HistoricChart({
       day: "numeric",
       timeZone: "UTC",
     }),
-    value: unit === "mm" ? d.derivedSnowfallIn * 25.4 : d.derivedSnowfallIn,
-    startDepthInches: (d as any).startSnowDepth ?? d.snowDepth,
+    value: unit === "mm" ? d.derivedSnowfall * 25.4 : d.derivedSnowfall,
+    startDepthInches: d.snowDepthAtStartOfDay,
   }));
 
   const unitLabel = unit === "mm" ? "mm" : '"';

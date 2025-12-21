@@ -15,28 +15,21 @@ import {
   type HistoricDay,
   type ForecastDaily,
   type ForecastGridData,
-  deriveDailySnowfall,
   aggregateForecastToDaily,
 } from "../components/snow-report/utils";
 
 // helper imports moved into components/snow-report/utils
 
 // Real data loaders (client-side via API routes)
-async function fetchHistoric(days: number): Promise<{ date: string; snowDepth: number | null; swe: number | null }[]> {
-  const res = await fetch(`/api/historic?days=${days}`, { cache: "no-store" });
-  if (!res.ok) {
+async function fetchHistoric(days: number): Promise<HistoricDay[]> {
+  const req = await fetch(`/api/historic?days=${days}`, { cache: "no-store" });
+  if (!req.ok) {
     let detail = "";
-    try { const j = await res.json(); detail = j?.error || JSON.stringify(j); } catch {}
-    throw new Error(`Historic fetch failed: ${res.status}${detail ? ` — ${detail}` : ""}`);
+    try { const j = await req.json(); detail = j?.error || JSON.stringify(j); } catch {}
+    throw new Error(`Historic fetch failed: ${req.status}${detail ? ` — ${detail}` : ""}`);
   }
-  const data = await res.json();
-  const arr = Array.isArray(data) ? data : (data?.data ?? []);
-  // Map new schema {date, snowDepth, swe, precip} → UI shape {date, snowDepth, swe}
-  return arr.map((r: any) => ({
-    date: r.date,
-    snowDepth: r.snowDepth ?? r.snwDepth ?? null,
-    swe: r.swe ?? r.WTEQ ?? null,
-  }));
+  const res = await req.json();
+  return res.data;
 }
 
 async function fetchForecastGrid(): Promise<ForecastGridData> {
@@ -65,8 +58,7 @@ export default function Home() {
     try {
       setLoading(true);
       setError(null);
-      const histRaw = await fetchHistoric(30);
-      const hist = deriveDailySnowfall(histRaw);
+      const hist = await fetchHistoric(30);
       const grid = await fetchForecastGrid();
       const fc = aggregateForecastToDaily(grid);
       setHistoric(hist);

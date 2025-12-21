@@ -1,3 +1,4 @@
+import { HistoricDay } from "@/components/snow-report/utils";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -7,9 +8,7 @@ export const runtime = "nodejs";
 
 type DailyRecord = {
   date: string; // YYYY-MM-DD
-  snowDepth: number | null; // SNWD in inches
-  swe: number | null; // WTEQ in inches
-  precip: number | null; // PREC in inches
+  snowDepthAtStartOfDay: number | null; // SNWD in inches
 };
 
 function toISODate(d: Date) {
@@ -46,7 +45,15 @@ function normalizeDate(input: any): string | null {
   return null;
 }
 
-export async function GET(request: Request) {
+interface GetResponseType {
+  error?: string;
+  detail?: string;
+  data?: HistoricDay[];
+}
+
+export async function GET(
+  request: Request
+): Promise<NextResponse<GetResponseType>> {
   const { searchParams } = new URL(request.url);
   // Allow custom range via query; default to last 30 days through today.
   // Some stations may not have published today's daily value yet; that's fine—AWDB will return what exists.
@@ -68,7 +75,7 @@ export async function GET(request: Request) {
   // AWDB endpoint pieces
   const BASE = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data";
   const stationTriplet = "1308:UT:SNTL";
-  const elements = "WTEQ,SNWD,PREC";
+  const elements = "SNWD";
   const duration = "DAILY";
   const unitSystem = "ENGLISH";
 
@@ -87,7 +94,7 @@ export async function GET(request: Request) {
     const res = await fetch(url, {
       headers: {
         "User-Agent":
-          "AltaSnowReport/1.0 (snow-data dev; contact: support@alta-snow.local)",
+          "AltaSnowReport/1.0 (snow-data dev; contact: support@alta-snow.local)", //TODO update contact info
         Accept: "application/json",
       },
       cache: "no-store",
@@ -124,17 +131,14 @@ export async function GET(request: Request) {
       if (!iso) return; // skip malformed dates
       const rec = byDate.get(iso) || {
         date: iso,
-        snowDepth: null,
-        swe: null,
-        precip: null,
+        // SNWD -> snowDepthAtStartOfDay (in inches)
+        snowDepthAtStartOfDay: null,
       };
       const num = value == null || value === "" ? null : Number(value);
-      if (el === "WTEQ")
-        rec.swe = Number.isFinite(num as number) ? (num as number) : null;
-      else if (el === "SNWD")
-        rec.snowDepth = Number.isFinite(num as number) ? (num as number) : null;
-      else if (el === "PREC")
-        rec.precip = Number.isFinite(num as number) ? (num as number) : null;
+      if (el === "SNWD")
+        rec.snowDepthAtStartOfDay = Number.isFinite(num as number)
+          ? (num as number)
+          : null;
       byDate.set(iso, rec);
     };
 
@@ -159,9 +163,28 @@ export async function GET(request: Request) {
       }
     }
 
-    const out = Array.from(byDate.values());
-    
-    return NextResponse.json(out, { status: 200 });
+    const dates = Array.from(byDate.keys()).sort();
+    // Attribute derived snowfall to the day it occurred: compute nextStart - curStart
+    const out = dates.map((d, idx) => {
+      const rec = byDate.get(d)!;
+      const next = idx < dates.length - 1 ? byDate.get(dates[idx + 1]) : undefined;
+      let derived = 0;
+      if (
+        next &&
+        rec.snowDepthAtStartOfDay != null &&
+        next.snowDepthAtStartOfDay != null
+      ) {
+        const dd = next.snowDepthAtStartOfDay - rec.snowDepthAtStartOfDay;
+        if (dd > 0) derived = dd;
+      }
+      return {
+        date: rec.date,
+        snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay ?? null,
+        derivedSnowfall: Number(Math.max(0, derived).toFixed(2)),
+      };
+    });
+
+    return NextResponse.json({ data: out }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json(
       { error: e?.message || String(e) },

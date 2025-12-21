@@ -9,7 +9,7 @@ export default function SnowSummaryStrip({ historic, forecast, unit }: { histori
   const last15 = historic.slice(-15); // ascending order
 
   const buckets = useMemo(() => {
-    const vals = last15.map((d) => d.derivedSnowfallIn);
+    const vals = last15.map((d) => d.derivedSnowfall);
     const prev11_15 = sum(vals.slice(0, 5));
     const prev6_10 = sum(vals.slice(5, 10));
     const prev1_5 = sum(vals.slice(10, 15));
@@ -39,7 +39,7 @@ export default function SnowSummaryStrip({ historic, forecast, unit }: { histori
     if (idx < 3) {
       // Historic buckets: slice groups from last15
       const group = idx === 0 ? last15.slice(0, 5) : idx === 1 ? last15.slice(5, 10) : last15.slice(10, 15);
-      return group.map((d) => d.derivedSnowfallIn).reverse();
+      return group.map((d) => d.derivedSnowfall).reverse();
     }
     // Forecast
     const groupF = idx === 4 ? forecast.slice(0, 5) : forecast.slice(5, 7);

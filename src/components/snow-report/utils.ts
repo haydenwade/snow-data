@@ -2,10 +2,8 @@ export type Unit = "in" | "mm";
 
 export type HistoricDay = {
   date: string;
-  snowDepth: number | null;
-  swe: number | null;
-  derivedSnowfallIn: number;
-  startSnowDepth?: number | null;
+  derivedSnowfall: number;
+  snowDepthAtStartOfDay?: number | null;
 };
 
 export type SeriesPoint = { start: string; hours: number; value: number };
@@ -140,23 +138,6 @@ export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[
   });
 }
 
-export function deriveDailySnowfall(historic: { date: string; snowDepth: number | null; swe: number | null }[]): HistoricDay[] {
-  const out: HistoricDay[] = [];
-  for (let i = 0; i < historic.length; i++) {
-    const cur = historic[i];
-    const prev = historic[i - 1];
-    let derived = 0;
-    if (prev) {
-      const dSnwd = cur.snowDepth != null && prev.snowDepth != null ? cur.snowDepth - prev.snowDepth : 0;
-      const dSwe = cur.swe != null && prev.swe != null ? cur.swe - prev.swe : 0;
-      if (dSnwd > 0) derived = dSnwd;
-      else if (dSwe > 0) derived = dSwe * 12;
-    }
-    const startSnow = prev ? prev.snowDepth ?? null : cur.snowDepth ?? null;
-    out.push({ date: cur.date, snowDepth: cur.snowDepth, swe: cur.swe, derivedSnowfallIn: Number(Math.max(0, derived).toFixed(2)), startSnowDepth: startSnow });
-  }
-  return out;
-}
 
 export function formatDateYYYYMMDD(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
