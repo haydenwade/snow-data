@@ -5,7 +5,13 @@ import SnowCell from "./SnowCell";
 import { formatDateYYYYMMDD } from "./utils";
 import type { Unit, HistoricDay } from "./utils";
 
-export default function HistoricTable({ data, unit }: { data: HistoricDay[]; unit: Unit }) {
+export default function HistoricTable({
+  data,
+  unit,
+}: {
+  data: HistoricDay[];
+  unit: Unit;
+}) {
   // `data` is already in the desired order (descending) from the page, so render as-is
   const rows = data;
   function InfoButton() {
@@ -14,7 +20,8 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
     useEffect(() => {
       function onDoc(e: MouseEvent) {
         if (!ref.current) return;
-        if (e.target instanceof Node && !ref.current.contains(e.target)) setOpen(false);
+        if (e.target instanceof Node && !ref.current.contains(e.target))
+          setOpen(false);
       }
       function onKey(e: KeyboardEvent) {
         if (e.key === "Escape") setOpen(false);
@@ -45,8 +52,14 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
             aria-label="Snow depth help"
             className="absolute right-0 mt-2 w-64 bg-slate-800/80 border border-slate-700/50 text-xs text-slate-300 p-3 rounded shadow-lg z-20"
           >
-            <div className="font-medium text-slate-200 mb-1">Snow Depth (start of day)</div>
-            <div className="leading-tight">This shows the measured snow depth at the start of the calendar day (reported by the station). "Snowfall" is the derived new snow during the day (positive increases in depth).</div>
+            <div className="font-medium text-slate-200 mb-1">
+              Snow Depth (start of day)
+            </div>
+            <div className="leading-tight">
+              This shows the measured snow depth at the start of the calendar
+              day (reported by the station). "Snowfall" is the derived new snow
+              during the day (positive increases in depth).
+            </div>
           </div>
         )}
       </div>
@@ -66,8 +79,12 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
           <table className="min-w-full text-sm table-fixed">
             <thead className="sticky top-0 z-10 bg-slate-800/70 backdrop-blur-sm">
               <tr className="border-slate-700/50">
-                <th className="text-left font-medium py-2 pl-4 text-slate-400">Date</th>
-                <th className="text-right font-medium py-2 text-slate-400">Snowfall</th>
+                <th className="text-left font-medium py-2 pl-4 text-slate-400">
+                  Date
+                </th>
+                <th className="text-right font-medium py-2 text-slate-400">
+                  Snowfall
+                </th>
                 <th className="text-right font-medium py-2 pr-4 text-slate-400">
                   <div className="flex items-center justify-end gap-2">
                     <span>Snow Depth</span>
@@ -80,16 +97,27 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
             </thead>
             <tbody>
               {rows.map((d) => (
-                <tr key={d.date} className="border-t border-slate-700/30 hover:bg-slate-700/20">
-                  <td className="py-2 pl-4 text-slate-300 font-medium">{formatDateYYYYMMDD(d.date)}</td>
-                  <td className="py-2 text-right"><SnowCell valueInInches={d.derivedSnowfall!} unit={unit} tone="historic" /></td>
-                  <td className="py-2 pr-4 text-right text-slate-400">{
-                    d.snowDepthAtStartOfDay != null
+                <tr
+                  key={d.date}
+                  className="border-t border-slate-700/30 hover:bg-slate-700/20"
+                >
+                  <td className="py-2 pl-4 text-slate-300 font-medium">
+                    {formatDateYYYYMMDD(d.date)}
+                  </td>
+                  <td className="py-2 text-right">
+                    <SnowCell
+                      valueInInches={d.derivedSnowfall!}
+                      unit={unit}
+                      tone="historic"
+                    />
+                  </td>
+                  <td className="py-2 pr-4 text-right text-slate-400">
+                    {d.snowDepthAtStartOfDay != null
                       ? unit === "mm"
-                        ? `${Math.round(d.snowDepthAtStartOfDay)! * 25.4} mm`
+                        ? `${Math.round(d.snowDepthAtStartOfDay * 25.4)} mm`
                         : `${d.snowDepthAtStartOfDay!.toFixed(0)}"`
-                      : "—"
-                  }</td>
+                      : "—"}
+                  </td>
                 </tr>
               ))}
             </tbody>

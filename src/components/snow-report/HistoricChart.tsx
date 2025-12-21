@@ -86,7 +86,7 @@ export default function HistoricChart({
         </h2>
       </div>
 
-      <div className="h-64">
+      <div className="h-100">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -119,7 +119,7 @@ export default function HistoricChart({
               <LabelList
                 dataKey="value"
                 position="top"
-                formatter={(v: number) => (v > 0 ? `${v}${unitLabel}` : "")}
+                formatter={(v: number) => (v > 0 ? `${Math.round(v)}${unitLabel}` : "")}
                 fill="#e2e8f0"
                 fontSize={10}
               />

@@ -110,7 +110,7 @@ export default function ForecastChart({
         <CloudSnow className="h-5 w-5 text-blue-400" />
         <h2 className="font-semibold text-white">7-Day Forecast</h2>
       </div>
-      <div className="h-64">
+      <div className="h-100">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -144,7 +144,7 @@ export default function ForecastChart({
               <LabelList
                 dataKey="value"
                 position="top"
-                formatter={(v: number) => (v > 0 ? `${v}${unitLabel}` : "")}
+                formatter={(v: number) => (v > 0 ? `${Math.round(v)}${unitLabel}` : "")}
                 fill="#e2e8f0"
                 fontSize={10}
               />
