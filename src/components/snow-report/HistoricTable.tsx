@@ -82,7 +82,7 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
               {rows.map((d) => (
                 <tr key={d.date} className="border-t border-slate-700/30 hover:bg-slate-700/20">
                   <td className="py-2 pl-4 text-slate-300 font-medium">{formatDateYYYYMMDD(d.date)}</td>
-                  <td className="py-2 text-right"><SnowCell valueInInches={d.derivedSnowfall} unit={unit} tone="historic" /></td>
+                  <td className="py-2 text-right"><SnowCell valueInInches={d.derivedSnowfall!} unit={unit} tone="historic" /></td>
                   <td className="py-2 pr-4 text-right text-slate-400">{
                     d.snowDepthAtStartOfDay != null
                       ? unit === "mm"

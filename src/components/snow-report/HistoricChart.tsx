@@ -37,12 +37,12 @@ export default function HistoricChart({
       day: "numeric",
       timeZone: "UTC",
     }),
-    value: unit === "mm" ? d.derivedSnowfall * 25.4 : d.derivedSnowfall,
+    value: unit === "mm" ? d.derivedSnowfall! * 25.4 : d.derivedSnowfall,
     startDepthInches: d.snowDepthAtStartOfDay,
   }));
 
   const unitLabel = unit === "mm" ? "mm" : '"';
-  const maxValue = Math.max(...chartData.map((d) => d.value), 1);
+  const maxValue = Math.max(...chartData.map((d) => d.value!), 1);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
@@ -112,8 +112,8 @@ export default function HistoricChart({
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.value > 0 ? "#f97316" : "#475569"}
-                  fillOpacity={0.8 + (entry.value / maxValue) * 0.2}
+                  fill={entry.value! > 0 ? "#f97316" : "#475569"}
+                  fillOpacity={0.8 + (entry.value! / maxValue) * 0.2}
                 />
               ))}
               <LabelList
