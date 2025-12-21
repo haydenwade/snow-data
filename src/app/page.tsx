@@ -84,7 +84,7 @@ export default function Home() {
 
   // For tables we prefer newest first (descending). Keep charts chronological (ascending).
   const lastNHistoricDesc = useMemo(() => [...historic.slice(-range)].reverse(), [historic, range]);
-  const last15Derived = useMemo(() => historic.slice(-15), [historic]);
+  const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -106,7 +106,7 @@ export default function Home() {
         <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
 
         <section className="grid md:grid-cols-2 gap-6">
-          <HistoricChart data={last15Derived} unit={unit} loading={loading} />
+          <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
           <ForecastChart data={forecast} unit={unit} loading={loading} />
         </section>
 
