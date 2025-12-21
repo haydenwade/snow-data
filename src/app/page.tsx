@@ -59,6 +59,7 @@ export default function Home() {
   const [forecast, setForecast] = useState<ForecastDaily[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
   const load = async () => {
     try {
@@ -70,6 +71,7 @@ export default function Home() {
       const fc = aggregateForecastToDaily(grid);
       setHistoric(hist);
       setForecast(fc);
+      setUpdatedAt(new Date());
     } catch (e) {
       console.error(e);
       setError((e as Error)?.message || "Failed to load data");
@@ -84,34 +86,28 @@ export default function Home() {
   const lastNHistoricDesc = useMemo(() => [...historic.slice(-range)].reverse(), [historic, range]);
   const last15Derived = useMemo(() => historic.slice(-15), [historic]);
 
-  const histLabels = last15Derived.map((d) => d.date);
-  const histValues = last15Derived.map((d) => d.derivedSnowfallIn);
-
-  const fcLabels = forecast.map((d) => d.date);
-  const fcValues = forecast.map((d) => d.snowIn);
-  const fcPops = forecast.map((d) => d.pop);
-
-  const toUnit = (v: number) => unit === "in" ? v : v * 25.4;
-
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header unit={unit} range={range} loading={loading} onUnit={setUnit} onRange={setRange} onRefresh={load} />
+      <Header unit={unit} range={range} loading={loading} onUnit={setUnit} onRange={setRange} onRefresh={load} station={{ name: "Alta, Utah" }} updatedAt={updatedAt} />
       {error && (
         <div className="max-w-6xl mx-auto px-4 pb-3"><div className="text-xs text-red-400">{error}</div></div>
       )}
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <StationMap />
-        <StationMetadata />
-
-        <section className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
-          <div className="p-4 border-b border-slate-700/50"><h2 className="text-sm font-semibold tracking-wide text-white">Snow Summary</h2></div>
-          <div className="p-4"><SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} /></div>
+        <section className="grid gap-6 md:grid-cols-3 items-stretch">
+          <div className="md:col-span-2 h-full">
+            <StationMap />
+          </div>
+          <div className="md:col-span-1 h-full">
+            <StationMetadata station={{ id: "1308", network: "SNOTEL", county: "Salt Lake", elevation: "8,750 ft", lat: 40.59, lon: -111.64, huc: "160202040202" }} />
+          </div>
         </section>
 
+        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
+
         <section className="grid md:grid-cols-2 gap-6">
-          <HistoricChart labels={histLabels} values={histValues} unit={unit} />
-          <ForecastChart labels={fcLabels} values={fcValues} pops={fcPops} unit={unit} />
+          <HistoricChart data={last15Derived} unit={unit} loading={loading} />
+          <ForecastChart data={forecast} unit={unit} loading={loading} />
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">

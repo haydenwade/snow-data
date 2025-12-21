@@ -5,7 +5,8 @@ import { formatDateYYYYMMDD } from "./utils";
 import type { Unit, HistoricDay } from "./utils";
 
 export default function HistoricTable({ data, unit }: { data: HistoricDay[]; unit: Unit }) {
-  const rows = [...data].reverse();
+  // `data` is already in the desired order (descending) from the page, so render as-is
+  const rows = data;
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
       <div className="p-4 border-b border-slate-700/50">
@@ -15,9 +16,10 @@ export default function HistoricTable({ data, unit }: { data: HistoricDay[]; uni
         </div>
       </div>
       <div className="p-0">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
+        {/* Single table with sticky header to keep columns perfectly aligned */}
+        <div className="overflow-x-auto overflow-y-auto h-80">
+          <table className="min-w-full text-sm table-fixed">
+            <thead className="sticky top-0 z-10 bg-slate-800/70 backdrop-blur-sm">
               <tr className="border-slate-700/50">
                 <th className="text-left font-medium py-2 pl-4 text-slate-400">Date</th>
                 <th className="text-right font-medium py-2 text-slate-400">Snowfall</th>

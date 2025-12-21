@@ -1,37 +1,68 @@
 "use client";
 import { useCallback } from "react";
+import { Mountain, Snowflake } from "lucide-react";
 import type { Unit } from "./utils";
 
-export default function Header({ unit, range, loading, onUnit, onRange, onRefresh }: {
+type HeaderProps = {
   unit: Unit;
   range: 15 | 30;
-  loading: boolean;
   onUnit: (u: Unit) => void;
   onRange: (r: 15 | 30) => void;
-  onRefresh: () => void;
-}) {
+  station?: { name?: string };
+};
+
+export default function Header({ unit, range, onUnit, onRange, station }: HeaderProps) {
   const setIn = useCallback(() => onUnit("in"), [onUnit]);
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
+  const stationName = station?.name ?? "Alta, Utah";
 
   return (
-    <header className="sticky top-0 z-20 backdrop-blur bg-slate-900/70 border-b border-slate-800">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Alta Snow Report</h1>
-          <div className="text-sm text-slate-400">SNOTEL + NWS forecast</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex rounded-md overflow-hidden border border-slate-700/50">
-            <button onClick={setIn} className={`px-3 py-1 text-sm ${unit === "in" ? "bg-slate-700/60" : "bg-slate-800/60"}`}>inches</button>
-            <button onClick={setMm} className={`px-3 py-1 text-sm ${unit === "mm" ? "bg-slate-700/60" : "bg-slate-800/60"}`}>mm</button>
+    <div className="bg-slate-900/70 border-b border-slate-800">
+      <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
+        {/* Top branding row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+              <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
+                <Snowflake className="h-8 w-8 text-white" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                Alta Snow Report
+              </h1>
+              <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+                <Mountain className="h-4 w-4" />
+                SNOTEL + NWS Forecast • {stationName}
+              </p>
+            </div>
           </div>
-          <select value={range} onChange={(e) => onRange(Number(e.target.value) as 15 | 30)} className="bg-slate-800/60 border border-slate-700/50 text-sm rounded px-2 py-1">
-            <option value={15}>Past 15 days</option>
-            <option value={30}>Past 30 days</option>
-          </select>
-          <button onClick={onRefresh} className="px-3 py-1 text-sm rounded bg-blue-600 hover:bg-blue-500">{loading ? "Refreshing..." : "Refresh"}</button>
+
+          <div className="hidden md:flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-700/50">
+            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-sm text-slate-400">Live Data</span>
+          </div>
+        </div>
+
+        {/* Controls row */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            {/* Unit toggle */}
+            <div className="inline-flex rounded-xl overflow-hidden border border-slate-700/50">
+              <button onClick={setIn} className={`px-4 py-2 text-sm transition-colors ${unit === 'in' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>inches</button>
+              <button onClick={setMm} className={`px-4 py-2 text-sm transition-colors ${unit === 'mm' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>mm</button>
+            </div>
+            {/* Range select */}
+            <select value={range} onChange={(e) => onRange(Number(e.target.value) as 15 | 30)} className="px-4 py-2 text-sm rounded-xl bg-transparent border border-slate-700/50 text-slate-200">
+              <option value={15}>Past 15 days</option>
+              <option value={30}>Past 30 days</option>
+            </select>
+          </div>
+
+          {/* (Refresh button and timestamp removed) */}
         </div>
       </div>
-    </header>
+    </div>
   );
 }

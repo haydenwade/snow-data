@@ -1,38 +1,88 @@
 "use client";
 import { CloudSnow } from "lucide-react";
-import type { Unit } from "./utils";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from "recharts";
+import type { Unit, ForecastDaily } from "./utils";
 
-export default function ForecastChart({ labels, values, pops, unit }: { labels: string[]; values: number[]; pops: number[]; unit: Unit }) {
-  const toUnit = (v: number) => unit === "in" ? v : v * 25.4;
-  const displayMax = Math.max(1, ...values.map(toUnit));
-  return (
-    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
-      <div className="p-4 border-b border-slate-700/50">
-        <h3 className="text-sm font-semibold tracking-wide text-white flex items-center gap-2"><CloudSnow className="w-4 h-4 text-blue-400" /> <span className="text-blue-300">Next 7 days forecast</span></h3>
-      </div>
-      <div className="p-4">
-        <div className="w-full">
-          <div className="flex items-end gap-2 h-40">
-            {values.map((v, i) => {
-              const h = (toUnit(v) / displayMax) * 100;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="relative w-full bg-slate-800 rounded">
-                    <div className="absolute bottom-0 left-0 right-0 bg-blue-500 rounded" style={{ height: `${h}%` }} />
-                    <div className="h-40" />
-                  </div>
-                  <div className="text-[10px] text-slate-400">{labels[i].slice(5)}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-2 text-xs text-slate-400">Max: {displayMax.toFixed(unit === "in" ? 1 : 0)} {unit}</div>
-          <div className="mt-3 flex items-center justify-between gap-2">
-            {pops.map((p, i) => (
-              <span key={i} className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-300">{p}%</span>
-            ))}
+function fmtDisplay(dateStr: string) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+}
+function fmtShort(dateStr: string) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  return d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
+}
+
+export default function ForecastChart({ data, unit, loading }: { data: ForecastDaily[]; unit: Unit; loading?: boolean }) {
+  const chartData = data.map((d) => ({
+    ...d,
+    displayDate: fmtDisplay(d.date),
+    shortDate: fmtShort(d.date),
+    value: unit === "mm" ? d.snowIn * 25.4 : d.snowIn,
+  }));
+
+  const unitLabel = unit === "mm" ? "mm" : '"';
+  const maxValue = Math.max(...chartData.map((d) => d.value), 1);
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const item = payload[0].payload;
+      return (
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 shadow-xl">
+          <p className="text-sm font-medium text-white">{item.displayDate}</p>
+          <p className="text-lg font-bold text-blue-400">{item.value.toFixed(1)}{unitLabel}</p>
+          <div className="flex items-center gap-4 mt-1">
+            <p className="text-xs text-slate-400">PoP: {item.pop}%</p>
+            {item.tMaxF != null && item.tMinF != null && (
+              <p className="text-xs text-slate-400">{Math.round(item.tMaxF)}°/{Math.round(item.tMinF)}°F</p>
+            )}
           </div>
         </div>
+      );
+    }
+    return null;
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
+        <div className="h-6 w-40 bg-slate-700 mb-4 rounded animate-pulse" />
+        <div className="h-64 w-full bg-slate-700 rounded animate-pulse" />
+      </div>
+    );
+  }
+
+  const PopLabel = (props: any) => {
+    const { x, y, width, value } = props;
+    if (value == null) return null;
+    const pop = Number(value);
+    const fill = pop >= 70 ? '#93c5fd' : pop >= 40 ? '#60a5fa' : '#64748b';
+    const textFill = pop >= 40 ? '#dbeafe' : '#94a3b8';
+    const labelY = Math.min(y - 6, 12);
+    return (
+      <text x={x + width / 2} y={labelY} fill={textFill} fontSize={10} textAnchor="middle">{pop}%</text>
+    );
+  };
+
+  return (
+    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
+      <div className="flex items-center gap-2 mb-4">
+        <CloudSnow className="h-5 w-5 text-blue-400" />
+        <h2 className="font-semibold text-white">7-Day Forecast</h2>
+      </div>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
+            <XAxis dataKey="shortDate" tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#475569' }} tickLine={false} />
+            <YAxis tick={{ fill: '#94a3b8', fontSize: 10 }} axisLine={{ stroke: '#475569' }} tickLine={false} tickFormatter={(v) => `${v}${unitLabel}`} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+            <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={50}>
+              <LabelList dataKey="pop" content={<PopLabel />} />
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.value > 0 ? '#3b82f6' : '#475569'} fillOpacity={0.7 + (entry.value / maxValue) * 0.3} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
