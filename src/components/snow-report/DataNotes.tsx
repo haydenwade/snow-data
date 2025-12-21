@@ -12,7 +12,7 @@ export default function DataNotes() {
 
       {/* Simple, accessible accordion using <details> */}
       <div className="space-y-2">
-        <details className="group border border-slate-700/30 rounded-lg" open>
+        <details className="group border border-slate-700/30 rounded-lg">
           <summary className="cursor-pointer list-none px-3 py-2 text-sm text-slate-300 hover:text-white flex items-center gap-2">
             <Database className="h-4 w-4 text-orange-400" />
             <span>Historic Data (SNOTEL)</span>
