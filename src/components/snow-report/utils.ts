@@ -107,7 +107,7 @@ export function aggregateForecastToDaily(grid: ForecastGridData): ForecastDaily[
   });
 
   const days = Object.keys(dayBuckets).sort();
-  return days.slice(0, 7).map((day) => {
+  return days.map((day) => {
     const b = dayBuckets[day];
     const pop = b.pops.length ? Math.round(Math.max(...b.pops)) : 0;
     const tMinF = b.tempsF.length ? Math.round(Math.min(...b.tempsF)) : undefined;
