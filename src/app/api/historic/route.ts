@@ -165,24 +165,22 @@ export async function GET(
 
     const dates = Array.from(byDate.keys()).sort();
     // Attribute derived snowfall to the day it occurred: compute nextStart - curStart
-    const out = dates.map((d, idx) => {
-      const rec = byDate.get(d)!;
-      const next = idx < dates.length - 1 ? byDate.get(dates[idx + 1]) : undefined;
-      let derived = 0;
-      if (
-        next &&
-        rec.snowDepthAtStartOfDay != null &&
-        next.snowDepthAtStartOfDay != null
-      ) {
-        const dd = next.snowDepthAtStartOfDay - rec.snowDepthAtStartOfDay;
-        if (dd > 0) derived = dd;
+    const out:HistoricDay[] = [];
+    for (let i = 0; i < dates.length; i++) {
+      const date = dates[i];
+      const rec = byDate.get(date)!;
+      const previousDay = i > 0 ? byDate.get(dates[i - 1]) : null;
+      let derivedSnowfall = null;
+      if (previousDay && rec.snowDepthAtStartOfDay != null && previousDay.snowDepthAtStartOfDay != null) {
+        const diff = rec.snowDepthAtStartOfDay - previousDay.snowDepthAtStartOfDay;
+        derivedSnowfall = diff > 0 ? diff : 0;
       }
-      return {
+      out.push({
         date: rec.date,
-        snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay ?? null,
-        derivedSnowfall: Number(Math.max(0, derived).toFixed(2)),
-      };
-    });
+        snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay,
+        derivedSnowfall: derivedSnowfall,
+      });
+    }
 
     return NextResponse.json({ data: out }, { status: 200 });
   } catch (e: any) {

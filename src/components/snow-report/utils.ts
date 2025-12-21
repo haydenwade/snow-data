@@ -2,7 +2,7 @@ export type Unit = "in" | "mm";
 
 export type HistoricDay = {
   date: string;
-  derivedSnowfall: number;
+  derivedSnowfall?: number | null;
   snowDepthAtStartOfDay?: number | null;
 };
 
