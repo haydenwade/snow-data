@@ -356,11 +356,6 @@ export const LOCATIONS: Location[] = [
         label: "Parking",
         url: "https://www.parkcitymountain.com/explore-the-resort/about-the-resort/getting-here.aspx",
       },
-
-      // {
-      //   label: "Doppler Radar | NWS",
-      //   url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      // },
     ],
     trafficInfoLinks: [
       {
@@ -630,12 +625,7 @@ export const LOCATIONS: Location[] = [
     huc: "160202030102",
     stationTriplet: "828:UT:SNTL",
     socialMediaLinks: [],
-    resortInfoLinks: [
-      {
-        label: "Doppler Radar | NWS",
-        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      },
-    ],
+    resortInfoLinks: [],
     avalancheInfoLinks: [
       {
         label: "Avalanche Forecast",
@@ -656,12 +646,7 @@ export const LOCATIONS: Location[] = [
     huc: "160202030104",
     stationTriplet: "1164:UT:SNTL",
     socialMediaLinks: [],
-    resortInfoLinks: [
-      {
-        label: "Doppler Radar | NWS",
-        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      },
-    ],
+    resortInfoLinks: [],
     avalancheInfoLinks: [
       {
         label: "Avalanche Forecast",
@@ -682,12 +667,7 @@ export const LOCATIONS: Location[] = [
     huc: "140600040103",
     stationTriplet: "795:UT:SNTL",
     socialMediaLinks: [],
-    resortInfoLinks: [
-      {
-        label: "Doppler Radar | NWS",
-        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      },
-    ],
+    resortInfoLinks: [],
     avalancheInfoLinks: [
       {
         label: "Avalanche Forecast",

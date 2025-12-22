@@ -1,7 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import Link from "next/link";
-import { Mountain, Snowflake } from "lucide-react";
+import { Mountain, Radar, Snowflake } from "lucide-react";
 import type { Location, Unit } from "./utils";
 import { usePathname } from "next/navigation";
 
@@ -36,19 +36,45 @@ export default function Header({
               aria-label="Home"
               className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
             >
-              <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
-              <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
-                <Snowflake className="h-8 w-8 text-white" />
-              </div>
+              {location.logoUrl ? (
+                <div className="relative bg-white p-2 rounded-2xl flex items-center justify-center w-14 h-14 border border-slate-200">
+                  <img
+                    src={location.logoUrl}
+                    alt={stationName + " logo"}
+                    className="max-h-10 max-w-10 object-contain"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+                  <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
+                    <Snowflake className="h-8 w-8 text-white" />
+                  </div>
+                </>
+              )}
             </Link>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 Snow Report | {stationName}
               </h1>
-              <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
-                <Mountain className="h-4 w-4" />
-                SNOTEL + NWS Forecast Data
-              </p>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-1">
+                <span className="flex items-center text-slate-400 text-sm">
+                  <Mountain className="h-4 w-4" />
+                  <span className="ml-1">SNOTEL + NWS Forecast Data</span>
+                </span>
+                <a
+                  href="https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Open NWS Radar Map"
+                  className="inline-flex items-center"
+                >
+                  <Radar className="h-4 w-4 text-blue-400" />
+                  <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
+                    NWS Radar
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
 
