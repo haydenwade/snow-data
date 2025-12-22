@@ -45,7 +45,7 @@ export default function LocationPage() {
   const [unit, setUnit] = useState<Unit>("in");
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
@@ -109,19 +109,26 @@ export default function LocationPage() {
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         <section className="grid md:grid-cols-2 gap-6">
           <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
-          <HistoricTable data={lastNHistoricDesc} unit={unit} />
+          <HistoricTable
+            data={lastNHistoricDesc}
+            unit={unit}
+            loading={loading}
+          />
         </section>
+        {!loading && (
+          <>
+            <section className="grid gap-6 md:grid-cols-3 items-stretch">
+              <div className="md:col-span-2 h-full">
+                <StationMap location={location} loading={loading} />
+              </div>
+              <div className="md:col-span-1 h-full">
+                <StationMetadata location={location} loading={loading} />
+              </div>
+            </section>
 
-        <section className="grid gap-6 md:grid-cols-3 items-stretch">
-          <div className="md:col-span-2 h-full">
-            <StationMap location={location} />
-          </div>
-          <div className="md:col-span-1 h-full">
-            <StationMetadata location={location} />
-          </div>
-        </section>
-
-        <DataNotes location={location} />
+            <DataNotes location={location} />
+          </>
+        )}
         <Footer />
       </main>
     </div>

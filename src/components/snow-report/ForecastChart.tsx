@@ -1,5 +1,6 @@
 "use client";
 import { CloudSnow } from "lucide-react";
+import ForecastChartSkeleton from "../skeletons/ForecastChartSkeleton";
 import {
   BarChart,
   Bar,
@@ -75,13 +76,8 @@ export default function ForecastChart({
     return null;
   };
 
-  if (loading) {
-    return (
-      <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-        <div className="h-6 w-40 bg-slate-700 mb-4 rounded animate-pulse" />
-        <div className="h-64 w-full bg-slate-700 rounded animate-pulse" />
-      </div>
-    );
+  if (loading || data.length === 0) {
+    return <ForecastChartSkeleton />;
   }
 
   const PopLabel = (props: any) => {

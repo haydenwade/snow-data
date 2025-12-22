@@ -2,7 +2,8 @@
 import { Mountain, Compass, MapPin, Database, Layers, Hash } from "lucide-react";
 import { Location } from "./utils";
 
-export default function StationMetadata({ location }: { location: Location }) {
+export default function StationMetadata({ location, loading }: { location: Location, loading: boolean }) {
+  if (loading) return null;
   const items = [
     { icon: Hash, label: "Station ID", value: location.stationId },
     { icon: Database, label: "Network", value: location.network },

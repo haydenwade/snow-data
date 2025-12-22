@@ -1,20 +1,25 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Loader2, Wind, Sun, Thermometer, Cloud, CloudSun, Cloudy, CloudSnow } from "lucide-react";
+import { Wind, Sun, Thermometer, Cloud, CloudSun, Cloudy, CloudSnow } from "lucide-react";
 import type { Unit } from "./utils";
 function SkyIcon({ sky }: { sky?: string | null }) {
   const s = (sky ?? "").trim().toLowerCase();
   if (!s) return <Cloud className="h-4 w-4 text-slate-300" />;
   if (s === "clear") return <Sun className="h-4 w-4 text-yellow-400" />;
-  if (s === "mostly clear") return <CloudSun className="h-4 w-4 text-yellow-300" />;
-  if (s === "partly cloudy") return <CloudSun className="h-4 w-4 text-yellow-300" />;
-  if (s === "mostly cloudy") return <Cloud className="h-4 w-4 text-slate-300" />;
+  if (s === "mostly clear")
+    return <CloudSun className="h-4 w-4 text-yellow-300" />;
+  if (s === "partly cloudy")
+    return <CloudSun className="h-4 w-4 text-yellow-300" />;
+  if (s === "mostly cloudy")
+    return <Cloud className="h-4 w-4 text-slate-300" />;
   if (s === "overcast") return <Cloudy className="h-4 w-4 text-slate-400" />;
-  if (s.includes("snow")) return <CloudSnow className="h-4 w-4 text-slate-400" />;
+  if (s.includes("snow"))
+    return <CloudSnow className="h-4 w-4 text-slate-400" />;
   return <Cloud className="h-4 w-4 text-slate-300" />;
 }
 
 import { degToCompass } from "./utils";
+import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
 type CurrentResp = {
   observedAt?: string | null;
   temperatureF?: number | null;
@@ -60,6 +65,10 @@ export default function CurrentConditions({
     };
   }, [locationId]);
 
+  if (loading) {
+    return <CurrentConditionsSkeleton />;
+  }
+
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
       <div className="p-4 border-b border-slate-700/50">
@@ -68,17 +77,19 @@ export default function CurrentConditions({
           <h2 className="font-semibold text-white">Current Conditions</h2>
           {data && data.observedAt && (
             <span className="text-xs text-slate-400 ml-3">
-              Obs: {new Date(data.observedAt).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
+              Obs:{" "}
+              {new Date(data.observedAt).toLocaleString(undefined, {
+                hour: "2-digit",
+                minute: "2-digit",
+                month: "short",
+                day: "numeric",
+              })}
             </span>
           )}
         </div>
       </div>
       <div className="p-4">
-        {loading ? (
-          <div className="flex items-center gap-2 text-slate-400">
-            <Loader2 className="h-4 w-4 animate-spin" /> Loading
-          </div>
-        ) : error ? (
+        { error ? (
           <div className="text-sm text-red-400">{error}</div>
         ) : data ? (
           <div className="grid grid-cols-1 gap-3">

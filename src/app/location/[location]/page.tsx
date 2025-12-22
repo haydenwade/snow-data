@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "../../../components/snow-report/Header";
 import StationMap from "../../../components/snow-report/StationMap";
@@ -75,7 +75,7 @@ export default function LocationPage() {
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
   const [forecast, setForecast] = useState<ForecastDaily[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
@@ -101,13 +101,6 @@ export default function LocationPage() {
   useEffect(() => {
     void load();
   }, [locationId]);
-
-  // For tables we prefer newest first (descending). Keep charts chronological (ascending).
-  const lastNHistoricDesc = useMemo(
-    () => [...historic.slice(-range)].reverse(),
-    [historic, range]
-  );
-  const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
 
   if (!location) {
     return (
@@ -135,7 +128,7 @@ export default function LocationPage() {
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         <section className="grid md:grid-cols-2 gap-6">
           <CurrentConditions locationId={locationId} unit={unit} />
-          <ForecastTimeline data={forecast} unit={unit} />
+          <ForecastTimeline data={forecast} unit={unit} loading={loading} />
         </section>
 
         <SnowSummaryStrip
@@ -143,30 +136,34 @@ export default function LocationPage() {
           forecast={forecast}
           unit={unit}
           locationId={locationId}
+          loading={loading}
         />
         <section className="grid md:grid-cols-2 gap-6">
           <ForecastChart data={forecast} unit={unit} loading={loading} />
-          <ForecastTable data={forecast} unit={unit} />
+          <ForecastTable data={forecast} unit={unit} loading={loading} />
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">
-          <ResortInfoLinks location={location} />
+          <ResortInfoLinks location={location} loading={loading} />
           <section className="w-full min-w-0 flex flex-col gap-6">
-            <AvalancheInfo location={location} />
-            <TrafficInfo location={location} />
+            <AvalancheInfo location={location} loading={loading} />
+            <TrafficInfo location={location} loading={loading} />
           </section>
         </section>
+        {!loading && (
+          <>
+            <section className="grid gap-6 md:grid-cols-3 items-stretch">
+              <div className="md:col-span-2 h-full">
+                <StationMap location={location} loading={loading} />
+              </div>
+              <div className="md:col-span-1 h-full">
+                <StationMetadata location={location} loading={loading} />
+              </div>
+            </section>
 
-        <section className="grid gap-6 md:grid-cols-3 items-stretch">
-          <div className="md:col-span-2 h-full">
-            <StationMap location={location} />
-          </div>
-          <div className="md:col-span-1 h-full">
-            <StationMetadata location={location} />
-          </div>
-        </section>
-
-        <DataNotes location={location} />
+            <DataNotes location={location} />
+          </>
+        )}
         <Footer />
       </main>
     </div>

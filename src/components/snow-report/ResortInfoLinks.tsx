@@ -11,9 +11,9 @@ function getSocialIcon(url: string) {
   return <Link className="h-5 w-5" />;
 }
 
-export default function ResortInfoLinks({ location }: { location: Location }) {
+export default function ResortInfoLinks({ location, loading }: { location: Location, loading: boolean }) {
   const links = location.resortInfoLinks ?? [];
-  if (links.length === 0) return null;
+  if (loading || links.length === 0) return null;
 
   // Deduplicate by URL (prevents repeated “Parking” etc.)
   const sorted = Array.from(new Map(links.map((l) => [l.url, l])).values());

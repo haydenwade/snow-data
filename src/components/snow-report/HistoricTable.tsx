@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import HistoricTableSkeleton from "../skeletons/HistoricTableSkeleton";
 import { History, Info } from "lucide-react";
 import SnowCell from "./SnowCell";
 import { formatDateYYYYMMDD } from "./utils";
@@ -8,9 +9,11 @@ import type { Unit, HistoricDay } from "./utils";
 export default function HistoricTable({
   data,
   unit,
+  loading
 }: {
   data: HistoricDay[];
   unit: Unit;
+  loading: boolean;
 }) {
   // `data` is already in the desired order (descending) from the page, so render as-is
   const rows = data;
@@ -65,6 +68,12 @@ export default function HistoricTable({
       </div>
     );
   }
+
+  if (loading || data.length === 0) {
+    return <HistoricTableSkeleton />;
+  }
+
+
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
       <div className="p-4 border-b border-slate-700/50">

@@ -4,9 +4,9 @@ import ResourceCard from "./ResourceCard";
 import type { Location } from "./utils";
 import { Car } from "lucide-react";
 
-export default function TrafficInfo({ location }: { location: Location }) {
+export default function TrafficInfo({ location, loading }: { location: Location, loading: boolean }) {
   const links = location.trafficInfoLinks ?? [];
-  if (links.length === 0) return null;
+  if (loading || links.length === 0) return null;
 
   return (
     <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 overflow-hidden">

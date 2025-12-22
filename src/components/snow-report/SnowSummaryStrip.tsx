@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import type { HistoricDay, ForecastDaily, Unit } from "./utils";
 import { CalendarDays } from "lucide-react";
+import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
 
 function sum(arr: number[]) {
   return arr.reduce((a, b) => a + b, 0);
@@ -12,11 +13,13 @@ export default function SnowSummaryStrip({
   forecast,
   unit,
   locationId,
+  loading
 }: {
   historic: HistoricDay[];
   forecast: ForecastDaily[];
   unit: Unit;
   locationId: string;
+  loading: boolean;
 }) {
   const useMetric = unit === "mm";
   const last15 = historic.slice(-15); // ascending order
@@ -89,6 +92,9 @@ export default function SnowSummaryStrip({
     return groupF.map((d) => d.snowIn);
   };
 
+  if (loading || !historic.length || !forecast.length) {
+    return <SnowSummaryStripSkeleton />;
+  }
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
       <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">

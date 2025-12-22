@@ -1,5 +1,6 @@
-"use client";;
+"use client";
 import { Sun, CloudSun, Cloud, Wind, CloudSnow, Cloudy } from "lucide-react";
+import ForecastTimelineSkeleton from "../skeletons/ForecastTimelineSkeleton";
 import SnowCell from "./SnowCell";
 import type { ForecastDaily, Unit } from "./utils";
 import { formatDateYYYYMMDD, degToCompass, skyCoverLabel } from "./utils";
@@ -15,8 +16,21 @@ function SkyIcon({ p }: { p?: number }) {
   return <CloudSnow className="text-slate-400" />;
 }
 
-export default function ForecastTimeline({ data, unit }: { data: ForecastDaily[]; unit: Unit }) {
+export default function ForecastTimeline({
+  data,
+  unit,
+  loading,
+}: {
+  data: ForecastDaily[];
+  unit: Unit;
+  loading: boolean;
+}) {
   const slice = data.length > 1 ? data.slice(1, 8) : data.slice(0, 7);
+
+  if (loading || data.length === 0) {
+    return <ForecastTimelineSkeleton />;
+  }
+
   return (
     <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 overflow-hidden">
       <div className="p-4 border-b border-slate-700/50">
@@ -27,45 +41,60 @@ export default function ForecastTimeline({ data, unit }: { data: ForecastDaily[]
       </div>
       <div className="p-3 overflow-x-auto">
         <div className="flex gap-3">
-        {slice.map((d) => (
-          <div key={d.date} className="flex-shrink-0 w-40 bg-slate-800/20 rounded-md p-3 flex flex-col items-start gap-2">
-            <div className="w-full">
-              <div className="text-sm text-slate-300 font-medium">{formatDateYYYYMMDD(d.date)}</div>
-            </div>
-
-            <div className="w-full flex items-center gap-3">
-              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-700/30 text-slate-100">
-                <SkyIcon p={d.skyCoverPercent} />
+          {slice.map((d) => (
+            <div
+              key={d.date}
+              className="flex-shrink-0 w-40 bg-slate-800/20 rounded-md p-3 flex flex-col items-start gap-2"
+            >
+              <div className="w-full">
+                <div className="text-sm text-slate-300 font-medium">
+                  {formatDateYYYYMMDD(d.date)}
+                </div>
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-semibold text-slate-100">{skyCoverLabel(d.skyCoverPercent)}</div>
-              </div>
-            </div>
 
-            <div className="w-full flex items-center justify-between">
-              <div className="text-sm text-slate-300">Snow</div>
-              <div className="text-sm">
-                <SnowCell valueInInches={d.snowIn} unit={unit} tone="forecast" />
+              <div className="w-full flex items-center gap-3">
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-700/30 text-slate-100">
+                  <SkyIcon p={d.skyCoverPercent} />
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-slate-100">
+                    {skyCoverLabel(d.skyCoverPercent)}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="w-full flex items-center justify-between text-sm text-slate-300">
-              <div className="flex items-center gap-2">
-                <Wind className="h-4 w-4 text-slate-300" />
-                {d.windMph != null ? (
-                  unit === "mm" ? (
-                    <span className="font-medium">{Math.round(d.windMph * 1.60934)} kph</span>
+              <div className="w-full flex items-center justify-between">
+                <div className="text-sm text-slate-300">Snow</div>
+                <div className="text-sm">
+                  <SnowCell
+                    valueInInches={d.snowIn}
+                    unit={unit}
+                    tone="forecast"
+                  />
+                </div>
+              </div>
+
+              <div className="w-full flex items-center justify-between text-sm text-slate-300">
+                <div className="flex items-center gap-2">
+                  <Wind className="h-4 w-4 text-slate-300" />
+                  {d.windMph != null ? (
+                    unit === "mm" ? (
+                      <span className="font-medium">
+                        {Math.round(d.windMph * 1.60934)} kph
+                      </span>
+                    ) : (
+                      <span className="font-medium">{d.windMph} mph</span>
+                    )
                   ) : (
-                    <span className="font-medium">{d.windMph} mph</span>
-                  )
-                ) : (
-                  <span className="text-slate-500">—</span>
-                )}
+                    <span className="text-slate-500">—</span>
+                  )}
+                </div>
+                <div className="text-xs text-slate-400">
+                  {degToCompass(d.windDirDeg)}
+                </div>
               </div>
-              <div className="text-xs text-slate-400">{degToCompass(d.windDirDeg)}</div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
     </div>

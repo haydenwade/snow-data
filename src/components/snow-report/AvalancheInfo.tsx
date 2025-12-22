@@ -4,9 +4,9 @@ import ResourceCard from "./ResourceCard";
 import type { Location } from "./utils";
 import { AlertTriangle } from "lucide-react";
 
-export default function AvalancheInfo({ location }: { location: Location }) {
+export default function AvalancheInfo({ location, loading }: { location: Location, loading: boolean }) {
   const links = location.avalancheInfoLinks ?? [];
-  if (links.length === 0) return null;
+  if (loading || links.length === 0) return null;
 
   return (
     <div className="bg-slate-800/60 rounded-2xl border border-slate-700/50 overflow-hidden">
