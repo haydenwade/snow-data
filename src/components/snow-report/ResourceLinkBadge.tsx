@@ -1,4 +1,4 @@
-import type { BadgeType } from "./ResortInfoLinks";
+import { BadgeType } from "./ResortInfoLinksMeta";
 
 export default function Badge({ text }: { text: BadgeType }) {
   return (
