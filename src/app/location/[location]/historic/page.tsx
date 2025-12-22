@@ -1,23 +1,13 @@
-"use client";
+"use client";;
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import Header from "../../../components/snow-report/Header";
-import StationMap from "../../../components/snow-report/StationMap";
-import StationMetadata from "../../../components/snow-report/StationMetadata";
-import SnowSummaryStrip from "../../../components/snow-report/SnowSummaryStrip";
-import ForecastChart from "../../../components/snow-report/ForecastChart";
-import ForecastTimeline from "../../../components/snow-report/ForecastTimeline";
-import ForecastTable from "../../../components/snow-report/ForecastTable";
-import DataNotes from "../../../components/snow-report/DataNotes";
-import CurrentConditions from "../../../components/snow-report/CurrentConditions";
-import {
-  type Unit,
-  type HistoricDay,
-  type ForecastDaily,
-  type ForecastGridData,
-  LOCATIONS,
-  aggregateForecastToDaily,
-} from "../../../components/snow-report/utils";
+import Header from "../../../../components/snow-report/Header";
+import StationMap from "../../../../components/snow-report/StationMap";
+import StationMetadata from "../../../../components/snow-report/StationMetadata";
+import HistoricChart from "../../../../components/snow-report/HistoricChart";
+import HistoricTable from "../../../../components/snow-report/HistoricTable";
+import DataNotes from "../../../../components/snow-report/DataNotes";
+import { type Unit, type HistoricDay, LOCATIONS } from "../../../../components/snow-report/utils";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(
@@ -42,25 +32,6 @@ async function fetchHistoric(
   return res.data;
 }
 
-async function fetchForecastGrid(
-  locationId: string
-): Promise<ForecastGridData> {
-  const res = await fetch(`/api/forecast?locationId=${locationId}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    let detail = "";
-    try {
-      const j = await res.json();
-      detail = j?.error || JSON.stringify(j);
-    } catch {}
-    throw new Error(
-      `Forecast fetch failed: ${res.status}${detail ? ` — ${detail}` : ""}`
-    );
-  }
-  const j = await res.json();
-  return j as ForecastGridData;
-}
 
 export default function LocationPage() {
   const params = useParams();
@@ -70,7 +41,6 @@ export default function LocationPage() {
   const [unit, setUnit] = useState<Unit>("in");
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
-  const [forecast, setForecast] = useState<ForecastDaily[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
@@ -81,10 +51,7 @@ export default function LocationPage() {
       setLoading(true);
       setError(null);
       const hist = await fetchHistoric(locationId, 30);
-      const grid = await fetchForecastGrid(locationId);
-      const fc = aggregateForecastToDaily(grid);
       setHistoric(hist);
-      setForecast(fc);
       setUpdatedAt(new Date());
     } catch (e) {
       console.error(e);
@@ -129,15 +96,11 @@ export default function LocationPage() {
       )}
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <section className="grid md:grid-cols-2 gap-6">
-          <CurrentConditions locationId={locationId} unit={unit} />
-          <ForecastTimeline data={forecast} unit={unit} />
-        </section>
+       
 
-        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
         <section className="grid md:grid-cols-2 gap-6">
-          <ForecastChart data={forecast} unit={unit} loading={loading} />
-          <ForecastTable data={forecast} unit={unit} />
+          <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
+          <HistoricTable data={lastNHistoricDesc} unit={unit} />
         </section>
 
         <section className="grid gap-6 md:grid-cols-3 items-stretch">

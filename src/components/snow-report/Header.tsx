@@ -5,6 +5,7 @@ import { Mountain, Snowflake, Link2 } from "lucide-react";
 import { useState } from "react";
 import LocationLinksDialog from "./LocationLinksDialog";
 import type { Location, Unit } from "./utils";
+import { usePathname } from "next/navigation";
 
 type HeaderProps = {
   unit: Unit;
@@ -19,6 +20,7 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
   const setIn = useCallback(() => onUnit("in"), [onUnit]);
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
   const stationName = location?.name ?? "Station X";
+  const pathname = usePathname();
 
   return (
     <div className="bg-slate-900/70 border-b border-slate-800">
@@ -63,14 +65,15 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
           <div className="flex items-center gap-2">
             {/* Unit toggle */}
             <div className="inline-flex rounded-xl overflow-hidden border border-slate-700/50">
-              <button onClick={setIn} className={`px-4 py-2 text-sm transition-colors ${unit === 'in' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>inches</button>
-              <button onClick={setMm} className={`px-4 py-2 text-sm transition-colors ${unit === 'mm' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>mm</button>
+              <button onClick={setIn} className={`px-4 py-2 text-sm transition-colors ${unit === 'in' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>Imperial</button>
+              <button onClick={setMm} className={`px-4 py-2 text-sm transition-colors ${unit === 'mm' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>Metric</button>
             </div>
             {/* Range select */}
-            <select value={range} onChange={(e) => onRange(Number(e.target.value) as 15 | 30)} className="px-4 py-2 text-sm rounded-xl bg-transparent border border-slate-700/50 text-slate-200">
+            {pathname.includes('historic') &&<select value={range} onChange={(e) => onRange(Number(e.target.value) as 15 | 30)} className="px-4 py-2 text-sm rounded-xl bg-transparent border border-slate-700/50 text-slate-200">
               <option value={15}>Past 15 days</option>
               <option value={30}>Past 30 days</option>
             </select>
+}
           </div>
 
         </div>
