@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Header from "../../../../components/snow-report/Header";
@@ -7,7 +7,11 @@ import StationMetadata from "../../../../components/snow-report/StationMetadata"
 import HistoricChart from "../../../../components/snow-report/HistoricChart";
 import HistoricTable from "../../../../components/snow-report/HistoricTable";
 import DataNotes from "../../../../components/snow-report/DataNotes";
-import { type Unit, type HistoricDay, LOCATIONS } from "../../../../components/snow-report/utils";
+import {
+  type Unit,
+  type HistoricDay,
+  LOCATIONS,
+} from "../../../../components/snow-report/utils";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(
@@ -31,7 +35,6 @@ async function fetchHistoric(
   const res = await req.json();
   return res.data;
 }
-
 
 export default function LocationPage() {
   const params = useParams();
@@ -94,7 +97,7 @@ export default function LocationPage() {
           <div className="text-xs text-red-400">{error}</div>
         </div>
       )}
- <div className="max-w-6xl mx-auto px-4 pt-6">
+      <div className="max-w-6xl mx-auto px-4 pt-6">
         <a
           href={`/location/${locationId}`}
           className="inline-block mb-4 px-2 py-1 rounded border border-slate-500 text-slate-400 text-sm hover:bg-slate-700/20 hover:text-slate-200 transition"
