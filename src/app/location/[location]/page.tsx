@@ -126,10 +126,7 @@ export default function LocationPage() {
       )}
 
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <section className="grid md:grid-cols-2 gap-6">
-          <CurrentConditions locationId={locationId} unit={unit} />
-          <ForecastTimeline data={forecast} unit={unit} loading={loading} />
-        </section>
+        <CurrentConditions locationId={locationId} unit={unit} />
 
         <SnowSummaryStrip
           historic={historic}
@@ -138,6 +135,8 @@ export default function LocationPage() {
           locationId={locationId}
           loading={loading}
         />
+        <ForecastTimeline data={forecast} unit={unit} loading={loading} />
+
         <section className="grid md:grid-cols-2 gap-6">
           <ForecastChart data={forecast} unit={unit} loading={loading} />
           <ForecastTable data={forecast} unit={unit} loading={loading} />
