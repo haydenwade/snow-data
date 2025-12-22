@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Alta Snow Report",
-  description: "SNOTEL history + NWS forecast for Alta, Utah",
+  title: "Snow Report",
+  description: "SNOTEL history + NWS forecast",
 };
 
 export default function RootLayout({
