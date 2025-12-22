@@ -62,7 +62,7 @@ export function getLinkMeta(link: Link): LinkMeta {
   if (u.includes("x.com") || u.includes("twitter.com")) {
     return {
       icon: <SiX className="h-5 w-5 text-blue-400" />,
-      description: "Live updates",
+      description: "Live updates related to lifts and terrain",
       badge: "LIVE",
     };
   }
