@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LOCATIONS } from "../components/snow-report/utils";
+import Footer from "@/components/snow-report/Footer";
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
             </Link>
           ))}
         </div>
+        <Footer textOverride={"Don't see the location you are looking for?"}/>
       </div>
     </div>
   );

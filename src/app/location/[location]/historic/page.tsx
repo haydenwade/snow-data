@@ -12,6 +12,7 @@ import {
   type HistoricDay,
   LOCATIONS,
 } from "../../../../components/snow-report/utils";
+import Footer from "@/components/snow-report/Footer";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(
@@ -121,6 +122,7 @@ export default function LocationPage() {
         </section>
 
         <DataNotes location={location} />
+        <Footer />
       </main>
     </div>
   );

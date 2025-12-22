@@ -21,6 +21,7 @@ import {
 import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
+import Footer from "@/components/snow-report/Footer";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(
@@ -137,12 +138,17 @@ export default function LocationPage() {
           <ForecastTimeline data={forecast} unit={unit} />
         </section>
 
-        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} locationId={locationId}/>
+        <SnowSummaryStrip
+          historic={historic}
+          forecast={forecast}
+          unit={unit}
+          locationId={locationId}
+        />
         <section className="grid md:grid-cols-2 gap-6">
           <ForecastChart data={forecast} unit={unit} loading={loading} />
           <ForecastTable data={forecast} unit={unit} />
         </section>
-        
+
         <section className="grid md:grid-cols-2 gap-6">
           <ResortInfoLinks location={location} />
           <section className="w-full min-w-0 flex flex-col gap-6">
@@ -161,6 +167,7 @@ export default function LocationPage() {
         </section>
 
         <DataNotes location={location} />
+        <Footer />
       </main>
     </div>
   );
