@@ -1,9 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import Link from "next/link";
-import { Mountain, Snowflake, Link2 } from "lucide-react";
-import { useState } from "react";
-import LocationLinksDialog from "./LocationLinksDialog";
+import { Mountain, Snowflake } from "lucide-react";
 import type { Location, Unit } from "./utils";
 import { usePathname } from "next/navigation";
 
@@ -16,7 +14,6 @@ type HeaderProps = {
 };
 
 export default function Header({ unit, range, onUnit, onRange, location }: HeaderProps) {
-  const [linksOpen, setLinksOpen] = useState(false);
   const setIn = useCallback(() => onUnit("in"), [onUnit]);
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
   const stationName = location?.name ?? "Station X";
@@ -41,15 +38,6 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
               <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
                 <Mountain className="h-4 w-4" />
                 SNOTEL + NWS Forecast Data
-                <button
-                  type="button"
-                  className="ml-2 p-2 rounded-full hover:bg-slate-700/30 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  aria-label="Show related links"
-                  onClick={() => setLinksOpen(true)}
-                >
-                  <Link2 className="h-5 w-5 text-blue-400" />
-                </button>
-                <LocationLinksDialog open={linksOpen} onOpenChange={setLinksOpen} links={location.links ?? []} />
               </p>
             </div>
           </div>

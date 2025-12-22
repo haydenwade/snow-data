@@ -105,10 +105,12 @@ export default function ForecastChart({
   };
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-      <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">
-        <CloudSnow className="h-5 w-5 text-blue-400" />
-        <h2 className="font-semibold text-white">7-Day Forecast</h2>
+    <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 overflow-hidden">
+      <div className="p-4 border-b border-slate-700/50">
+        <div className="flex items-center gap-2">
+          <CloudSnow className="h-5 w-5 text-blue-400" />
+          <h2 className="font-semibold text-white">7-Day Forecast</h2>
+        </div>
       </div>
       <div className="h-100">
         <ResponsiveContainer width="100%" height="100%">
@@ -144,7 +146,9 @@ export default function ForecastChart({
               <LabelList
                 dataKey="value"
                 position="top"
-                formatter={(v: number) => (v > 0 ? `${Math.round(v)}${unitLabel}` : "")}
+                formatter={(v: number) =>
+                  v > 0 ? `${Math.round(v)}${unitLabel}` : ""
+                }
                 fill="#e2e8f0"
                 fontSize={10}
               />

@@ -1,5 +1,10 @@
 export type Unit = "in" | "mm";
 
+export type GenericLink = {
+  label: string;
+  url: string;
+};
+
 export type Location = {
   id: string;
   stationId: string;
@@ -12,10 +17,10 @@ export type Location = {
   huc: string;
   stationTriplet: string;
   logoUrl?: string;
-  links: {
-    label: string;
-    url: string;
-  }[];
+  socialMediaLinks: GenericLink[];
+  resortInfoLinks: GenericLink[];
+  avalancheInfoLinks: GenericLink[];
+  trafficInfoLinks: GenericLink[];
 };
 
 export type HistoricDay = {
@@ -319,23 +324,55 @@ export const LOCATIONS: Location[] = [
     huc: "160201020101",
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
-    links: [
-       {
-        label: "Resort Info and Lift Status",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/pcski/",
+      },
+      { label: "X", url: "https://x.com/pcski" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "PC Mtn Alerts (Twitter/X)",
+        url: "https://x.com/PCMtnAlert",
+      },
+      {
+        label: "Lift and Terrain Status",
         url: "https://www.parkcitymountain.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
       },
+      {
+        label: "Hours of Operation",
+        url: "https://www.parkcitymountain.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.parkcitymountain.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.parkcitymountain.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.parkcitymountain.com/explore-the-resort/about-the-resort/getting-here.aspx",
+      },
+
+      // {
+      //   label: "Doppler Radar | NWS",
+      //   url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
+      // },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "Parley's Canyon Traffic Info | UDOT on X",
+        url: "https://x.com/wasatchbackudot",
+      },
+    ],
+    avalancheInfoLinks: [
       {
         label: "Avalanche Forecast",
         url: "https://utahavalanchecenter.org/forecast/salt-lake",
       },
-      {
-        label: "Doppler Radar | NWS",
-        url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      },
-      {
-        label: "Traffic Cameras | UDOT",
-        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
-      }
     ],
   },
   {
@@ -350,7 +387,8 @@ export const LOCATIONS: Location[] = [
     huc: "160202040202",
     logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
-    links: [
+    socialMediaLinks: [],
+    resortInfoLinks: [
       {
         label: "Resort Info and Conditions",
         url: "https://www.alta.com/weather",
@@ -367,11 +405,13 @@ export const LOCATIONS: Location[] = [
         label: "7-day Forecast | NOAA",
         url: "https://forecast.weather.gov/MapClick.php?lon=-111.63439750671387&lat=40.57318341334175",
       },
-     {
+      {
         label: "Traffic Cameras | UDOT",
-        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
-      }
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras",
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "snowbird",
@@ -385,7 +425,8 @@ export const LOCATIONS: Location[] = [
     huc: "160202040202",
     logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
-    links: [
+    socialMediaLinks: [],
+    resortInfoLinks: [
       {
         label: "Resort Info and Conditions",
         url: "https://www.snowbird.com/the-mountain/mountain-report/current-conditions-weather/",
@@ -404,9 +445,11 @@ export const LOCATIONS: Location[] = [
       },
       {
         label: "Traffic Cameras | UDOT",
-        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
-      }
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras",
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "brighton",
@@ -420,7 +463,8 @@ export const LOCATIONS: Location[] = [
     huc: "160202040201",
     logoUrl: "/brighton-logo.png",
     stationTriplet: "366:UT:SNTL",
-    links: [
+    socialMediaLinks: [],
+    resortInfoLinks: [
       {
         label: "Resort Info and Conditions",
         url: "https://www.brightonresort.com/conditions",
@@ -435,9 +479,11 @@ export const LOCATIONS: Location[] = [
       },
       {
         label: "Traffic Cameras | UDOT",
-        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras"
-      }
+        url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras",
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "powdermountain",
@@ -451,8 +497,9 @@ export const LOCATIONS: Location[] = [
     huc: "160102030102",
     logoUrl: "/powdermtn-logo.svg",
     stationTriplet: "1300:UT:SNTL",
-    links: [
-       {
+    socialMediaLinks: [],
+    resortInfoLinks: [
+      {
         label: "Resort Info and Conditions",
         url: "https://powdermountain.com/conditions",
       },
@@ -465,6 +512,8 @@ export const LOCATIONS: Location[] = [
         url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
       },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "triallake",
@@ -477,16 +526,19 @@ export const LOCATIONS: Location[] = [
     lon: -110.95,
     huc: "160202030102",
     stationTriplet: "828:UT:SNTL",
-    links: [
-       {
+    socialMediaLinks: [],
+    resortInfoLinks: [
+      {
         label: "Avalanche Forecast",
         url: "https://utahavalanchecenter.org/forecast/uintas",
       },
       {
         label: "Doppler Radar | NWS",
         url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      }
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "wolfcreekpeak",
@@ -499,16 +551,19 @@ export const LOCATIONS: Location[] = [
     lon: -111.04,
     huc: "160202030104",
     stationTriplet: "1164:UT:SNTL",
-    links: [
-        {
+    socialMediaLinks: [],
+    resortInfoLinks: [
+      {
         label: "Avalanche Forecast",
         url: "https://utahavalanchecenter.org/forecast/uintas",
       },
       {
         label: "Doppler Radar | NWS",
         url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      }
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
   {
     id: "strawberrydivide",
@@ -521,7 +576,8 @@ export const LOCATIONS: Location[] = [
     lon: -111.21,
     huc: "140600040103",
     stationTriplet: "795:UT:SNTL",
-    links: [
+    socialMediaLinks: [],
+    resortInfoLinks: [
       {
         label: "Avalanche Forecast",
         url: "https://utahavalanchecenter.org/forecast/uintas",
@@ -529,7 +585,9 @@ export const LOCATIONS: Location[] = [
       {
         label: "Doppler Radar | NWS",
         url: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/",
-      }
+      },
     ],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
   },
 ];
