@@ -94,10 +94,15 @@ export default function LocationPage() {
           <div className="text-xs text-red-400">{error}</div>
         </div>
       )}
-
+ <div className="max-w-6xl mx-auto px-4 pt-6">
+        <a
+          href={`/location/${locationId}`}
+          className="inline-block mb-4 px-2 py-1 rounded border border-slate-500 text-slate-400 text-sm hover:bg-slate-700/20 hover:text-slate-200 transition"
+        >
+          ← Back to Forecast
+        </a>
+      </div>
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-       
-
         <section className="grid md:grid-cols-2 gap-6">
           <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
           <HistoricTable data={lastNHistoricDesc} unit={unit} />

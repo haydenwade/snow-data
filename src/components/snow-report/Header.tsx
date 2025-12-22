@@ -13,7 +13,13 @@ type HeaderProps = {
   location: Location;
 };
 
-export default function Header({ unit, range, onUnit, onRange, location }: HeaderProps) {
+export default function Header({
+  unit,
+  range,
+  onUnit,
+  onRange,
+  location,
+}: HeaderProps) {
   const setIn = useCallback(() => onUnit("in"), [onUnit]);
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
   const stationName = location?.name ?? "Station X";
@@ -25,7 +31,11 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
         {/* Top branding row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/" aria-label="Home" className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded">
+            <Link
+              href="/"
+              aria-label="Home"
+              className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+            >
               <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
               <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
                 <Snowflake className="h-8 w-8 text-white" />
@@ -53,17 +63,39 @@ export default function Header({ unit, range, onUnit, onRange, location }: Heade
           <div className="flex items-center gap-2">
             {/* Unit toggle */}
             <div className="inline-flex rounded-xl overflow-hidden border border-slate-700/50">
-              <button onClick={setIn} className={`px-4 py-2 text-sm transition-colors ${unit === 'in' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>Imperial</button>
-              <button onClick={setMm} className={`px-4 py-2 text-sm transition-colors ${unit === 'mm' ? 'bg-slate-700/70 text-white' : 'bg-slate-800/60 text-slate-300'}`}>Metric</button>
+              <button
+                onClick={setIn}
+                className={`px-4 py-2 text-sm transition-colors ${
+                  unit === "in"
+                    ? "bg-slate-700/70 text-white"
+                    : "bg-slate-800/60 text-slate-300"
+                }`}
+              >
+                Imperial
+              </button>
+              <button
+                onClick={setMm}
+                className={`px-4 py-2 text-sm transition-colors ${
+                  unit === "mm"
+                    ? "bg-slate-700/70 text-white"
+                    : "bg-slate-800/60 text-slate-300"
+                }`}
+              >
+                Metric
+              </button>
             </div>
             {/* Range select */}
-            {pathname.includes('historic') &&<select value={range} onChange={(e) => onRange(Number(e.target.value) as 15 | 30)} className="px-4 py-2 text-sm rounded-xl bg-transparent border border-slate-700/50 text-slate-200">
-              <option value={15}>Past 15 days</option>
-              <option value={30}>Past 30 days</option>
-            </select>
-}
+            {pathname.includes("historic") && (
+              <select
+                value={range}
+                onChange={(e) => onRange(Number(e.target.value) as 15 | 30)}
+                className="px-4 py-2 text-sm rounded-xl bg-transparent border border-slate-700/50 text-slate-200"
+              >
+                <option value={15}>Past 15 days</option>
+                <option value={30}>Past 30 days</option>
+              </select>
+            )}
           </div>
-
         </div>
       </div>
     </div>

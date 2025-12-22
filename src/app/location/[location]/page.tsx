@@ -137,7 +137,7 @@ export default function LocationPage() {
           <ForecastTimeline data={forecast} unit={unit} />
         </section>
 
-        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} />
+        <SnowSummaryStrip historic={historic} forecast={forecast} unit={unit} locationId={locationId}/>
         <section className="grid md:grid-cols-2 gap-6">
           <ForecastChart data={forecast} unit={unit} loading={loading} />
           <ForecastTable data={forecast} unit={unit} />
