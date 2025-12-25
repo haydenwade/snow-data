@@ -11,17 +11,15 @@ import ForecastTable from "../../../components/snow-report/ForecastTable";
 import DataNotes from "../../../components/snow-report/DataNotes";
 import CurrentConditions from "../../../components/snow-report/CurrentConditions";
 import {
-  type Unit,
-  type HistoricDay,
-  type ForecastDaily,
-  type ForecastGridData,
-  LOCATIONS,
   aggregateForecastToDaily,
 } from "../../../components/snow-report/utils";
 import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
 import Footer from "@/components/snow-report/Footer";
+import { HistoricDay } from "@/types/historic";
+import { ForecastDaily, ForecastGridData, Unit } from "@/types/forecast";
+import { LOCATIONS } from "@/constants/locations";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(

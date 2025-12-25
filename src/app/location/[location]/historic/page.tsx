@@ -7,12 +7,10 @@ import StationMetadata from "../../../../components/snow-report/StationMetadata"
 import HistoricChart from "../../../../components/snow-report/HistoricChart";
 import HistoricTable from "../../../../components/snow-report/HistoricTable";
 import DataNotes from "../../../../components/snow-report/DataNotes";
-import {
-  type Unit,
-  type HistoricDay,
-  LOCATIONS,
-} from "../../../../components/snow-report/utils";
 import Footer from "@/components/snow-report/Footer";
+import { HistoricDay } from "@/types/historic";
+import { LOCATIONS } from "@/constants/locations";
+import { Unit } from "@/types/forecast";
 
 // Real data loaders (client-side via API routes)
 async function fetchHistoric(

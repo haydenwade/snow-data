@@ -1,4 +1,5 @@
-import { HistoricDay, LOCATIONS } from "@/components/snow-report/utils";
+import { LOCATIONS } from "@/constants/locations";
+import { HistoricDay } from "@/types/historic";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";

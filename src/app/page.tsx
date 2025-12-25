@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { LOCATIONS } from "../components/snow-report/utils";
 import Footer from "@/components/snow-report/Footer";
+import { LOCATIONS } from "@/constants/locations";
 
 export default function Home() {
   return (

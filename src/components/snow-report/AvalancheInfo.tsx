@@ -1,10 +1,10 @@
 "use client";
 
+import { MountainLocation } from "@/types/location";
 import ResourceCard from "./ResourceCard";
-import type { Location } from "./utils";
 import { AlertTriangle } from "lucide-react";
 
-export default function AvalancheInfo({ location, loading }: { location: Location, loading: boolean }) {
+export default function AvalancheInfo({ location, loading }: { location: MountainLocation, loading: boolean }) {
   const links = location.avalancheInfoLinks ?? [];
   if (loading || links.length === 0) return null;
 

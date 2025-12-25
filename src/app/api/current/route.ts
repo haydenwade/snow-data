@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import { LOCATIONS, cToF } from "../../../components/snow-report/utils";
+import { cToF } from "../../../components/snow-report/utils";
 import SunCalc from "suncalc";
+import { LOCATIONS } from "@/constants/locations";
 
+
+//TODO: move helper methods to utils file and/or consolidate with existing utils
 const USER_AGENT = "snow-data (github.com)";
 const STALE_MINUTES = 60;
 
