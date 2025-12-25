@@ -18,7 +18,22 @@ export default function StationMetadata({
 }) {
   if (loading) return null;
   const items = [
-    { icon: Hash, label: "Station ID", value: location.stationId },
+    {
+      icon: Hash,
+      label: "Station ID",
+      value: (
+        <a
+          href={`https://wcc.sc.egov.usda.gov/nwcc/site?sitenum=${encodeURIComponent(
+            location.stationId
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sky-300 hover:underline"
+        >
+          {location.stationId}
+        </a>
+      ),
+    },
     { icon: Database, label: "Network", value: location.network },
     { icon: MapPin, label: "County", value: location.county },
     { icon: Mountain, label: "Elevation", value: location.elevation },

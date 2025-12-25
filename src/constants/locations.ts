@@ -373,4 +373,22 @@ export const LOCATIONS: MountainLocation[] = [
     ],
     trafficInfoLinks: [],
   },
+  {
+    id: "cottonwoodcreekredtop",
+    stationId: "419",
+    name: "Cottonwood Creek - Red Top Mountain (Afton, WY)",
+    network: "SNOTEL",
+    county: "Lincoln",
+    elevation: "7,710 ft",
+    lat: 42.65,
+    lon: -110.81,
+    huc: "170401050102",
+    timezone: "America/Denver",
+    stationTriplet: "419:WY:SNTL",
+    socialMediaLinks: [],
+    resortInfoLinks: [],
+    avalancheInfoLinks: [],
+    trafficInfoLinks: [],
+  },
+  
 ];
