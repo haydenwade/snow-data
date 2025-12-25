@@ -1,14 +1,14 @@
 import {
-    CableCar,
-    Clock,
-    Camera,
-    Map as MapIcon,
-    Car,
-    CloudSnow,
-    AlertTriangle,
-    Radar,
-    Cloud,
-    ExternalLink,
+  CableCar,
+  Clock,
+  Camera,
+  Map as MapIcon,
+  Car,
+  CloudSnow,
+  AlertTriangle,
+  Radar,
+  Cloud,
+  ExternalLink,
 } from "lucide-react";
 import React from "react";
 import { SiX } from "react-icons/si";
@@ -27,7 +27,7 @@ export function getLinkMeta(link: Link): LinkMeta {
   const u = link.url.toLowerCase();
 
   // URL-based detection (more reliable)
-  if (u.includes("utahavalanchecenter.org")) {
+  if (u.includes("utahavalanchecenter.org") || u.includes("bridgertetonavalanchecenter.org")) {
     return {
       icon: <AlertTriangle className="h-5 w-5 text-amber-400" />,
       description: "Backcountry danger rating + problem types",
