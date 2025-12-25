@@ -4,7 +4,8 @@ import HistoricTableSkeleton from "../skeletons/HistoricTableSkeleton";
 import { History, Info } from "lucide-react";
 import SnowCell from "./SnowCell";
 import { formatDateYYYYMMDD } from "./utils";
-import type { Unit, HistoricDay } from "./utils";
+import { HistoricDay } from "@/types/historic";
+import { Unit } from "@/types/forecast";
 
 export default function HistoricTable({
   data,

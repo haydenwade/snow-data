@@ -2,15 +2,16 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import { Mountain, Radar, Snowflake } from "lucide-react";
-import type { Location, Unit } from "./utils";
 import { usePathname } from "next/navigation";
+import { Unit } from "@/types/forecast";
+import { MountainLocation } from "@/types/location";
 
 type HeaderProps = {
   unit: Unit;
   range: 15 | 30;
   onUnit: (u: Unit) => void;
   onRange: (r: 15 | 30) => void;
-  location: Location;
+  location: MountainLocation;
 };
 
 export default function Header({

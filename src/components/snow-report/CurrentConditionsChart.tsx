@@ -1,7 +1,7 @@
 import { ApiResp } from "@/types/current-conditions-response";
-import { CloudSun, Droplets, LineChart, Thermometer, Wind } from "lucide-react";
+import { CloudSun, Droplets, Thermometer, Wind } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { celsiusFromF, kphFromMph } from "./utils";
 import { SkyIcon } from "./SkyIcon";
 import { Unit } from "@/types/forecast";
@@ -98,8 +98,10 @@ function ChartTooltip({
 //TODO: rename prop
 export default function CurrentConditionsChart({
   resp,
+  unit,
 }: {
   resp: ApiResp | null;
+  unit: Unit;
 }) {
   const [tab, setTab] = useState<TabKey>("temp");
 

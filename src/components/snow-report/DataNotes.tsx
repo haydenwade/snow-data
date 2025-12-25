@@ -1,9 +1,9 @@
 "use client";
 
+import { MountainLocation } from "@/types/location";
 import { Info, Database, Cloud } from "lucide-react";
-import { Location } from "./utils";
 
-export default function DataNotes(props:{location:Location}) {
+export default function DataNotes(props:{location:MountainLocation}) {
   const { location } = props;
   return (
     <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl border border-slate-700/30 p-4">

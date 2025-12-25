@@ -1,8 +1,9 @@
 "use client";
 import { useMemo } from "react";
-import type { HistoricDay, ForecastDaily, Unit } from "./utils";
 import { CalendarDays } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
+import { HistoricDay } from "@/types/historic";
+import { ForecastDaily, Unit } from "@/types/forecast";
 
 function sum(arr: number[]) {
   return arr.reduce((a, b) => a + b, 0);

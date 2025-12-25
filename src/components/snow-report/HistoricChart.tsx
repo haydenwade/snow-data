@@ -11,7 +11,8 @@ import {
   Cell,
   LabelList,
 } from "recharts";
-import type { Unit, HistoricDay } from "./utils";
+import { HistoricDay } from "@/types/historic";
+import { Unit } from "@/types/forecast";
 
 function fmtShort(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);

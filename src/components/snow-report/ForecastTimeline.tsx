@@ -2,11 +2,12 @@
 import { Sun, CloudSun, Cloud, Wind, CloudSnow, Cloudy } from "lucide-react";
 import ForecastTimelineSkeleton from "../skeletons/ForecastTimelineSkeleton";
 import SnowCell from "./SnowCell";
-import type { ForecastDaily, Unit } from "./utils";
 import { formatDateYYYYMMDD, degToCompass, skyCoverLabel } from "./utils";
+import { ForecastDaily, Unit } from "@/types/forecast";
 
 // using degToCompass and skyCoverLabel from utils
 
+//TODO: can we use the sky icon component here?
 function SkyIcon({ p }: { p?: number }) {
   if (p == null || Number.isNaN(p)) return <Cloud className="text-slate-300" />;
   if (p <= 10) return <Sun className="text-yellow-400" />;

@@ -179,7 +179,7 @@ export default function CurrentConditions({
               </div>
             </div>
 
-            <CurrentConditionsChart resp={resp}/>
+            <CurrentConditionsChart resp={resp} unit={unit} />
           </div>
         )}
       </div>

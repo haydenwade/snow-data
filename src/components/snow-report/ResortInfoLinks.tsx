@@ -1,8 +1,8 @@
 "use client";
-import type { Location } from "./utils";
 import { Instagram, Link, Mountain } from "lucide-react";
 import ResourceCard from "./ResourceCard";
 import { SiX } from "react-icons/si";
+import { MountainLocation } from "@/types/location";
 
 function getSocialIcon(url: string) {
   if (/twitter\.com/.test(url)) return <SiX className="h-5 w-5" />;
@@ -11,7 +11,7 @@ function getSocialIcon(url: string) {
   return <Link className="h-5 w-5" />;
 }
 
-export default function ResortInfoLinks({ location, loading }: { location: Location, loading: boolean }) {
+export default function ResortInfoLinks({ location, loading }: { location: MountainLocation, loading: boolean }) {
   const links = location.resortInfoLinks ?? [];
   if (loading || links.length === 0) return null;
 

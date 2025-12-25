@@ -1,10 +1,16 @@
 "use client";
 
+import { MountainLocation } from "@/types/location";
 import ResourceCard from "./ResourceCard";
-import type { Location } from "./utils";
 import { Car } from "lucide-react";
 
-export default function TrafficInfo({ location, loading }: { location: Location, loading: boolean }) {
+export default function TrafficInfo({
+  location,
+  loading,
+}: {
+  location: MountainLocation;
+  loading: boolean;
+}) {
   const links = location.trafficInfoLinks ?? [];
   if (loading || links.length === 0) return null;
 

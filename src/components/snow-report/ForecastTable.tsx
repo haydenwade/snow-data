@@ -3,7 +3,7 @@ import { CloudSnow } from "lucide-react";
 import SnowCell from "./SnowCell";
 import { formatDateYYYYMMDD, degToCompass, skyCoverLabel } from "./utils";
 import ForecastTableSkeleton from "../skeletons/ForecastTableSkeleton";
-import type { Unit, ForecastDaily } from "./utils";
+import { ForecastDaily, Unit } from "@/types/forecast";
 
 export default function ForecastTable({
   data,

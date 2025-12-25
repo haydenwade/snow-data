@@ -11,7 +11,7 @@ import {
   Cell,
   LabelList,
 } from "recharts";
-import type { Unit, ForecastDaily } from "./utils";
+import { ForecastDaily, Unit } from "@/types/forecast";
 
 function fmtDisplay(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
