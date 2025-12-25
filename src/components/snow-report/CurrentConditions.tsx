@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Wind,
   Sun,
+  Sunrise,
+  Sunset,
   Thermometer,
   Cloud,
   CloudSun,
@@ -61,6 +63,11 @@ type ApiResp = {
       arrowRotation: number | null;
       label: string | null;
     } | null;
+    sun?: {
+      sunrise: string | null;
+      sunset: string | null;
+      timeZone?: string | null;
+    } | null;
   };
   timeseriesData: TimeseriesPoint[];
 };
@@ -105,6 +112,24 @@ function skyLabelFromCode(code: number) {
   if (code === 2) return "Partly";
   if (code === 1) return "Clear";
   return "—";
+}
+
+function formatTimeInZone(
+  iso?: string | Date | null,
+  timeZone?: string | null
+) {
+  if (!iso) return null;
+  const d = typeof iso === "string" ? new Date(iso) : iso;
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return null;
+  try {
+    return d.toLocaleTimeString(undefined, {
+      timeZone: timeZone ?? "America/Denver",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  }
 }
 
 function TabButton({
@@ -242,6 +267,16 @@ export default function CurrentConditions({
       }));
   }, [resp]);
 
+  const sunriseLabel = useMemo(() => {
+    if (!current?.sun?.sunrise) return null;
+    return formatTimeInZone(current.sun.sunrise, current.sun.timeZone ?? undefined);
+  }, [current]);
+
+  const sunsetLabel = useMemo(() => {
+    if (!current?.sun?.sunset) return null;
+    return formatTimeInZone(current.sun.sunset, current.sun.timeZone ?? undefined);
+  }, [current]);
+
   const hasTimeseries = chartData.length > 0;
 
   if (loading) return <CurrentConditionsSkeleton />;
@@ -281,7 +316,7 @@ export default function CurrentConditions({
                     </div>
                   </div>
 
-                  <div className="mt-3 flex items-center gap-4 text-sm text-slate-300">
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-slate-300">
                     <div className="flex items-center gap-2">
                       <SkyIcon sky={current.conditionText} />
                       <div>
@@ -315,6 +350,28 @@ export default function CurrentConditions({
                         </div>
                       </div>
                     </div>
+
+                    {/* Sunrise */}
+                    <div className="flex items-center gap-2">
+                      <Sunrise className="h-4 w-4 text-amber-300" />
+                      <div>
+                        <div className="text-xs text-slate-400">Sunrise</div>
+                        <div className="font-medium text-slate-200">
+                          {sunriseLabel ?? "—"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Sunset */}
+                    <div className="flex items-center gap-2">
+                      <Sunset className="h-4 w-4 text-orange-400" />
+                      <div>
+                        <div className="text-xs text-slate-400">Sunset</div>
+                        <div className="font-medium text-slate-200">
+                          {sunsetLabel ?? "—"}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Optional status line */}
@@ -329,7 +386,7 @@ export default function CurrentConditions({
 
                 {/* Big icon */}
                 <div className="flex flex-col items-end">
-                  <SkyIcon sky={current.conditionText} className="h-10 w-10" />
+                  <SkyIcon sky={current.conditionText} className="h-20 w-20" />
                 </div>
               </div>
             </div>

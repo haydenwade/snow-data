@@ -1,8 +1,75 @@
 import { NextResponse } from "next/server";
 import { LOCATIONS, cToF } from "../../../components/snow-report/utils";
+import SunCalc from "suncalc";
 
 const USER_AGENT = "snow-data (github.com)";
 const STALE_MINUTES = 60;
+
+const DENVER_TZ = "America/Denver";
+
+// Compute the timezone offset (in minutes) for a given Date at a specific IANA timezone
+function getTimeZoneOffsetAt(date: Date, timeZone: string): number {
+  const dtf = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  const parts = dtf.formatToParts(date);
+  const n = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+  const asUTC = Date.UTC(
+    n("year"),
+    n("month") - 1,
+    n("day"),
+    n("hour"),
+    n("minute"),
+    n("second")
+  );
+  // minutes; positive means local time is ahead of UTC
+  return (asUTC - date.getTime()) / 60000;
+}
+
+// Given any Date, return a Date representing midnight at that calendar day in the provided timezone
+function getMidnightInZone(date: Date, timeZone: string): Date {
+  const ymd = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const year = Number(ymd.find((p) => p.type === "year")?.value);
+  const month = Number(ymd.find((p) => p.type === "month")?.value);
+  const day = Number(ymd.find((p) => p.type === "day")?.value);
+
+  const utcMid = Date.UTC(year, month - 1, day, 0, 0, 0);
+  const offsetMin = getTimeZoneOffsetAt(new Date(utcMid), timeZone);
+  return new Date(utcMid - offsetMin * 60000);
+}
+
+export function getSunTimes({
+  lat,
+  lon,
+  date,
+}: {
+  lat: number;
+  lon: number;
+  date: Date;
+}) {
+  // Use the location's local midnight to anchor "the day"
+  const base = getMidnightInZone(date, DENVER_TZ);
+  const times = SunCalc.getTimes(base, lat, lon);
+
+  return {
+    sunrise: times.sunrise ?? null,
+    sunset: times.sunset ?? null,
+  };
+}
 
 function nonEmptyString(v: unknown): string | null {
   if (typeof v !== "string") return null;
@@ -29,7 +96,7 @@ function windLabel(mph?: number | null) {
   if (s < 1) return "Calm";
   if (s < 6) return "Light";
   if (s < 15) return "Moderate";
-  if (s < 25) return "Fresh";
+  if (s < 25) return "Blustery"; // previously: "Fresh" as this is from Beaufort scale
   if (s < 40) return "Strong";
   return "Gale";
 }
@@ -419,6 +486,10 @@ export async function GET(req: Request) {
         directionText: windDirectionText,
         arrowRotation: windArrowRotation(windDirectionDeg),
         label: windLabel(windSpeedMph),
+      },
+      sun: {
+        ...getSunTimes({ lat: loc.lat, lon: loc.lon, date: new Date() }),
+        timeZone: DENVER_TZ,
       },
     };
 
