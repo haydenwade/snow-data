@@ -387,7 +387,12 @@ export const LOCATIONS: MountainLocation[] = [
     stationTriplet: "419:WY:SNTL",
     socialMediaLinks: [],
     resortInfoLinks: [],
-    avalancheInfoLinks: [],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url:"https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/"
+      }
+    ],
     trafficInfoLinks: [],
   },
   
