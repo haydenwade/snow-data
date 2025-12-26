@@ -177,20 +177,26 @@ export async function GET(
 
     const dates = Array.from(byDate.keys()).sort();
     // Attribute derived snowfall to the day it occurred: compute nextStart - curStart
-    const out:HistoricDay[] = [];
+    // Root-cause of off-by-one: we were previously comparing current-start to previous-start,
+    // which credited new snow to the following calendar day. Use next day's start instead.
+    const out: HistoricDay[] = [];
     for (let i = 0; i < dates.length; i++) {
       const date = dates[i];
       const rec = byDate.get(date)!;
-      const previousDay = i > 0 ? byDate.get(dates[i - 1]) : null;
-      let derivedSnowfall = null;
-      if (previousDay && rec.snowDepthAtStartOfDay != null && previousDay.snowDepthAtStartOfDay != null) {
-        const diff = rec.snowDepthAtStartOfDay - previousDay.snowDepthAtStartOfDay;
+      const nextDay = i + 1 < dates.length ? byDate.get(dates[i + 1]!) : null;
+      let derivedSnowfall: number | null = null;
+      if (
+        nextDay &&
+        rec.snowDepthAtStartOfDay != null &&
+        nextDay.snowDepthAtStartOfDay != null
+      ) {
+        const diff = nextDay.snowDepthAtStartOfDay - rec.snowDepthAtStartOfDay;
         derivedSnowfall = diff > 0 ? diff : 0;
       }
       out.push({
         date: rec.date,
         snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay,
-        derivedSnowfall: derivedSnowfall,
+        derivedSnowfall,
       });
     }
 
