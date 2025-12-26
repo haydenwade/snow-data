@@ -19,6 +19,14 @@ function toISODate(d: Date) {
   return `${y}-${m}-${day}`;
 }
 
+// Shift a YYYY-MM-DD date string by N days (UTC-safe for our usage)
+function shiftISO(iso: string, days: number) {
+  const d = new Date(`${iso}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return iso;
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 // Normalize various date formats from AWDB values to YYYY-MM-DD
 function normalizeDate(input: any): string | null {
   if (typeof input === "string") {
@@ -56,6 +64,9 @@ export async function GET(
   request: Request
 ): Promise<NextResponse<GetResponseType>> {
   const { searchParams } = new URL(request.url);
+  // Always return dates aligned to the station's local "start of day" label.
+  // The AWDB DAILY JSON labels SNWD one calendar day earlier than the UI's
+  // "Start of Day" table, so we normalize by shifting +1 day consistently.
 
   const locationId = searchParams.get("locationId");
   const location = LOCATIONS.find((l) => l.id === locationId);
@@ -176,9 +187,10 @@ export async function GET(
     }
 
     const dates = Array.from(byDate.keys()).sort();
-    // Attribute derived snowfall to the day it occurred: compute nextStart - curStart
-    // Root-cause of off-by-one: we were previously comparing current-start to previous-start,
-    // which credited new snow to the following calendar day. Use next day's start instead.
+    // Attribute derived snowfall to the day it occurred: compute nextStart - curStart.
+    // USDA "data" service dates for DAILY SNWD appear to be labeled one day earlier than
+    // the "Start of Day" dates shown in the ReportGenerator UI. To align with the UI and
+    // common expectation, we shift the output date forward by +1 day.
     const out: HistoricDay[] = [];
     for (let i = 0; i < dates.length; i++) {
       const date = dates[i];
@@ -194,7 +206,9 @@ export async function GET(
         derivedSnowfall = diff > 0 ? diff : 0;
       }
       out.push({
-        date: rec.date,
+        // Align to UI/local reporting day boundary by shifting dates +1 day
+        // (AWDB DAILY label -> local Start-of-Day label)
+        date: shiftISO(rec.date, 1),
         snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay,
         derivedSnowfall,
       });
