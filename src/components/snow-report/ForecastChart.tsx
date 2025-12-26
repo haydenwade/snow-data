@@ -26,6 +26,12 @@ function fmtShort(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
   return d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
 }
+function fmtMonthDay(dateStr: string) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  const m = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
+  return `${m}/${day}`;
+}
 
 export default function ForecastChart({
   data,
@@ -40,6 +46,8 @@ export default function ForecastChart({
     ...d,
     displayDate: fmtDisplay(d.date),
     shortDate: fmtShort(d.date),
+    tickDOW: fmtShort(d.date),
+    tickMD: fmtMonthDay(d.date),
     value: unit === "mm" ? d.snowIn * 25.4 : d.snowIn,
   }));
 
@@ -100,6 +108,22 @@ export default function ForecastChart({
     );
   };
 
+  const DayTick = (props: any) => {
+    const { x, y, payload } = props;
+    const idx = payload?.index ?? 0;
+    const row = chartData[idx] || {};
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text dy={16} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+          {row.tickDOW}
+        </text>
+        <text dy={30} textAnchor="middle" fill="#94a3b8" fontSize={10} opacity={0.85}>
+          {row.tickMD}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <div className="bg-slate-800/40 rounded-2xl border border-slate-700/50 overflow-hidden">
       <div className="p-4 border-b border-slate-700/50">
@@ -112,13 +136,14 @@ export default function ForecastChart({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 28, right: 10, left: -10, bottom: 0 }}
+            margin={{ top: 28, right: 10, left: -10, bottom: 40 }}
           >
             <XAxis
-              dataKey="shortDate"
-              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              dataKey="tickDOW"
+              tick={<DayTick />}
               axisLine={{ stroke: "#475569" }}
               tickLine={false}
+              interval={0}
             />
             <YAxis
               tick={{ fill: "#94a3b8", fontSize: 10 }}
