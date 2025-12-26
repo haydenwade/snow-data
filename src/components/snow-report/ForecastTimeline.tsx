@@ -26,7 +26,7 @@ export default function ForecastTimeline({
   unit: Unit;
   loading: boolean;
 }) {
-  const slice = data.length > 1 ? data.slice(1, 8) : data.slice(0, 7);
+  const slice =  data.slice(1);
 
   if (loading || data.length === 0) {
     return <ForecastTimelineSkeleton />;

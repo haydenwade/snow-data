@@ -10,9 +10,7 @@ import ForecastTimeline from "../../../components/snow-report/ForecastTimeline";
 import ForecastTable from "../../../components/snow-report/ForecastTable";
 import DataNotes from "../../../components/snow-report/DataNotes";
 import CurrentConditions from "../../../components/snow-report/CurrentConditions";
-import {
-  aggregateForecastToDaily,
-} from "../../../components/snow-report/utils";
+import { aggregateForecastToDaily } from "../../../components/snow-report/utils";
 import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
@@ -108,6 +106,15 @@ export default function LocationPage() {
     );
   }
 
+  const todayAndFutureForecast = forecast.filter((d) => {
+    const today = new Date();
+    const dDate = new Date(`${d.date}T00:00:00`);
+    // Only include today or future days
+    return (
+      dDate >= new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    );
+  });
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       <Header
@@ -135,9 +142,14 @@ export default function LocationPage() {
         />
         <ForecastTimeline data={forecast} unit={unit} loading={loading} />
 
+        {/* Only show today and future days in forecast chart/table */}
         <section className="grid md:grid-cols-2 gap-6">
-          <ForecastChart data={forecast} unit={unit} loading={loading} />
-          <ForecastTable data={forecast} unit={unit} loading={loading} />
+          <ForecastChart data={todayAndFutureForecast} unit={unit} loading={loading} />
+          <ForecastTable
+            data={todayAndFutureForecast}
+            unit={unit}
+            loading={loading}
+          />
         </section>
 
         <section className="grid md:grid-cols-2 gap-6">
