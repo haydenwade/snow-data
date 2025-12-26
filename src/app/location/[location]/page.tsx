@@ -135,7 +135,7 @@ export default function LocationPage() {
 
         <SnowSummaryStrip
           historic={historic}
-          forecast={forecast}
+          forecast={todayAndFutureForecast}
           unit={unit}
           locationId={locationId}
           loading={loading}

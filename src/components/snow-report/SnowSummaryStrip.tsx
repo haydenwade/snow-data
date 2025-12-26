@@ -25,16 +25,24 @@ export default function SnowSummaryStrip({
   const useMetric = unit === "mm";
   const last15 = historic.slice(-15); // ascending order
 
+  console.log('forecast', forecast);
+  const todayDate = forecast[0]?.date; // YYYY-MM-DD for current day
   const buckets = useMemo(() => {
-    const vals = last15.map((d) => d.derivedSnowfall!);
-    const prev11_15 = sum(vals.slice(0, 5));
-    const prev6_10 = sum(vals.slice(5, 10));
-    const prev1_5 = sum(vals.slice(10, 15));
-    const last24 = vals.at(-1) ?? 0;
-    const next1_5 = sum(forecast.slice(0, 5).map((d) => d.snowIn));
-    const next6_7 = sum(forecast.slice(5, 7).map((d) => d.snowIn));
-    return { prev11_15, prev6_10, prev1_5, last24, next1_5, next6_7 };
-  }, [historic, forecast]);
+    // Use only days strictly before today for historic buckets and last24
+    const historicBeforeToday = todayDate
+      ? historic.filter((d) => d.date < todayDate)
+      : historic;
+    const last14 = historicBeforeToday.slice(-14);
+    const prev8_14_vals = last14.slice(0, 7).map((d) => d.derivedSnowfall ?? 0);
+    const prev1_7_vals = last14.slice(-7).map((d) => d.derivedSnowfall ?? 0);
+    const prev8_14 = sum(prev8_14_vals);
+    const prev1_7 = sum(prev1_7_vals);
+    const last24 = (historicBeforeToday.at(-1)?.derivedSnowfall ?? 0);
+    // Forecast: next 24 is today; next 1-7 excludes today
+    const next24 = forecast[0]?.snowIn ?? 0;
+    const next1_7 = sum(forecast.slice(1, 8).map((d) => d.snowIn));
+    return { prev8_14, prev1_7, last24, next24, next1_7 };
+  }, [historic, forecast, todayDate]);
 
   const formatSnow = (value: number) => {
     if (useMetric) return `${Math.round(value * 25.4)}`;
@@ -44,18 +52,13 @@ export default function SnowSummaryStrip({
 
   const summaryItems = [
     {
-      label: "Prev 11-15 Days",
-      value: buckets.prev11_15,
+      label: "Prev 8-14 Days",
+      value: buckets.prev8_14,
       type: "historic" as const,
     },
     {
-      label: "Prev 6-10 Days",
-      value: buckets.prev6_10,
-      type: "historic" as const,
-    },
-    {
-      label: "Prev 1-5 Days",
-      value: buckets.prev1_5,
+      label: "Prev 1-7 Days",
+      value: buckets.prev1_7,
       type: "historic" as const,
     },
     {
@@ -65,32 +68,62 @@ export default function SnowSummaryStrip({
       highlight: true,
     },
     {
-      label: "Next 1-5 Days",
-      value: buckets.next1_5,
+      label: "Next 24 Hours",
+      value: buckets.next24,
       type: "forecast" as const,
     },
     {
-      label: "Next 6-7 Days",
-      value: buckets.next6_7,
+      label: "Next 1-7 Days",
+      value: buckets.next1_7,
       type: "forecast" as const,
     },
   ];
 
-  const getBarData = (idx: number) => {
-    if (idx === 3) return [buckets.last24];
-    if (idx < 3) {
-      // Historic buckets: slice groups from last15
-      const group =
-        idx === 0
-          ? last15.slice(0, 5)
-          : idx === 1
-          ? last15.slice(5, 10)
-          : last15.slice(10, 15);
-      return group.map((d) => d.derivedSnowfall!).reverse();
+  // Helper to extract day-of-month from YYYY-MM-DD
+  const dayOfMonth = (date: string) => {
+    const parts = date.split("-");
+    const day = parts[2] ?? "01";
+    return parseInt(day, 10);
+  };
+
+  // Build per-bar items with value and date for labeling
+  const getBarItems = (idx: number) => {
+    // 0: Prev 1-7, 1: Prev 8-14, 2: Last 24 Hours, 3: Next 24 Hours, 4: Next 1-7
+    const historicBeforeToday = todayDate
+      ? last15.filter((d) => d.date < todayDate)
+      : last15;
+    if (idx === 0) {
+      // Prev 8-14 in ascending date order
+      const last14 = historicBeforeToday.slice(-14);
+      const group = last14.slice(0, 7);
+      return group.map((d) => ({ value: d.derivedSnowfall ?? 0, date: d.date }));
     }
-    // Forecast
-    const groupF = idx === 4 ? forecast.slice(0, 5) : forecast.slice(5, 7);
-    return groupF.map((d) => d.snowIn);
+    if (idx === 1) {
+      // Prev 1-7 in ascending date order
+      const group = historicBeforeToday.slice(-7);
+      return group.map((d) => ({ value: d.derivedSnowfall ?? 0, date: d.date }));
+    }
+    if (idx === 2) {
+      const d = historicBeforeToday.at(-1);
+      return [
+        {
+          value: d?.derivedSnowfall ?? 0,
+          date: d?.date ?? "",
+        },
+      ];
+    }
+    if (idx === 3) {
+      const d = forecast[0];
+      return [
+        {
+          value: d?.snowIn ?? 0,
+          date: d?.date ?? "",
+        },
+      ];
+    }
+    // Next 1-7 excludes today
+    const groupF = forecast.slice(1, 8);
+    return groupF.map((d) => ({ value: d.snowIn, date: d.date }));
   };
 
   if (loading || !historic.length || !forecast.length) {
@@ -104,8 +137,8 @@ export default function SnowSummaryStrip({
       </div>
       <div className="flex gap-2 flex-wrap">
         {summaryItems.map((item, idx) => {
-          const barData = getBarData(idx);
-          const maxBar = Math.max(...barData, 1);
+          const barItems = getBarItems(idx);
+          const maxBar = Math.max(...barItems.map((b) => b.value), 1);
           const isForecast = item.type === "forecast";
           return (
             <div
@@ -123,26 +156,45 @@ export default function SnowSummaryStrip({
               >
                 {item.label}
               </p>
-              <div className="flex items-end gap-0.5 h-10 mb-2">
-                {barData.map((val, i) => (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-t transition-all ${
-                      isForecast
-                        ? "bg-blue-500/80"
-                        : val > 0
-                        ? "bg-orange-500/80"
-                        : "bg-slate-600/50"
-                    }`}
-                    style={{
-                      height: `${Math.max(
-                        (val / maxBar) * 100,
-                        val > 0 ? 15 : 5
-                      )}%`,
-                      minHeight: "2px",
-                    }}
-                  />
-                ))}
+              <div className="flex items-end gap-0.5 h-10 mb-1">
+                {barItems.map((bar, i) => {
+                  const val = bar.value;
+                  return (
+                    <div
+                      key={i}
+                      className={`flex-1 rounded-t transition-all ${
+                        isForecast
+                          ? "bg-blue-500/80"
+                          : val > 0
+                          ? "bg-orange-500/80"
+                          : "bg-slate-600/50"
+                      }`}
+                      style={{
+                        height: `${Math.max(
+                          (val / maxBar) * 100,
+                          val > 0 ? 15 : 5
+                        )}%`,
+                        minHeight: "2px",
+                      }}
+                      title={`${val.toFixed(2)} ${useMetric ? "in (raw)" : "in"} | DoM ${dayOfMonth(bar.date)}`}
+                    />
+                  );
+                })}
+              </div>
+              <div className="flex gap-0.5 text-[10px] leading-tight text-slate-400">
+                {barItems.map((bar, i) => {
+                  const displayVal = useMetric
+                    ? Math.round(bar.value * 25.4)
+                    : Number.isInteger(bar.value)
+                    ? bar.value
+                    : parseFloat(bar.value.toFixed(1));
+                  return (
+                    <div key={i} className="flex-1 text-center">
+                      <div className="font-medium text-slate-300">{displayVal}</div>
+                      <div className="opacity-70">{dayOfMonth(bar.date)}</div>
+                    </div>
+                  );
+                })}
               </div>
               <p
                 className={`text-2xl font-bold ${
