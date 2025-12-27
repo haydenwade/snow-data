@@ -5,6 +5,10 @@ import Header from "@/components/snow-report/Header";
 export const metadata: Metadata = {
   title: "SNOWD",
   description: "Trusted snow conditions, forecasts, and historical snowfall — plus lift/terrain status and traffic cams.",
+  manifest: "/manifest.json",
+  icons: {
+    apple: [{ url: "/snowd-icon-ios.png", sizes: "180x180" }],
+  },
   openGraph: {
     title: "SNOWD",
     description:
