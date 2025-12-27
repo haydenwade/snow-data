@@ -1,5 +1,5 @@
+import { ForecastGridData } from '@/types/forecast';
 import { aggregateForecastToDaily } from './utils';
-import type { ForecastGridData } from './utils';
 
 const grid: ForecastGridData = {
   snowfallAmount: {
@@ -146,7 +146,7 @@ const grid: ForecastGridData = {
 
 describe('aggregateForecastToDaily', () => {
   it('assigns snowfall, pop and temps to Denver local days and sums correctly', () => {
-    const days = aggregateForecastToDaily(grid);
+    const days = aggregateForecastToDaily(grid, "America/Denver");
     const byDate = Object.fromEntries(days.map((d) => [d.date, d]));
 
     const expected: Record<string, { snowIn: number; pop: number; tMaxC?: number; tMinC?: number; tMaxF?: number; tMinF?: number }> = {
