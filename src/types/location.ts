@@ -8,6 +8,8 @@ export type MountainLocation = {
   id: string;
   stationId: string;
   name: string;
+  city: string;
+  state: string;
   network: string;
   county: string;
   elevation: string;

@@ -25,7 +25,6 @@ export default function SnowSummaryStrip({
   const useMetric = unit === "mm";
   const last15 = historic.slice(-15); // ascending order
 
-  console.log('forecast', forecast);
   const todayDate = forecast[0]?.date; // YYYY-MM-DD for current day
   const buckets = useMemo(() => {
     // Use only days strictly before today for historic buckets and last24

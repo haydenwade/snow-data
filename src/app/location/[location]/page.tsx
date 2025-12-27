@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import Header from "../../../components/snow-report/Header";
+import LocationTitle from "../../../components/snow-report/LocationTitle";
 import StationMap from "../../../components/snow-report/StationMap";
 import StationMetadata from "../../../components/snow-report/StationMetadata";
 import SnowSummaryStrip from "../../../components/snow-report/SnowSummaryStrip";
@@ -117,7 +117,7 @@ export default function LocationPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header
+      <LocationTitle
         unit={unit}
         range={range}
         onUnit={setUnit}
@@ -130,7 +130,7 @@ export default function LocationPage() {
         </div>
       )}
 
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
         <CurrentConditions locationId={locationId} unit={unit} />
 
         <SnowSummaryStrip

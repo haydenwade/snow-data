@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
-import Header from "../../../../components/snow-report/Header";
+import LocationTitle from "../../../../components/snow-report/LocationTitle";
 import StationMap from "../../../../components/snow-report/StationMap";
 import StationMetadata from "../../../../components/snow-report/StationMetadata";
 import HistoricChart from "../../../../components/snow-report/HistoricChart";
@@ -84,7 +84,7 @@ export default function LocationPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <Header
+      <LocationTitle
         unit={unit}
         range={range}
         onUnit={setUnit}
@@ -104,7 +104,7 @@ export default function LocationPage() {
           ← Back to Forecast
         </a>
       </div>
-      <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
         <section className="grid md:grid-cols-2 gap-6">
           <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
           <HistoricTable
