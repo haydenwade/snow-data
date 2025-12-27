@@ -16,6 +16,7 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver", //TODO: update to use variable instead of magic string - find library or use constant from utils
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
+    radarLink: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41MDgsNDAuNjUxXSwibG9jYXRpb24iOlstMTExLjUwOCw0MC42NTFdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -77,6 +78,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver",
     logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS42NDUsNDAuNTg5XSwibG9jYXRpb24iOlstMTExLjY0NSw0MC41ODldLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -142,6 +145,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver",
     logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS42NTYsNDAuNTgyXSwibG9jYXRpb24iOlstMTExLjY1Niw0MC41ODJdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -211,6 +216,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver",
     logoUrl: "/brighton-logo.png",
     stationTriplet: "366:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41OTMsNDAuNjEyXSwibG9jYXRpb24iOlstMTExLjU5Myw0MC42MTJdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -276,6 +283,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver",
     logoUrl: "/powdermtn-logo.svg",
     stationTriplet: "1300:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS44MTMsNDEuMjk5XSwibG9jYXRpb24iOlstMTExLjgxMyw0MS4yOTldLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -331,6 +340,9 @@ export const LOCATIONS: MountainLocation[] = [
     huc: "160202030102",
     timezone: "America/Denver",
     stationTriplet: "828:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS4yODEsNDAuNjQzXSwibG9jYXRpb24iOlstMTExLjI4MSw0MC42NDNdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -355,6 +367,8 @@ export const LOCATIONS: MountainLocation[] = [
     huc: "160202030104",
     timezone: "America/Denver",
     stationTriplet: "1164:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MTIsNDAuNTA4XSwibG9jYXRpb24iOlstMTExLjQxMiw0MC41MDhdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -379,6 +393,8 @@ export const LOCATIONS: MountainLocation[] = [
     huc: "140600040103",
     timezone: "America/Denver",
     stationTriplet: "795:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MTIsNDAuNTA4XSwibG9jYXRpb24iOlstMTExLjQxMiw0MC41MDhdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -403,6 +419,8 @@ export const LOCATIONS: MountainLocation[] = [
     huc: "170401050102",
     timezone: "America/Denver",
     stationTriplet: "419:WY:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMC45MzQsNDIuNzI1XSwibG9jYXRpb24iOlstMTEwLjkzNCw0Mi43MjVdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -428,6 +446,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Los_Angeles",
     stationTriplet: "518:CA:SNTL",
     logoUrl: "/heavenly-logo.png",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/skiheavenly/" },
     ],
@@ -480,6 +500,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Los_Angeles",
     stationTriplet: "784:CA:SNTL",
     logoUrl: "/palisades-logo.jpg",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/palisadestahoe/" },
     ],
@@ -531,6 +553,8 @@ export const LOCATIONS: MountainLocation[] = [
     huc: "180201290101",
     timezone: "America/Los_Angeles",
     stationTriplet: "1067:CA:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -556,6 +580,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Los_Angeles",
     stationTriplet: "652:NV:SNTL",
     logoUrl: "/mtrose-logo.jpg",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/mtroseskitahoe/" },
       { label: "X", url: "https://x.com/MtRoseSkiTahoe" },

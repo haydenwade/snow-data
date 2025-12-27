@@ -64,7 +64,7 @@ export default function LocationTitle({
                   <span className="ml-1">SNOTEL + NWS Forecast Data</span>
                 </span>
                 <a
-                  href="https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MzMsNDAuNTE1XSwiem9vbSI6OCwibG9jYXRpb24iOlstMTExLjY0LDQwLjU5XX0sImJhc2UiOiJzdGFuZGFyZCIsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlfQ%3D%3D#/"
+                  href={location.radarLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Open NWS Radar Map"
