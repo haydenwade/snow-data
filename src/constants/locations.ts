@@ -408,10 +408,183 @@ export const LOCATIONS: MountainLocation[] = [
     avalancheInfoLinks: [
       {
         label: "Avalanche Forecast",
-        url:"https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/"
-      }
+        url: "https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/",
+      },
     ],
     trafficInfoLinks: [],
   },
-  
+  {
+    id: "heavenly",
+    stationId: "518",
+    name: "Heavenly",
+    city: "South Lake Tahoe",
+    state: "California",
+    network: "SNOTEL",
+    county: "El Dorado",
+    elevation: "8,540 ft",
+    lat: 38.92,
+    lon: -119.92,
+    huc: "160501010302",
+    timezone: "America/Los_Angeles",
+    stationTriplet: "518:CA:SNTL",
+    logoUrl: "/heavenly-logo.png",
+    socialMediaLinks: [
+      { label: "Instagram", url: "https://www.instagram.com/skiheavenly/" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Heavenly Conditions (Twitter/X)",
+        url: "https://x.com/HVConditions",
+      },
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.skiheavenly.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.skiheavenly.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.skiheavenly.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.skiheavenly.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.skiheavenly.com/explore-the-resort/about-the-resort/getting-here-and-parking.aspx",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "palisades",
+    stationId: "784",
+    name: "Palisades",
+    city: "Olympic Valley",
+    state: "California",
+    network: "SNOTEL",
+    county: "Placer",
+    elevation: "8,010 ft",
+    lat: 39.19,
+    lon: -120.27,
+    huc: "160501020202",
+    timezone: "America/Los_Angeles",
+    stationTriplet: "784:CA:SNTL",
+    logoUrl: "/palisades-logo.jpg",
+    socialMediaLinks: [
+      { label: "Instagram", url: "https://www.instagram.com/palisadestahoe/" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Palisades Mtn Ops (Twitter/X)",
+        url: "https://x.com/palisadesops",
+      },
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.palisadestahoe.com/mountain-information/mountain-report",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.palisadestahoe.com/mountain-information/hours-of-operation",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.palisadestahoe.com/mountain-information/webcams",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.palisadestahoe.com/mountain-information/trail-maps",
+      },
+      {
+        label: "Parking",
+        url: "https://www.palisadestahoe.com/mountain-information/parking-and-road-conditions",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "carsonpass",
+    stationId: "1067",
+    name: "Carson Pass",
+    city: "Kirkwood",
+    state: "California",
+    network: "SNOTEL",
+    county: "Alpine",
+    elevation: "8,360 ft",
+    lat: 38.69,
+    lon: -120.0,
+    huc: "180201290101",
+    timezone: "America/Los_Angeles",
+    stationTriplet: "1067:CA:SNTL",
+    socialMediaLinks: [],
+    resortInfoLinks: [],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "mtrose",
+    stationId: "652",
+    name: "Mt Rose",
+    city: "Incline Village",
+    state: "Nevada",
+    network: "SNOTEL",
+    county: "Washoe",
+    elevation: "8,810 ft",
+    lat: 39.32,
+    lon: -119.89,
+    huc: "160501020304",
+    timezone: "America/Los_Angeles",
+    stationTriplet: "652:NV:SNTL",
+    logoUrl: "/mtrose-logo.jpg",
+    socialMediaLinks: [
+      { label: "Instagram", url: "https://www.instagram.com/mtroseskitahoe/" },
+      { label: "X", url: "https://x.com/MtRoseSkiTahoe" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://skirose.com/snow-report/",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://skirose.com/mountain-information/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://skirose.com/trail-maps/",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "Traffic Cameras | NDOT",
+        url: "https://www.nvroads.com/",
+      },
+    ],
+  },
 ];

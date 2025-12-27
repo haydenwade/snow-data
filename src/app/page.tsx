@@ -1,10 +1,36 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
 import { LOCATIONS } from "@/constants/locations";
-import { Mountain } from "lucide-react";
+import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
 
 export default function Home() {
+  const [query, setQuery] = useState("");
+
+  const filteredLocations = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return LOCATIONS;
+    return LOCATIONS.filter((l) => {
+      const haystack = [
+        l.name,
+        l.city,
+        l.state,
+        l.county,
+        l.elevation,
+        l.network,
+        l.id,
+        l.stationId,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [query]);
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-28">
@@ -20,6 +46,27 @@ export default function Home() {
           <RotatingFeatures />
         </div>
 
+        {/* Search */}
+        <div className="max-w-xl mx-auto mb-6">
+          <label htmlFor="location-search" className="sr-only">
+            Search locations
+          </label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+            <input
+              id="location-search"
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, city, state, or station ID"
+              className="w-full pl-10 pr-4 py-2 rounded-md bg-slate-800/70 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            {query ? `${filteredLocations.length} result${filteredLocations.length === 1 ? "" : "s"}` : `${LOCATIONS.length} locations`}
+          </p>
+        </div>
+
         {/* Locations grid */}
         <h2 className="text-center text-slate-200 text-lg md:text-xl font-semibold mb-4">
           Select a location to see current conditions and snowfall.
@@ -28,7 +75,7 @@ export default function Home() {
           id="locations"
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-w-0"
         >
-          {LOCATIONS.map((location) => (
+          {filteredLocations.map((location) => (
             <Link
               key={location.id}
               href={`/location/${location.id}`}
@@ -68,6 +115,11 @@ export default function Home() {
               </div>
             </Link>
           ))}
+          {filteredLocations.length === 0 && (
+            <div className="col-span-full text-center text-slate-400 py-8">
+              No locations match your search.
+            </div>
+          )}
         </div>
         <Footer textOverride={"Don't see the location you are looking for?"} />
       </div>
