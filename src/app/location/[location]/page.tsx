@@ -82,7 +82,7 @@ export default function LocationPage() {
       setError(null);
       const hist = await fetchHistoric(locationId, 30);
       const grid = await fetchForecastGrid(locationId);
-      const fc = aggregateForecastToDaily(grid);
+      const fc = aggregateForecastToDaily(grid, location.timezone);
       setHistoric(hist);
       setForecast(fc);
       setUpdatedAt(new Date());

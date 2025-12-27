@@ -8,7 +8,6 @@ import { LOCATIONS } from "@/constants/locations";
 const USER_AGENT = "snow-data (github.com)";
 const STALE_MINUTES = 60;
 
-const DENVER_TZ = "America/Denver";
 
 // Compute the timezone offset (in minutes) for a given Date at a specific IANA timezone
 function getTimeZoneOffsetAt(date: Date, timeZone: string): number {
@@ -59,13 +58,15 @@ export function getSunTimes({
   lat,
   lon,
   date,
+  timeZone,
 }: {
   lat: number;
   lon: number;
   date: Date;
+  timeZone: string;
 }) {
   // Use the location's local midnight to anchor "the day"
-  const base = getMidnightInZone(date, DENVER_TZ);
+  const base = getMidnightInZone(date, timeZone);
   const times = SunCalc.getTimes(base, lat, lon);
 
   return {
@@ -342,7 +343,7 @@ export async function GET(req: Request) {
         startTime, // ISO (local offset)
         hourLabel: startTime
           ? new Date(startTime).toLocaleTimeString("en-US", {
-              timeZone: "America/Denver",
+              timeZone: loc.timezone,
               hour: "numeric",
             })
           : null,
@@ -491,8 +492,8 @@ export async function GET(req: Request) {
         label: windLabel(windSpeedMph),
       },
       sun: {
-        ...getSunTimes({ lat: loc.lat, lon: loc.lon, date: new Date() }),
-        timeZone: DENVER_TZ,
+        ...getSunTimes({ lat: loc.lat, lon: loc.lon, date: new Date(), timeZone: loc.timezone }),
+        timeZone: loc.timezone,
       },
     };
 

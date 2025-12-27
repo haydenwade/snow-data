@@ -1,9 +1,8 @@
 import { ForecastDaily, ForecastGridData, SeriesPoint } from "@/types/forecast";
 
-export const DENVER_TZ = "America/Denver";
-
-export function dateKeyDenver(d: Date) {
-  return d.toLocaleDateString("en-CA", { timeZone: DENVER_TZ });
+// Return YYYY-MM-DD string for a given date in the provided IANA time zone
+export function dateKeyInZone(d: Date, timeZone: string = "America/Denver") {
+  return d.toLocaleDateString("en-CA", { timeZone });
 }
 
 export function isoToDate(iso: string) {
@@ -64,7 +63,7 @@ export function formatTimeInZone(
   if (!(d instanceof Date) || Number.isNaN(d.getTime())) return null;
   try {
     return d.toLocaleTimeString(undefined, {
-      timeZone: timeZone ?? "America/Denver",
+      timeZone: timeZone ?? undefined,
       hour: "numeric",
       minute: "2-digit",
     });
@@ -100,7 +99,8 @@ export function expandToHourly(p: SeriesPoint): Date[] {
 }
 
 export function aggregateForecastToDaily(
-  grid: ForecastGridData
+  grid: ForecastGridData,
+  timeZone: string
 ): ForecastDaily[] {
   const dayBuckets: Record<
     string,
@@ -139,7 +139,7 @@ export function aggregateForecastToDaily(
     const perHourIn = inches / hours;
     const hoursList = expandToHourly(p);
     hoursList.forEach((h) => {
-      const day = dateKeyDenver(h);
+      const day = dateKeyInZone(h, timeZone);
       pushDay(day);
       dayBuckets[day].snowIn += perHourIn;
     });
@@ -148,7 +148,7 @@ export function aggregateForecastToDaily(
   grid.probabilityOfPrecipitation.points.forEach((p) => {
     const hoursList = expandToHourly(p);
     hoursList.forEach((h) => {
-      const day = dateKeyDenver(h);
+      const day = dateKeyInZone(h, timeZone);
       pushDay(day);
       dayBuckets[day].pops.push(p.value);
     });
@@ -159,7 +159,7 @@ export function aggregateForecastToDaily(
     grid.windSpeed.points.forEach((p) => {
       const hoursList = expandToHourly(p);
       hoursList.forEach((h) => {
-        const day = dateKeyDenver(h);
+        const day = dateKeyInZone(h, timeZone);
         pushDay(day);
         // store raw value for later normalization
         dayBuckets[day].windSpeeds.push(p.value);
@@ -171,7 +171,7 @@ export function aggregateForecastToDaily(
     grid.windDirection.points.forEach((p) => {
       const hoursList = expandToHourly(p);
       hoursList.forEach((h) => {
-        const day = dateKeyDenver(h);
+        const day = dateKeyInZone(h, timeZone);
         pushDay(day);
         dayBuckets[day].windDirs.push({ dir: p.value, speed: 0 });
       });
@@ -182,7 +182,7 @@ export function aggregateForecastToDaily(
     grid.skyCover.points.forEach((p) => {
       const hoursList = expandToHourly(p);
       hoursList.forEach((h) => {
-        const day = dateKeyDenver(h);
+        const day = dateKeyInZone(h, timeZone);
         pushDay(day);
         dayBuckets[day].skyCovers.push(p.value);
       });
@@ -195,7 +195,7 @@ export function aggregateForecastToDaily(
     const start = isoToDate(p.start);
     const hours = Math.max(1, p.hours || 1);
     const mid = new Date(start.getTime() + (hours * 3600_000) / 2);
-    return dateKeyDenver(mid);
+    return dateKeyInZone(mid, timeZone);
   }
 
   if (grid.maxTemperature && grid.maxTemperature.points) {
