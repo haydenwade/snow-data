@@ -21,7 +21,7 @@ export default function Home() {
 
     // Special case: show hidden emigrantsummit if user searches exactly "emigrant"
     const searchPool =
-      q.toLowerCase() === "emigrant" ? LOCATIONS : visibleLocations;
+      q === "emigrant" ? LOCATIONS : visibleLocations;
 
     return searchPool.filter((l) => {
       const haystack = [
