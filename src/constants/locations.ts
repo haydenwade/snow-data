@@ -613,4 +613,30 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
   },
+  {
+    id: "emigrantsummit",
+    stationId: "471",
+    name: "Emigrant Summit",
+    city: "Montpelier",
+    state: "Idaho",
+    network: "SNOTEL",
+    county: "Bear Lake",
+    elevation: "7,390 ft",
+    lat: 42.36,
+    lon: -111.56,
+    huc: "160102020206",
+    timezone: "America/Boise",
+    stationTriplet: "471:ID:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41Niw0Mi4zNTZdLCJsb2NhdGlvbiI6Wy0xMTEuNTYsNDIuMzU2XSwiem9vbSI6MTIuMjkzMzMzMzMzMzMzMzMxLCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+    socialMediaLinks: [],
+    resortInfoLinks: [],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/logan",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
 ];
