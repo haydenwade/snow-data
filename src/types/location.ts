@@ -24,4 +24,5 @@ export type MountainLocation = {
   avalancheInfoLinks: GenericLink[];
   trafficInfoLinks: GenericLink[];
   radarLink: string;
+  isHidden: boolean;
 };

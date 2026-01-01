@@ -10,10 +10,20 @@ import RotatingFeatures from "@/components/RotatingFeatures";
 export default function Home() {
   const [query, setQuery] = useState("");
 
+  const visibleLocations = useMemo(
+    () => LOCATIONS.filter((l) => !l.isHidden),
+    []
+  );
+
   const filteredLocations = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return LOCATIONS;
-    return LOCATIONS.filter((l) => {
+    if (!q) return visibleLocations;
+
+    // Special case: show hidden emigrantsummit if user searches exactly "emigrant"
+    const searchPool =
+      q === "emigrant" ? LOCATIONS : visibleLocations;
+
+    return searchPool.filter((l) => {
       const haystack = [
         l.name,
         l.city,
@@ -29,7 +39,7 @@ export default function Home() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query]);
+  }, [query, visibleLocations]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -63,7 +73,7 @@ export default function Home() {
             />
           </div>
           <p className="mt-2 text-xs text-slate-400">
-            {query ? `${filteredLocations.length} result${filteredLocations.length === 1 ? "" : "s"}` : `${LOCATIONS.length} locations`}
+            {query ? `${filteredLocations.length} result${filteredLocations.length === 1 ? "" : "s"}` : `${visibleLocations.length} locations`}
           </p>
         </div>
 

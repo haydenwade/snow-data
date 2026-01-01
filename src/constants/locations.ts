@@ -62,6 +62,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://utahavalanchecenter.org/forecast/salt-lake",
       },
     ],
+    isHidden: false,
   },
   {
     id: "alta",
@@ -129,6 +130,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras",
       },
     ],
+    isHidden: false,
   },
   {
     id: "snowbird",
@@ -200,6 +202,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://cottonwoodcanyons.udot.utah.gov/road-information/#traffic-cameras",
       },
     ],
+    isHidden: false,
   },
   {
     id: "brighton",
@@ -267,6 +270,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://www.brightonresort.com/conditions#road",
       },
     ],
+    isHidden: false,
   },
   {
     id: "powdermountain",
@@ -325,6 +329,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://ogdenvalley.udot.utah.gov/",
       },
     ],
+    isHidden: false,
   },
   {
     id: "triallake",
@@ -352,6 +357,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "wolfcreekpeak",
@@ -378,6 +384,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "strawberrydivide",
@@ -404,6 +411,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "cottonwoodcreekredtop",
@@ -430,6 +438,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "heavenly",
@@ -484,6 +493,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "palisades",
@@ -538,6 +548,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "carsonpass",
@@ -564,6 +575,7 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: false,
   },
   {
     id: "mtrose",
@@ -612,6 +624,7 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://www.nvroads.com/",
       },
     ],
+    isHidden: false,
   },
   {
     id: "emigrantsummit",
@@ -628,7 +641,7 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Boise",
     stationTriplet: "471:ID:SNTL",
     radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41Niw0Mi4zNTZdLCJsb2NhdGlvbiI6Wy0xMTEuNTYsNDIuMzU2XSwiem9vbSI6MTIuMjkzMzMzMzMzMzMzMzMxLCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41Niw0Mi4zNTZdLCJsb2NhdGlvbiI6Wy0xMTEuNTYsNDIuMzU2XSwiem9vbSI6OC4yOTMzMzMzMzMzMzMzMzEsImxheWVyIjoiYnJlZl9xY2QifSwiYW5pbWF0aW5nIjpmYWxzZSwiYmFzZSI6InN0YW5kYXJkIiwiYXJ0Y2MiOmZhbHNlLCJjb3VudHkiOmZhbHNlLCJjd2EiOmZhbHNlLCJyZmMiOmZhbHNlLCJzdGF0ZSI6ZmFsc2UsIm1lbnUiOnRydWUsInNob3J0RnVzZWRPbmx5IjpmYWxzZSwib3BhY2l0eSI6eyJhbGVydHMiOjAuOCwibG9jYWwiOjAuNiwibG9jYWxTdGF0aW9ucyI6MC44LCJuYXRpb25hbCI6MC42fX0%3D",
     socialMediaLinks: [],
     resortInfoLinks: [],
     avalancheInfoLinks: [
@@ -638,5 +651,6 @@ export const LOCATIONS: MountainLocation[] = [
       },
     ],
     trafficInfoLinks: [],
+    isHidden: true,
   },
 ];
