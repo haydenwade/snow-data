@@ -16,7 +16,8 @@ export const LOCATIONS: MountainLocation[] = [
     timezone: "America/Denver", //TODO: update to use variable instead of magic string - find library or use constant from utils
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
-    radarLink: "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41MDgsNDAuNjUxXSwibG9jYXRpb24iOlstMTExLjUwOCw0MC42NTFdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41MDgsNDAuNjUxXSwibG9jYXRpb24iOlstMTExLjUwOCw0MC42NTFdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -652,5 +653,60 @@ export const LOCATIONS: MountainLocation[] = [
     ],
     trafficInfoLinks: [],
     isHidden: true,
+  },
+  {
+    id: "pebblecreek",
+    stationId: "1299",
+    name: "Pebble Creek",
+    city: "Inkom",
+    state: "Idaho",
+    network: "SNOTEL",
+    county: "Caribou",
+    elevation: "6,520 ft",
+    lat: 42.77,
+    lon: -112.11,
+    huc: "170402080206",
+    timezone: "America/Boise",
+    stationTriplet: "1299:ID:SNTL",
+    logoUrl: "/pebblecreek-logo.png",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMi4yNTIsNDIuNzk4XSwibG9jYXRpb24iOlstMTEyLjI1Miw0Mi43OThdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/pebbleskiarea/",
+      },
+      { label: "X", url: "https://x.com/PebbleSkiArea" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://pebblecreekskiarea.com/the-mountain/trails-grooming",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://pebblecreekskiarea.com/the-mountain/webcam/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://pebblecreekskiarea.com/the-mountain/trails-grooming/",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast (Logan UAC)",
+        url: "https://utahavalanchecenter.org/forecast/logan",
+      },
+      {
+        label: "Avalanche Forecast (Bridger Teton)",
+        url: "https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/",
+      },
+      {
+        label: "Avalanche Forecast (Sawtooth)",
+        url: "https://www.sawtoothavalanche.com/forecasts/avalanche/soldier-&-wood-river-valley-mtns#/soldier-%26-wood-river-valley-mtns",
+      },
+    ],
+    trafficInfoLinks: [],
+    isHidden: false,
   },
 ];

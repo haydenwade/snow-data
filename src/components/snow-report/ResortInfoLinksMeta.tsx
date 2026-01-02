@@ -14,7 +14,13 @@ import React from "react";
 import { SiX } from "react-icons/si";
 
 export type Link = { label: string; url: string };
-export type BadgeType = "LIVE" | "OFFICIAL" | "MAP" | "CAM" | "RISK" | "FORECAST";
+export type BadgeType =
+  | "LIVE"
+  | "OFFICIAL"
+  | "MAP"
+  | "CAM"
+  | "RISK"
+  | "FORECAST";
 
 export type LinkMeta = {
   icon: React.ReactNode;
@@ -27,7 +33,12 @@ export function getLinkMeta(link: Link): LinkMeta {
   const u = link.url.toLowerCase();
 
   // URL-based detection (more reliable)
-  if (u.includes("utahavalanchecenter.org") || u.includes("bridgertetonavalanchecenter.org")) {
+  if (
+    u.includes("utahavalanchecenter.org") ||
+    u.includes("bridgertetonavalanchecenter.org") ||
+    u.includes("avalanchecenter.org") ||
+    u.includes("sawtoothavalanche.com")
+  ) {
     return {
       icon: <AlertTriangle className="h-5 w-5 text-amber-400" />,
       description: "Backcountry danger rating + problem types",
