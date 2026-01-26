@@ -2,7 +2,13 @@
 import { Sun, CloudSun, Cloud, Wind, CloudSnow, Cloudy } from "lucide-react";
 import ForecastTimelineSkeleton from "../skeletons/ForecastTimelineSkeleton";
 import SnowCell from "./SnowCell";
-import { formatDateYYYYMMDD, degToCompass, skyCoverLabel } from "./utils";
+import {
+  formatDateYYYYMMDD,
+  degToCompass,
+  skyCoverLabel,
+  celsiusFromF,
+  cToF,
+} from "./utils";
 import { ForecastDaily, Unit } from "@/types/forecast";
 
 // using degToCompass and skyCoverLabel from utils
@@ -61,6 +67,32 @@ export default function ForecastTimeline({
                   <div className="text-sm font-semibold text-slate-100">
                     {skyCoverLabel(d.skyCoverPercent)}
                   </div>
+                </div>
+              </div>
+
+              {/* High / Low Temperatures */}
+              <div className="w-full flex items-center justify-between">
+                <div className="text-sm text-slate-300">Temp</div>
+                <div className="text-sm font-medium text-slate-100">
+                  {(() => {
+                    const metric = unit === "mm";
+                    const tMax = metric
+                      ? d.tMaxC ?? (d.tMaxF != null ? celsiusFromF(d.tMaxF) : undefined)
+                      : d.tMaxF ?? (d.tMaxC != null ? Math.round(cToF(d.tMaxC)) : undefined);
+                    const tMin = metric
+                      ? d.tMinC ?? (d.tMinF != null ? celsiusFromF(d.tMinF) : undefined)
+                      : d.tMinF ?? (d.tMinC != null ? Math.round(cToF(d.tMinC)) : undefined);
+                    const unitLabel = metric ? "C" : "F";
+                    const hi = tMax != null && !Number.isNaN(tMax) ? `${tMax}°${unitLabel}` : "—";
+                    const lo = tMin != null && !Number.isNaN(tMin) ? `${tMin}°${unitLabel}` : "—";
+                    return (
+                      <span>
+                        <span className="font-semibold">{hi}</span>
+                        <span className="mx-1 text-slate-400">/</span>
+                        <span className="font-semibold">{lo}</span>
+                      </span>
+                    );
+                  })()}
                 </div>
               </div>
 
