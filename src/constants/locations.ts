@@ -709,4 +709,55 @@ export const LOCATIONS: MountainLocation[] = [
     trafficInfoLinks: [],
     isHidden: false,
   },
+  {
+    id: "snowbasin",
+    stationId: "332",
+    name: "Snowbasin",
+    city: "Huntsville",
+    state: "Utah",
+    network: "SNOTEL",
+    county: "Weber",
+    elevation: "7,690 ft",
+    lat: 41.22,
+    lon: -111.86,
+    huc: "160201020302",
+    timezone: "America/Denver",
+    logoUrl: "/snowbasin-logo.webp",
+    stationTriplet: "332:UT:SNTL",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS44Niw0MS4yMl0sImxvY2F0aW9uIjpbLTExMS44Niw0MS4yMl0sInpvb20iOjcsImxheWVyIjoiYnJlZl9xY2QifSwiYW5pbWF0aW5nIjpmYWxzZSwiYmFzZSI6InN0YW5kYXJkIiwiYXJ0Y2MiOmZhbHNlLCJjb3VudHkiOmZhbHNlLCJjd2EiOmZhbHNlLCJyZmMiOmZhbHNlLCJzdGF0ZSI6ZmFsc2UsIm1lbnUiOnRydWUsInNob3J0RnVzZWRPbmx5IjpmYWxzZSwib3BhY2l0eSI6eyJhbGVydHMiOjAuOCwibG9jYWwiOjAuNiwibG9jYWxTdGF0aW9ucyI6MC44LCJuYXRpb25hbCI6MC42fX0=",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/snowbasinresort/",
+      },
+      { label: "X", url: "https://x.com/SnowbasinResort" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Mountain Report & Conditions",
+        url: "https://www.snowbasin.com/the-mountain/mountain-report/",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.snowbasin.com/the-mountain/web-cams/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.snowbasin.com/the-mountain/trail-maps/",
+      },
+      {
+        label: "Parking",
+        url: "https://www.snowbasin.com/about/getting-here/",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://utahavalanchecenter.org/forecast/ogden",
+      },
+    ],
+    trafficInfoLinks: [],
+    isHidden: false,
+  },
 ];
