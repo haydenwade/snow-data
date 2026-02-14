@@ -2,12 +2,9 @@
 import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
+import { computeSnowBuckets } from "./utils";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, Unit } from "@/types/forecast";
-
-function sum(arr: number[]) {
-  return arr.reduce((a, b) => a + b, 0);
-}
 
 export default function SnowSummaryStrip({
   historic,
@@ -26,22 +23,10 @@ export default function SnowSummaryStrip({
   const last15 = historic.slice(-15); // ascending order
 
   const todayDate = forecast[0]?.date; // YYYY-MM-DD for current day
-  const buckets = useMemo(() => {
-    // Use only days strictly before today for historic buckets and last24
-    const historicBeforeToday = todayDate
-      ? historic.filter((d) => d.date < todayDate)
-      : historic;
-    const last14 = historicBeforeToday.slice(-14);
-    const prev8_14_vals = last14.slice(0, 7).map((d) => d.derivedSnowfall ?? 0);
-    const prev1_7_vals = last14.slice(-7).map((d) => d.derivedSnowfall ?? 0);
-    const prev8_14 = sum(prev8_14_vals);
-    const prev1_7 = sum(prev1_7_vals);
-    const last24 = (historicBeforeToday.at(-1)?.derivedSnowfall ?? 0);
-    // Forecast: next 24 is today; next 1-7 excludes today
-    const next24 = forecast[0]?.snowIn ?? 0;
-    const next1_7 = sum(forecast.slice(1, 8).map((d) => d.snowIn));
-    return { prev8_14, prev1_7, last24, next24, next1_7 };
-  }, [historic, forecast, todayDate]);
+  const buckets = useMemo(
+    () => computeSnowBuckets(historic, forecast),
+    [historic, forecast]
+  );
 
   const formatSnow = (value: number) => {
     if (useMetric) return `${Math.round(value * 25.4)}`;

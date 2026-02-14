@@ -11,29 +11,7 @@ import Footer from "@/components/snow-report/Footer";
 import { HistoricDay } from "@/types/historic";
 import { LOCATIONS } from "@/constants/locations";
 import { Unit } from "@/types/forecast";
-
-// Real data loaders (client-side via API routes)
-async function fetchHistoric(
-  locationId: string,
-  days: number
-): Promise<HistoricDay[]> {
-  const req = await fetch(
-    `/api/historic?locationId=${locationId}&days=${days}`,
-    { cache: "no-store" }
-  );
-  if (!req.ok) {
-    let detail = "";
-    try {
-      const j = await req.json();
-      detail = j?.error || JSON.stringify(j);
-    } catch {}
-    throw new Error(
-      `Historic fetch failed: ${req.status}${detail ? ` — ${detail}` : ""}`
-    );
-  }
-  const res = await req.json();
-  return res.data;
-}
+import { fetchHistoric } from "@/lib/api";
 
 export default function LocationPage() {
   const params = useParams();

@@ -5,6 +5,7 @@ import { Mountain, Radar, Snowflake } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type LocationTitleProps = {
   unit: Unit;
@@ -30,30 +31,33 @@ export default function LocationTitle({
     <div className="bg-slate-900/70">
       <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
         {/* Top branding row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              aria-label="Home"
-              className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
-            >
-              {location.logoUrl ? (
-                <div className="relative bg-white p-2 rounded-2xl flex items-center justify-center w-14 h-14 border border-slate-200">
-                  <img
-                    src={location.logoUrl}
-                    alt={stationName + " logo"}
-                    className="max-h-10 max-w-10 object-contain"
-                  />
-                </div>
-              ) : (
-                <>
-                  <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
-                  <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
-                    <Snowflake className="h-8 w-8 text-white" />
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex flex-col items-center gap-1">
+              <Link
+                href="/"
+                aria-label="Home"
+                className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+              >
+                {location.logoUrl ? (
+                  <div className="relative bg-white p-2 rounded-2xl flex items-center justify-center w-14 h-14 border border-slate-200">
+                    <img
+                      src={location.logoUrl}
+                      alt={stationName + " logo"}
+                      className="max-h-10 max-w-10 object-contain"
+                    />
                   </div>
-                </>
-              )}
-            </Link>
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
+                    <div className="relative bg-gradient-to-br from-blue-500 to-blue-700 p-3 rounded-2xl">
+                      <Snowflake className="h-8 w-8 text-white" />
+                    </div>
+                  </>
+                )}
+              </Link>
+              <FavoriteButton locationId={location.id} size="md" />
+            </div>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 {stationName}
