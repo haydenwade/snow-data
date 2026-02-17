@@ -434,8 +434,63 @@ export const LOCATIONS: MountainLocation[] = [
     resortInfoLinks: [],
     avalancheInfoLinks: [
       {
-        label: "Avalanche Forecast",
+        label: "Avalanche Forecast (Salt River and Wyoming Ranges)",
         url: "https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/",
+      },
+    ],
+    trafficInfoLinks: [],
+    isHidden: false,
+  },
+  {
+    id: "jacksonhole",
+    stationId: "689",
+    name: "Jackson Hole",
+    city: "Teton Village",
+    state: "Wyoming",
+    network: "SNOTEL",
+    county: "Teton",
+    elevation: "8,170 ft",
+    lat: 43.52,
+    lon: -110.91,
+    huc: "170401030504",
+    timezone: "America/Denver",
+    stationTriplet: "689:WY:SNTL",
+    logoUrl: "/jacksonhole-logo.webp",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMC43MzgsNDMuNjA3XSwibG9jYXRpb24iOlstMTEwLjczOCw0My42MDddLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/JacksonHole/",
+      },
+      { label: "X", url: "https://x.com/jhski" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Trail Map",
+        url: "https://www.jacksonhole.com/maps/mountain-winter",
+      },
+      {
+        label: "Lift Status",
+        url: "https://www.jacksonhole.com/mountain-report#lifts-deck",
+      },
+      {
+        label: "Trail Status",
+        url: "https://www.jacksonhole.com/mountain-report#terrain",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.jacksonhole.com/mountain-report#webcams",
+      },
+      {
+        label: "Parking and Parking Lot Status",
+        url: "https://www.jacksonhole.com/by-car",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast (Tetons)",
+        url: "https://bridgertetonavalanchecenter.org/forecasts/#/tetons",
       },
     ],
     trafficInfoLinks: [],
@@ -624,9 +679,9 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://www.mammothmountain.com/discover-mammoth/getting-around/parking",
       },
       {
-        label:"Ski Patrol Storm Summaries",
-        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWNiBrrz1TOMRDnh4v4szob_nKany9HhE-YyXU-Mg1h9vCstNG4MlRDAAhVGxtuaoXEdbjbUltkzok/pubhtml#gid=1268759607"
-      }
+        label: "Ski Patrol Storm Summaries",
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWNiBrrz1TOMRDnh4v4szob_nKany9HhE-YyXU-Mg1h9vCstNG4MlRDAAhVGxtuaoXEdbjbUltkzok/pubhtml#gid=1268759607",
+      },
     ],
     avalancheInfoLinks: [
       {
@@ -829,5 +884,4 @@ export const LOCATIONS: MountainLocation[] = [
     trafficInfoLinks: [],
     isHidden: false,
   },
-  
 ];
