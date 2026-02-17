@@ -579,6 +579,70 @@ export const LOCATIONS: MountainLocation[] = [
     isHidden: false,
   },
   {
+    id: "mammothmountain",
+    stationId: "MHP",
+    name: "Mammoth Mountain",
+    city: "Mammoth Lakes",
+    state: "California",
+    network: "Cooperator Snow Sensors",
+    county: "Mono",
+    elevation: "9,400 ft",
+    lat: 37.61,
+    lon: -119.03,
+    huc: "180901020204",
+    timezone: "America/Los_Angeles",
+    stationTriplet: "MHP:CA:MSNT",
+    logoUrl: "/mammoth-logo.jpg",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExOC45NjgsMzcuNjQ3XSwibG9jYXRpb24iOlstMTE4Ljk2OCwzNy42NDddLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/MammothMountain/",
+      },
+      { label: "X", url: "https://x.com/MammothMountain" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Trail Status",
+        url: "https://www.mammothmountain.com/on-the-mountain/mountain-report#lifts-and-trails",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.mammothmountain.com/on-the-mountain/hours-of-operation",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.mammothmountain.com/on-the-mountain/mammoth-webcam",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.mammothmountain.com/on-the-mountain/winter-trail-map",
+      },
+      {
+        label: "Parking",
+        url: "https://www.mammothmountain.com/discover-mammoth/getting-around/parking",
+      },
+      {
+        label:"Ski Patrol Storm Summaries",
+        url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWNiBrrz1TOMRDnh4v4szob_nKany9HhE-YyXU-Mg1h9vCstNG4MlRDAAhVGxtuaoXEdbjbUltkzok/pubhtml#gid=1268759607"
+      }
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast",
+        url: "https://www.esavalanche.org/forecasts/#/eastside-region",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "Road Conditions",
+        url: "https://www.mammothmountain.com/on-the-mountain/road-conditions",
+      },
+    ],
+    isHidden: false,
+  },
+  {
     id: "mtrose",
     stationId: "652",
     name: "Mt Rose",
@@ -765,4 +829,5 @@ export const LOCATIONS: MountainLocation[] = [
     trafficInfoLinks: [],
     isHidden: false,
   },
+  
 ];

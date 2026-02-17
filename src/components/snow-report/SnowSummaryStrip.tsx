@@ -2,6 +2,7 @@
 import { useMemo } from "react";
 import { CalendarDays } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
+import WteqEstimateIndicator from "./WteqEstimateIndicator";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, Unit } from "@/types/forecast";
 
@@ -95,12 +96,20 @@ export default function SnowSummaryStrip({
       // Prev 8-14 in ascending date order
       const last14 = historicBeforeToday.slice(-14);
       const group = last14.slice(0, 7);
-      return group.map((d) => ({ value: d.derivedSnowfall ?? 0, date: d.date }));
+      return group.map((d) => ({
+        value: d.derivedSnowfall ?? 0,
+        date: d.date,
+        depthSource: d.depthSource ?? null,
+      }));
     }
     if (idx === 1) {
       // Prev 1-7 in ascending date order
       const group = historicBeforeToday.slice(-7);
-      return group.map((d) => ({ value: d.derivedSnowfall ?? 0, date: d.date }));
+      return group.map((d) => ({
+        value: d.derivedSnowfall ?? 0,
+        date: d.date,
+        depthSource: d.depthSource ?? null,
+      }));
     }
     if (idx === 2) {
       const d = historicBeforeToday.at(-1);
@@ -108,6 +117,7 @@ export default function SnowSummaryStrip({
         {
           value: d?.derivedSnowfall ?? 0,
           date: d?.date ?? "",
+          depthSource: d?.depthSource ?? null,
         },
       ];
     }
@@ -117,12 +127,13 @@ export default function SnowSummaryStrip({
         {
           value: d?.snowIn ?? 0,
           date: d?.date ?? "",
+          depthSource: null,
         },
       ];
     }
     // Next 1-7 excludes today
     const groupF = forecast.slice(1, 8);
-    return groupF.map((d) => ({ value: d.snowIn, date: d.date }));
+    return groupF.map((d) => ({ value: d.snowIn, date: d.date, depthSource: null }));
   };
 
   if (loading || !historic.length || !forecast.length) {
@@ -139,6 +150,9 @@ export default function SnowSummaryStrip({
           const barItems = getBarItems(idx);
           const maxBar = Math.max(...barItems.map((b) => b.value), 1);
           const isForecast = item.type === "forecast";
+          const hasEstimatedDepth =
+            !isForecast &&
+            barItems.some((bar) => bar.depthSource === "WTEQ");
           return (
             <div
               key={idx}
@@ -148,13 +162,14 @@ export default function SnowSummaryStrip({
                   : "bg-slate-700/30 border border-slate-600/30"
               }`}
             >
-              <p
-                className={`text-xs font-medium mb-2 ${
+              <div
+                className={`text-xs font-medium mb-2 inline-flex items-center gap-1 ${
                   isForecast ? "text-blue-400" : "text-slate-400"
                 }`}
               >
-                {item.label}
-              </p>
+                <span>{item.label}</span>
+                {hasEstimatedDepth && <WteqEstimateIndicator />}
+              </div>
               <div className="flex items-end gap-0.5 h-10 mb-1">
                 {barItems.map((bar, i) => {
                   const val = bar.value;

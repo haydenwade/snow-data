@@ -10,6 +10,7 @@ export const runtime = "nodejs";
 type DailyRecord = {
   date: string; // YYYY-MM-DD
   snowDepthAtStartOfDay: number | null; // SNWD in inches
+  sourceElement?: "SNWD" | "WTEQ" | null;
 };
 
 function toISODate(d: Date) {
@@ -61,7 +62,7 @@ interface GetResponseType {
 }
 
 export async function GET(
-  request: Request
+  request: Request,
 ): Promise<NextResponse<GetResponseType>> {
   const { searchParams } = new URL(request.url);
   // Always return dates aligned to the station's local "start of day" label.
@@ -73,10 +74,9 @@ export async function GET(
   if (!location) {
     return NextResponse.json(
       { error: "No location found matching locationId" },
-      { status: 404 }
+      { status: 404 },
     );
   }
-
 
   // Allow custom range via query; default to last 30 days through today.
   // Some stations may not have published today's daily value yet; that's fine—AWDB will return what exists.
@@ -85,7 +85,7 @@ export async function GET(
   const end = endParam || toISODate(today);
   const days = Math.min(
     30,
-    Math.max(1, Number(searchParams.get("days") || 30))
+    Math.max(1, Number(searchParams.get("days") || 30)),
   );
   const begin =
     searchParams.get("beginDate") ||
@@ -98,7 +98,9 @@ export async function GET(
   // AWDB endpoint pieces
   const BASE = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data";
   const stationTriplet = location.stationTriplet; // e.g., "1308:SNTL:UT"
-  const elements = "SNWD";
+  // Some stations (e.g., MSNT/Cooperator) may not publish SNWD but do publish WTEQ.
+  // Request both and prefer SNWD; fall back to WTEQ so historic table is not empty.
+  const elements = "SNWD,WTEQ";
   const duration = "DAILY";
   const unitSystem = "ENGLISH";
 
@@ -116,8 +118,7 @@ export async function GET(
   try {
     const res = await fetch(url, {
       headers: {
-        "User-Agent":
-          "AltaSnowReport/1.0 (snow-data dev; contact: support@alta-snow.local)", //TODO update contact info
+        "User-Agent": "snowd.app/1.0 (snow-data dev;)", //TODO update contact info
         Accept: "application/json",
       },
       cache: "no-store",
@@ -129,7 +130,7 @@ export async function GET(
           error: `AWDB fetch failed: ${res.status}`,
           detail: body.slice(0, 1000),
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -156,12 +157,24 @@ export async function GET(
         date: iso,
         // SNWD -> snowDepthAtStartOfDay (in inches)
         snowDepthAtStartOfDay: null,
+        sourceElement: null,
       };
       const num = value == null || value === "" ? null : Number(value);
-      if (el === "SNWD")
+      if (el === "SNWD") {
         rec.snowDepthAtStartOfDay = Number.isFinite(num as number)
           ? (num as number)
           : null;
+        rec.sourceElement = "SNWD";
+      }
+      // Fallback only when SNWD is not available for that date.
+      else if (el === "WTEQ" && rec.snowDepthAtStartOfDay == null) {
+        // Estimate snow depth from SWE using bulk density assumption:
+        // Depth ≈ WTEQ / 0.25 - 25% is based on sierra snowpack
+        rec.snowDepthAtStartOfDay = Number.isFinite(num as number)
+          ? (num as number) / 0.25
+          : null;
+        rec.sourceElement = "WTEQ";
+      }
       byDate.set(iso, rec);
     };
 
@@ -180,7 +193,7 @@ export async function GET(
           pushValue(
             String(el).toUpperCase(),
             (v as any).date,
-            (v as any).value
+            (v as any).value,
           );
         }
       }
@@ -200,7 +213,9 @@ export async function GET(
       if (
         nextDay &&
         rec.snowDepthAtStartOfDay != null &&
-        nextDay.snowDepthAtStartOfDay != null
+        nextDay.snowDepthAtStartOfDay != null &&
+        rec.sourceElement != null &&
+        rec.sourceElement === nextDay.sourceElement
       ) {
         const diff = nextDay.snowDepthAtStartOfDay - rec.snowDepthAtStartOfDay;
         derivedSnowfall = diff > 0 ? diff : 0;
@@ -211,6 +226,7 @@ export async function GET(
         date: shiftISO(rec.date, 1),
         snowDepthAtStartOfDay: rec.snowDepthAtStartOfDay,
         derivedSnowfall,
+        depthSource: rec.sourceElement,
       });
     }
 
@@ -218,7 +234,7 @@ export async function GET(
   } catch (e: any) {
     return NextResponse.json(
       { error: e?.message || String(e) },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

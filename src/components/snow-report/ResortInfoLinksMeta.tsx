@@ -39,7 +39,8 @@ export function getLinkMeta(link: Link): LinkMeta {
     u.includes("bridgertetonavalanchecenter.org") ||
     u.includes("avalanchecenter.org") ||
     u.includes("sawtoothavalanche.com") ||
-    u.includes("mtavalanche.com")
+    u.includes("mtavalanche.com") ||
+    u.includes("esavalanche.org")
   ) {
     return {
       icon: <AlertTriangle className="h-5 w-5 text-amber-400" />,
@@ -92,6 +93,14 @@ export function getLinkMeta(link: Link): LinkMeta {
   if (l.includes("trail") && !l.includes("lift")) {
     return {
       icon: <MountainSnow className="h-5 w-5 text-blue-400" />,
+      description: "What's open right now",
+      badge: "OFFICIAL",
+    };
+  }
+
+  if(l.includes("lift") && l.includes("trail")) {
+     return {
+      icon: <CableCar className="h-5 w-5 text-blue-400" />,
       description: "What's open right now",
       badge: "OFFICIAL",
     };
