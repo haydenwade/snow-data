@@ -709,4 +709,60 @@ export const LOCATIONS: MountainLocation[] = [
     trafficInfoLinks: [],
     isHidden: false,
   },
+  {
+    id: "bigsky",
+    stationId: "590",
+    name: "Big Sky",
+    city: "Big Sky",
+    state: "Montana",
+    network: "SNOTEL",
+    county: "Madison",
+    elevation: "8,820 ft",
+    lat: 45.27,
+    lon: -111.43,
+    huc: "100200080201",
+    timezone: "America/Denver",
+    stationTriplet: "590:MT:SNTL",
+    logoUrl: "/bigsky-logo.webp",
+    radarLink:
+      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS4zMSw0NS4yNTldLCJsb2NhdGlvbiI6Wy0xMTEuMzEsNDUuMjU5XSwiem9vbSI6NywibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/bigskyresort/",
+      },
+      { label: "X", url: "https://x.com/bigskyresort" },
+    ],
+    resortInfoLinks: [
+      { label: "Trail Map", url: "https://www.bigskyresort.com/trail-maps" },
+      {
+        label: "Lift Status",
+        url: "https://www.bigskyresort.com/current-conditions#lift-status",
+      },
+      {
+        label: "Trail Status",
+        url: "https://www.bigskyresort.com/current-conditions#trail-status",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.bigskyresort.com/current-conditions#weather",
+      },
+      {
+        label: "Parking",
+        url: "https://www.bigskyresort.com/current-conditions#parking",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.bigskyresort.com/hours",
+      },
+    ],
+    avalancheInfoLinks: [
+      {
+        label: "Avalanche Forecast (Northern Madison Range)",
+        url: "https://www.mtavalanche.com/avalanche-forecast#/northern-madison-range/",
+      },
+    ],
+    trafficInfoLinks: [],
+    isHidden: false,
+  },
 ];
