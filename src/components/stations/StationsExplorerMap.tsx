@@ -491,14 +491,13 @@ export default function StationsExplorerMap({
             onClick={recenterOnCurrentLocation}
             disabled={!currentLocation}
             className={[
-              "inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs border transition",
+              "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs border transition",
               currentLocation
                 ? "text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/10"
                 : "text-slate-500 border-slate-700/70 cursor-not-allowed",
             ].join(" ")}
           >
             <LocateFixed className="h-3.5 w-3.5" />
-            {usingCurrentLocation ? "current location" : "Salt Lake City default"}
           </button>
         </div>
       </div>

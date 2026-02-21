@@ -1,10 +1,8 @@
 "use client";
-
 import StationsExplorerMap, {
   StationsMapViewport,
 } from "@/components/stations/StationsExplorerMap";
 import { GeoBounds, StationSummary } from "@/types/station";
-import { Info } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -152,25 +150,9 @@ export default function StationsExplorerSection() {
   return (
     <section id="stations" className="space-y-6 scroll-mt-20">
       <section className="space-y-3 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Explore Weather Stations
-          </h2>
-          <div className="relative group self-center translate-y-0.5">
-            <button
-              type="button"
-              aria-label="What is SNOTEL?"
-              className="p-1 rounded-full hover:bg-slate-700/30 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <Info className="h-4 w-4 text-slate-400" />
-            </button>
-            <div className="pointer-events-none absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 rounded-lg border border-slate-600 bg-slate-900/95 px-3 py-2 text-left text-xs text-slate-200 opacity-0 shadow-xl transition group-hover:opacity-100 group-focus-within:opacity-100 z-30">
-              SNOTEL stations are mountain weather sensors. They measure snow,
-              temperature, and rain so you can see what conditions are really
-              like before you go.
-            </div>
-          </div>
-        </div>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+          Explore Weather Stations
+        </h2>
         <p className="text-slate-300 max-w-3xl mx-auto">
           Pan and zoom the map to find mountain weather stations across the
           West. Click a marker to see current snow depth, recent snowfall,
