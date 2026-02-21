@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import { Wind, Sunrise, Sunset, Thermometer } from "lucide-react";
 import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
@@ -11,9 +11,11 @@ import { SkyIcon } from "./SkyIcon";
 
 export default function CurrentConditions({
   locationId,
+  stationId,
   unit = "in",
 }: {
-  locationId: string;
+  locationId?: string;
+  stationId?: string;
   unit?: Unit;
 }) {
   const [resp, setResp] = useState<ApiResp | null>(null);
@@ -25,7 +27,21 @@ export default function CurrentConditions({
     setLoading(true);
     setError(null);
 
-    fetch(`/api/current?locationId=${encodeURIComponent(locationId)}`)
+    const endpoint = locationId
+      ? `/api/current?locationId=${encodeURIComponent(locationId)}`
+      : stationId
+      ? `/api/stations/${encodeURIComponent(stationId)}/current`
+      : null;
+
+    if (!endpoint) {
+      setError("Missing location identifier");
+      setLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    fetch(endpoint)
       .then(async (r) => {
         if (!r.ok) throw new Error(`status:${r.status}`);
         return r.json();
@@ -43,7 +59,7 @@ export default function CurrentConditions({
     return () => {
       mounted = false;
     };
-  }, [locationId]);
+  }, [locationId, stationId]);
 
   const current = resp?.currentData ?? null;
 

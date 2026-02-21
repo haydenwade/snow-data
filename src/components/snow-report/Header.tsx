@@ -1,12 +1,10 @@
-"use client";;
+"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 export default function Header() {
 	const pathname = usePathname();
-	const segments = (pathname || "").split("/").filter(Boolean);
-	const isHome = segments.length === 0;
 	return (
 		<header className="bg-slate-900 border-b border-slate-800">
 			<div className="mx-auto max-w-6xl px-4">
@@ -22,16 +20,28 @@ export default function Header() {
 						/>
 					</Link>
 
-					{!isHome && (
-						<nav className="flex items-center gap-1 sm:gap-2 text-sm text-slate-300">
-							<Link
-								href="/"
-								className="px-2 py-1 rounded-lg hover:text-white hover:bg-slate-800/60 transition"
-							>
-								Locations
-							</Link>
-						</nav>
-					)}
+					<nav className="flex items-center gap-1 sm:gap-2 text-sm text-slate-300">
+						<Link
+							href="/"
+							className={`px-2 py-1 rounded-lg transition ${
+								pathname === "/"
+									? "text-white bg-slate-800/70"
+									: "hover:text-white hover:bg-slate-800/60"
+							}`}
+						>
+							Locations
+						</Link>
+						<Link
+							href="/stations"
+							className={`px-2 py-1 rounded-lg transition ${
+								pathname?.startsWith("/stations")
+									? "text-white bg-slate-800/70"
+									: "hover:text-white hover:bg-slate-800/60"
+							}`}
+						>
+							Stations
+						</Link>
+					</nav>
 				</div>
 			</div>
 		</header>

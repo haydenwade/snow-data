@@ -1,9 +1,13 @@
-import { LOCATIONS } from "@/constants/locations";
 import { fetchHistoricByStationTriplet } from "@/lib/server/historic";
+import { resolveStation } from "@/lib/server/stations";
 import { HistoricDay } from "@/types/historic";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
+
+type RouteContext = {
+  params: Promise<{ stationId: string }>;
+};
 
 interface GetResponseType {
   error?: string;
@@ -12,25 +16,27 @@ interface GetResponseType {
 
 export async function GET(
   request: Request,
+  context: RouteContext,
 ): Promise<NextResponse<GetResponseType>> {
-  const { searchParams } = new URL(request.url);
-  const locationId = searchParams.get("locationId");
-  const location = LOCATIONS.find((entry) => entry.id === locationId);
+  const params = await context.params;
+  const stationId = params.stationId;
+  const station = await resolveStation(stationId);
 
-  if (!location) {
+  if (!station) {
     return NextResponse.json(
-      { error: "No location found matching locationId" },
+      { error: "No station found matching stationId" },
       { status: 404 },
     );
   }
 
+  const { searchParams } = new URL(request.url);
   const days = Number(searchParams.get("days") || 30);
   const beginDate = searchParams.get("beginDate");
   const endDate = searchParams.get("endDate");
 
   try {
     const data = await fetchHistoricByStationTriplet({
-      stationTriplet: location.stationTriplet,
+      stationTriplet: station.stationTriplet,
       days,
       beginDate,
       endDate,

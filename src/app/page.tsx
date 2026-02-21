@@ -54,6 +54,14 @@ export default function Home() {
             planners use to get stoked without being misled.
           </p>
           <RotatingFeatures />
+          <div className="mt-4">
+            <Link
+              href="/stations"
+              className="inline-flex items-center rounded-xl border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800/50 transition"
+            >
+              Explore All SNOTEL Stations
+            </Link>
+          </div>
         </div>
 
         {/* Search */}

@@ -54,5 +54,5 @@ TODO - switch and/or use snotel data as primary source for near real time
 3. [API](https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1/data?stationTriplets=1308:UT:SNTL&elements=WTEQ,SNWD,PREC&duration=DAILY&beginDate=2025-11-21&endDate=2025-12-20&unitSystem=ENGLISH)
 
 # References:
-
 (SNOTEL API Swagger Docs)[https://wcc.sc.egov.usda.gov/awdbRestApi/swagger-ui/index.html#/]
+(SNOTEL MCP Server)[https://mcpservers.org/servers/jymmyt/snotel-mcp-server]

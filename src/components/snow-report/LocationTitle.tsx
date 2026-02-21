@@ -63,18 +63,20 @@ export default function LocationTitle({
                   <Mountain className="h-4 w-4" />
                   <span className="ml-1">SNOTEL + NWS Forecast Data</span>
                 </span>
-                <a
-                  href={location.radarLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Open NWS Radar Map"
-                  className="inline-flex items-center"
-                >
-                  <Radar className="h-4 w-4 text-blue-400" />
-                  <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
-                    NWS Radar
-                  </span>
-                </a>
+                {location.radarLink ? (
+                  <a
+                    href={location.radarLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open NWS Radar Map"
+                    className="inline-flex items-center"
+                  >
+                    <Radar className="h-4 w-4 text-blue-400" />
+                    <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
+                      NWS Radar
+                    </span>
+                  </a>
+                ) : null}
               </div>
             </div>
           </div>

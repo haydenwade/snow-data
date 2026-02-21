@@ -13,6 +13,7 @@ export type TimeseriesPoint = {
 };
 
 export type ApiResp = {
+  lastUpdatedAt?: string | null;
   currentData: {
     locationId: string;
     stationId: string | null;
