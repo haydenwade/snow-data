@@ -10,6 +10,7 @@ import HistoricTable from "@/components/snow-report/HistoricTable";
 import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
 import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
+import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { normalizeTripletInput } from "@/lib/station-triplet";
 import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
 import { Unit } from "@/types/forecast";
@@ -133,7 +134,7 @@ export default function StationHistoricPage() {
   if (!location) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        {loading ? "Loading station..." : "Station not found"}
+        {loading ? <SnowLoadingGraphic /> : "Station not found"}
       </div>
     );
   }

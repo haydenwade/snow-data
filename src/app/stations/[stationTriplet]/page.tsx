@@ -16,6 +16,7 @@ import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
 import Footer from "@/components/snow-report/Footer";
+import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { normalizeTripletInput } from "@/lib/station-triplet";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, ForecastGridData, Unit } from "@/types/forecast";
@@ -158,7 +159,7 @@ export default function StationPage() {
   if (!location) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        {loading ? "Loading station..." : "Station not found"}
+        {loading ? <SnowLoadingGraphic /> : "Station not found"}
       </div>
     );
   }

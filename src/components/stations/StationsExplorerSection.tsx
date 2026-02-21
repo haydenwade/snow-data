@@ -2,6 +2,7 @@
 import StationsExplorerMap, {
   StationsMapViewport,
 } from "@/components/stations/StationsExplorerMap";
+import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { GeoBounds, StationSummary } from "@/types/station";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -163,7 +164,7 @@ export default function StationsExplorerSection() {
       {error ? <div className="text-xs text-red-400">{error}</div> : null}
 
       {!hasLoadedOnce && isRefreshing ? (
-        <div className="text-xs text-slate-400">Loading stations...</div>
+        <SnowLoadingGraphic className="origin-left scale-90" />
       ) : null}
 
       <StationsExplorerMap
