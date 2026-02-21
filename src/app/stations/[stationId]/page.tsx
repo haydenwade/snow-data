@@ -16,11 +16,10 @@ import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
 import Footer from "@/components/snow-report/Footer";
-import ForecastComparisonPanel from "@/components/stations/ForecastComparisonPanel";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, ForecastGridData, Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
-import { SnotelForecastSummary, StationDetailResponse } from "@/types/station";
+import { StationDetailResponse } from "@/types/station";
 
 async function fetchStationDetail(stationId: string): Promise<StationDetailResponse> {
   const response = await fetch(`/api/stations/${encodeURIComponent(stationId)}`, {
@@ -90,20 +89,6 @@ async function fetchForecastGrid(
   return (await response.json()) as ForecastGridData;
 }
 
-async function fetchSnotelForecast(
-  stationId: string,
-): Promise<SnotelForecastSummary[]> {
-  const response = await fetch(
-    `/api/forecasts/snotel?stationId=${encodeURIComponent(stationId)}`,
-    { cache: "no-store" },
-  );
-  if (!response.ok) {
-    return [];
-  }
-  const payload = await response.json();
-  return (payload.summary ?? []) as SnotelForecastSummary[];
-}
-
 export default function StationPage() {
   const params = useParams();
   const stationId = params.stationId as string;
@@ -113,7 +98,6 @@ export default function StationPage() {
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
   const [forecast, setForecast] = useState<ForecastDaily[]>([]);
-  const [snotelForecast, setSnotelForecast] = useState<SnotelForecastSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -129,10 +113,9 @@ export default function StationPage() {
         if (!mounted) return;
         setLocation(detail.location);
 
-        const [historicData, nwsGrid, snotel] = await Promise.all([
+        const [historicData, nwsGrid] = await Promise.all([
           fetchHistoric(stationId, 30),
           fetchForecastGrid(detail.location.lat, detail.location.lon),
-          fetchSnotelForecast(stationId),
         ]);
         if (!mounted) return;
 
@@ -142,7 +125,6 @@ export default function StationPage() {
         );
         setHistoric(historicData);
         setForecast(dailyForecast);
-        setSnotelForecast(snotel);
       } catch (err) {
         if (!mounted) return;
         setError((err as Error)?.message ?? "Failed to load station data");
@@ -209,12 +191,6 @@ export default function StationPage() {
             loading={loading}
           />
         </section>
-
-        <ForecastComparisonPanel
-          nwsForecast={todayAndFutureForecast}
-          snotelForecast={snotelForecast}
-          loading={loading}
-        />
 
         <section className="grid md:grid-cols-2 gap-6">
           <ResortInfoLinks location={location} loading={loading} />

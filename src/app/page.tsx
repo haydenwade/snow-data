@@ -91,7 +91,7 @@ export default function Home() {
           {filteredLocations.map((location) => (
             <Link
               key={location.id}
-              href={`/location/${location.id}`}
+              href={`/stations/${encodeURIComponent(location.stationId)}`}
               className="block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
             >
               <div className="flex items-center gap-4 mb-3">

@@ -9,7 +9,8 @@ import HistoricChart from "@/components/snow-report/HistoricChart";
 import HistoricTable from "@/components/snow-report/HistoricTable";
 import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
-import { HistoricDay } from "@/types/historic";
+import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
+import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
 import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
@@ -36,7 +37,10 @@ async function fetchStationDetail(stationId: string): Promise<StationDetailRespo
 async function fetchHistoric(
   stationId: string,
   days: number,
-): Promise<HistoricDay[]> {
+): Promise<{
+  data: HistoricDay[];
+  hourlyTemperature: HistoricHourlyTemperaturePoint[];
+}> {
   const response = await fetch(
     `/api/stations/${encodeURIComponent(stationId)}/historic?days=${days}`,
     { cache: "no-store" },
@@ -54,7 +58,11 @@ async function fetchHistoric(
     );
   }
   const payload = await response.json();
-  return payload.data as HistoricDay[];
+  return {
+    data: (payload.data ?? []) as HistoricDay[],
+    hourlyTemperature:
+      (payload.hourlyTemperature ?? []) as HistoricHourlyTemperaturePoint[],
+  };
 }
 
 export default function StationHistoricPage() {
@@ -65,6 +73,9 @@ export default function StationHistoricPage() {
   const [unit, setUnit] = useState<Unit>("in");
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
+  const [hourlyTemperature, setHourlyTemperature] = useState<
+    HistoricHourlyTemperaturePoint[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -79,9 +90,10 @@ export default function StationHistoricPage() {
         if (!mounted) return;
         setLocation(detail.location);
 
-        const data = await fetchHistoric(stationId, 30);
+        const response = await fetchHistoric(stationId, 30);
         if (!mounted) return;
-        setHistoric(data);
+        setHistoric(response.data);
+        setHourlyTemperature(response.hourlyTemperature);
       } catch (err) {
         if (!mounted) return;
         setError((err as Error)?.message || "Failed to load data");
@@ -143,8 +155,14 @@ export default function StationHistoricPage() {
             data={lastNHistoricDesc}
             unit={unit}
             loading={loading}
+            showTemperatureColumns
           />
         </section>
+        <HistoricTemperatureChart
+          data={hourlyTemperature}
+          unit={unit}
+          loading={loading}
+        />
         {!loading ? (
           <>
             <section className="grid gap-6 md:grid-cols-3 items-stretch">

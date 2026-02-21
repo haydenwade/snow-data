@@ -1,10 +1,13 @@
-import { HistoricDay } from "@/types/historic";
-import { fetchAwdbJson, parseAwdbDate, toIsoDate } from "./awdb";
+import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
+import { awdbDateToIso, fetchAwdbJson, parseAwdbDate, toIsoDate } from "./awdb";
 
 type DailyRecord = {
   date: string;
   snowDepthAtStartOfDay: number | null;
   sourceElement?: "SNWD" | "WTEQ" | null;
+  tempHighF?: number | null;
+  tempLowF?: number | null;
+  tempAvgF?: number | null;
 };
 
 type StationDataResponse = Array<{
@@ -55,7 +58,7 @@ export async function fetchHistoricByStationTriplet({
 
   const json = await fetchAwdbJson<StationDataResponse>("/data", {
     stationTriplets: stationTriplet,
-    elements: "SNWD,WTEQ",
+    elements: "SNWD,WTEQ,TMAX,TMIN,TAVG",
     duration: "DAILY",
     beginDate: begin,
     endDate: end,
@@ -88,6 +91,18 @@ export async function fetchHistoricByStationTriplet({
         ? (numeric as number) / 0.25
         : null;
       existing.sourceElement = "WTEQ";
+    } else if (elementCode === "TMAX") {
+      existing.tempHighF = Number.isFinite(numeric as number)
+        ? (numeric as number)
+        : null;
+    } else if (elementCode === "TMIN") {
+      existing.tempLowF = Number.isFinite(numeric as number)
+        ? (numeric as number)
+        : null;
+    } else if (elementCode === "TAVG") {
+      existing.tempAvgF = Number.isFinite(numeric as number)
+        ? (numeric as number)
+        : null;
     }
 
     byDate.set(isoDate, existing);
@@ -133,13 +148,72 @@ export async function fetchHistoricByStationTriplet({
       derivedSnowfall = diff > 0 ? diff : 0;
     }
 
+    const shiftedDate = shiftIsoDate(current.date, 1);
+    const shifted = byDate.get(shiftedDate);
+
     out.push({
-      date: shiftIsoDate(current.date, 1),
+      date: shiftedDate,
       snowDepthAtStartOfDay: current.snowDepthAtStartOfDay,
       derivedSnowfall,
       depthSource: current.sourceElement,
+      tempHighF: shifted?.tempHighF ?? null,
+      tempLowF: shifted?.tempLowF ?? null,
+      tempAvgF: shifted?.tempAvgF ?? null,
     });
   }
 
+  return out;
+}
+
+export async function fetchHourlyTemperatureByStationTriplet({
+  stationTriplet,
+  dataTimeZoneHours,
+  pastHours = 168,
+}: {
+  stationTriplet: string;
+  dataTimeZoneHours?: number | null;
+  pastHours?: number;
+}): Promise<HistoricHourlyTemperaturePoint[]> {
+  const safeHours = Math.max(1, Math.min(24 * 14, Math.round(pastHours)));
+
+  const json = await fetchAwdbJson<StationDataResponse>("/data", {
+    stationTriplets: stationTriplet,
+    elements: "TOBS",
+    duration: "HOURLY",
+    beginDate: -safeHours,
+    endDate: 0,
+    unitSystem: "ENGLISH",
+  });
+
+  const stationData = Array.isArray(json) ? json : [];
+  const out: HistoricHourlyTemperaturePoint[] = [];
+
+  for (const station of stationData) {
+    for (const elementRecord of station.data ?? []) {
+      const elementCode = String(
+        elementRecord.stationElement?.elementCode ??
+          elementRecord.elementCd ??
+          elementRecord.elementCode ??
+          "",
+      ).toUpperCase();
+      if (elementCode !== "TOBS") continue;
+
+      for (const valueRecord of elementRecord.values ?? []) {
+        const rawDate = String(valueRecord.date ?? "");
+        const timestamp = awdbDateToIso(rawDate, dataTimeZoneHours ?? null);
+        if (!timestamp) continue;
+        const numeric =
+          valueRecord.value == null || valueRecord.value === ""
+            ? null
+            : Number(valueRecord.value);
+        out.push({
+          timestamp,
+          temperatureF: Number.isFinite(numeric as number) ? (numeric as number) : null,
+        });
+      }
+    }
+  }
+
+  out.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
   return out;
 }

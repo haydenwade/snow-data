@@ -30,14 +30,3 @@ export type StationDetailResponse = {
   location: MountainLocation;
   locationMatch: MountainLocation | null;
 };
-
-export type SnotelForecastSummary = {
-  elementCode: string | null;
-  forecastPeriod: string[] | null;
-  forecastStatus: string | null;
-  issueDate: string | null;
-  publicationDate: string | null;
-  unitCode: string | null;
-  periodNormal: number | null;
-  forecastValues: Record<string, number>;
-};
