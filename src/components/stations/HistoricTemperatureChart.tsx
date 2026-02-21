@@ -113,7 +113,7 @@ export default function HistoricTemperatureChart({
             <Line
               type="monotone"
               dataKey="temperatureF"
-              stroke="#38bdf8"
+              stroke="#f97316"
               strokeWidth={2}
               dot={false}
               connectNulls
