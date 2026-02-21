@@ -13,7 +13,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISSED_SESSION_KEY = "snowd-a2hs-dismissed";
-const SHOW_DELAY_MS = 60_000;
+const SHOW_DELAY_MS = 30_000;
 
 function detectDeviceType(): DeviceType {
   const userAgent = window.navigator.userAgent || "";
@@ -128,7 +128,7 @@ export default function AddToHomeScreenPrompt() {
         {deviceType === "ios" ? (
           <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-slate-300">
             <li>Tap the Share button in your browser.</li>
-            <li>Choose Add to Home Screen.</li>
+            <li>Choose View More &gt; Add to Home Screen.</li>
             <li>Tap Add.</li>
           </ol>
         ) : (
