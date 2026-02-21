@@ -16,6 +16,9 @@ export async function GET(_request: Request, context: RouteContext) {
   try {
     const params = await context.params;
     const stationId = params.stationId;
+    // TODO: when is this a station triplet vs station id? Should station triplet be used instead?
+    // Mammoth: MHP, others had number
+    console.log("Fetching data for stationId:", stationId);
     const station = await resolveStation(stationId);
 
     if (!station) {
@@ -25,6 +28,7 @@ export async function GET(_request: Request, context: RouteContext) {
       );
     }
 
+    // Determine if the station is a SNOTEL or COOP station
     const locationMatch =
       findLocationByTriplet(station.stationTriplet) ??
       findLocationByStationId(station.stationId);

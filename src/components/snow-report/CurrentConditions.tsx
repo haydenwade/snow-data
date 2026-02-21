@@ -5,16 +5,18 @@ import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
 import CurrentConditionsChart from "./CurrentConditionsChart";
 import { Unit } from "@/types/forecast";
 import { ApiResp } from "@/types/current-conditions-response";
-import { celsiusFromF, formatObservedLabel, formatTimeInZone, kphFromMph } from "./utils";
+import {
+  celsiusFromF,
+  formatObservedLabel,
+  formatTimeInZone,
+  kphFromMph,
+} from "./utils";
 import { SkyIcon } from "./SkyIcon";
 
-
 export default function CurrentConditions({
-  locationId,
   stationId,
   unit = "in",
 }: {
-  locationId?: string;
   stationId?: string;
   unit?: Unit;
 }) {
@@ -27,9 +29,7 @@ export default function CurrentConditions({
     setLoading(true);
     setError(null);
 
-    const endpoint = locationId
-      ? `/api/current?locationId=${encodeURIComponent(locationId)}`
-      : stationId
+    const endpoint = stationId
       ? `/api/stations/${encodeURIComponent(stationId)}/current`
       : null;
 
@@ -59,36 +59,40 @@ export default function CurrentConditions({
     return () => {
       mounted = false;
     };
-  }, [locationId, stationId]);
+  }, [stationId]);
 
   const current = resp?.currentData ?? null;
 
   const observedLabel = useMemo(() => {
     if (!current) return null;
     const observedAt = stationId
-      ? resp?.lastUpdatedAt ?? current.observedAt
+      ? (resp?.lastUpdatedAt ?? current.observedAt)
       : current.observedAt;
     const t = formatObservedLabel(observedAt);
     if (!t) return null;
     const src = stationId
       ? "Temp Obs"
       : current.source === "observation"
-      ? "Obs"
-      : "Forecast";
+        ? "Obs"
+        : "Forecast";
     return `${src}: ${t}`;
   }, [current, resp?.lastUpdatedAt, stationId]);
 
-
   const sunriseLabel = useMemo(() => {
     if (!current?.sun?.sunrise) return null;
-    return formatTimeInZone(current.sun.sunrise, current.sun.timeZone ?? undefined);
+    return formatTimeInZone(
+      current.sun.sunrise,
+      current.sun.timeZone ?? undefined,
+    );
   }, [current]);
 
   const sunsetLabel = useMemo(() => {
     if (!current?.sun?.sunset) return null;
-    return formatTimeInZone(current.sun.sunset, current.sun.timeZone ?? undefined);
+    return formatTimeInZone(
+      current.sun.sunset,
+      current.sun.timeZone ?? undefined,
+    );
   }, [current]);
-
 
   if (loading) return <CurrentConditionsSkeleton />;
 
@@ -122,8 +126,8 @@ export default function CurrentConditions({
                       {current.temperatureF == null
                         ? "—"
                         : unit === "mm"
-                        ? `${celsiusFromF(current.temperatureF)}°C`
-                        : `${current.temperatureF}°F`}
+                          ? `${celsiusFromF(current.temperatureF)}°C`
+                          : `${current.temperatureF}°F`}
                     </div>
                   </div>
 
@@ -146,8 +150,8 @@ export default function CurrentConditions({
                           {current.wind?.speedMph == null
                             ? "—"
                             : unit === "mm"
-                            ? `${kphFromMph(current.wind.speedMph)} kph`
-                            : `${current.wind.speedMph} mph`}
+                              ? `${kphFromMph(current.wind.speedMph)} kph`
+                              : `${current.wind.speedMph} mph`}
                           {current.wind?.directionText ? (
                             <span className="text-slate-400 ml-2">
                               {current.wind.directionText}
@@ -190,10 +194,10 @@ export default function CurrentConditions({
                     {stationId && resp?.lastUpdatedAt
                       ? `Temperature from SNOTEL observation (${formatObservedLabel(resp.lastUpdatedAt)}).`
                       : current.isObserved
-                      ? current.isObservationStale
-                        ? "Observation is stale — showing latest available."
-                        : "Live observation."
-                      : "Approximate (hourly forecast)."}
+                        ? current.isObservationStale
+                          ? "Observation is stale — showing latest available."
+                          : "Live observation."
+                        : "Approximate (hourly forecast)."}
                   </div>
                 </div>
 
