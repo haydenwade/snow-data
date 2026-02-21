@@ -42,9 +42,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 3. snowfallAmount, quantitativePrecipitation (backup if snowfallAmount not available), probabilityOfPrecipitation,maxTemperature, minTemperature
 
 
-## Current data (SNOTEL):
-- Currently getting this from NWS
-TODO - switch and/or use snotel data as primary source for near real time
+## Current conditions data:
+- From NWS for wind, temp forecast, precipitation
+- Current temp is from SNOTEL
 
 
 ## Historic data (SNOTEL):
