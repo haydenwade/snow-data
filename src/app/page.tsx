@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
 import { LOCATIONS } from "@/constants/locations";
@@ -92,7 +92,7 @@ export default function Home() {
           {filteredLocations.map((location) => (
             <Link
               key={location.id}
-              href={`/stations/${encodeURIComponent(location.stationTriplet)}`}
+              href={`/stations/${encodeURIComponent(location.id)}`}
               className="block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
             >
               <div className="flex items-center gap-4 mb-3">
@@ -136,7 +136,9 @@ export default function Home() {
           )}
         </div>
         <div className="mt-12">
-          <StationsExplorerSection />
+          <Suspense fallback={null}>
+            <StationsExplorerSection />
+          </Suspense>
         </div>
         <Footer textOverride={"Don't see the location you are looking for?"} />
       </div>

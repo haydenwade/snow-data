@@ -1,4 +1,9 @@
 import { LOCATIONS } from "@/constants/locations";
+import {
+  normalizeStationKeyInput,
+  stationKeyToTriplet,
+  stationTripletToKey,
+} from "@/lib/station-key";
 import { normalizeTripletInput } from "@/lib/station-triplet";
 import { MountainLocation } from "@/types/location";
 import { StationSummary } from "@/types/station";
@@ -148,6 +153,24 @@ export function findLocationByTriplet(stationTriplet: string) {
   );
 }
 
+export function findLocationById(locationId: string) {
+  const normalized = normalizeStationKeyInput(locationId);
+  if (!normalized) return null;
+  return LOCATIONS.find((location) => location.id.toLowerCase() === normalized) ?? null;
+}
+
+export function resolveTripletFromStationKey(stationKey: string) {
+  const normalizedKey = normalizeStationKeyInput(stationKey);
+  if (!normalizedKey) return null;
+
+  const locationMatch = findLocationById(normalizedKey);
+  if (locationMatch) {
+    return normalizeTripletInput(locationMatch.stationTriplet);
+  }
+
+  return stationKeyToTriplet(normalizedKey);
+}
+
 export function inferTimeZone(
   station: Pick<AwdbStation, "stateCode" | "dataTimeZone">,
   locationMatch: MountainLocation | null,
@@ -162,7 +185,14 @@ export function toStationSummary(
   station: AwdbStation,
   locationMatch: MountainLocation | null,
 ): StationSummary {
+  const derivedStationKey =
+    stationTripletToKey(station.stationTriplet) ??
+    `${station.stationId}-${station.stateCode}-${station.networkCode}`.toLowerCase();
+  const stationKey =
+    locationMatch?.id ?? derivedStationKey;
+
   return {
+    stationKey,
     stationTriplet: station.stationTriplet,
     stationId: station.stationId,
     stateCode: station.stateCode,

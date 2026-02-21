@@ -14,13 +14,13 @@ export default function SnowSummaryStrip({
   historic,
   forecast,
   unit,
-  stationTriplet,
+  stationKey,
   loading
 }: {
   historic: HistoricDay[];
   forecast: ForecastDaily[];
   unit: Unit;
-  stationTriplet: string;
+  stationKey: string;
   loading: boolean;
 }) {
   const useMetric = unit === "mm";
@@ -228,7 +228,7 @@ export default function SnowSummaryStrip({
       </div>
       <div className="mt-6 flex justify-end">
         <a
-          href={`/stations/${encodeURIComponent(stationTriplet)}/historic`}
+          href={`/stations/${encodeURIComponent(stationKey)}/historic`}
           className="inline-block px-2 py-1 rounded border border-slate-500 text-slate-400 text-sm hover:bg-slate-700/20 hover:text-slate-200 transition"
         >
           View Historic Data

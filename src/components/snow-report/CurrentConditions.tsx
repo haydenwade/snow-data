@@ -14,10 +14,10 @@ import {
 import { SkyIcon } from "./SkyIcon";
 
 export default function CurrentConditions({
-  stationTriplet,
+  stationKey,
   unit = "in",
 }: {
-  stationTriplet?: string;
+  stationKey?: string;
   unit?: Unit;
 }) {
   const [resp, setResp] = useState<ApiResp | null>(null);
@@ -29,8 +29,8 @@ export default function CurrentConditions({
     setLoading(true);
     setError(null);
 
-    const endpoint = stationTriplet
-      ? `/api/stations/${encodeURIComponent(stationTriplet)}/current`
+    const endpoint = stationKey
+      ? `/api/stations/${encodeURIComponent(stationKey)}/current`
       : null;
 
     if (!endpoint) {
@@ -59,7 +59,7 @@ export default function CurrentConditions({
     return () => {
       mounted = false;
     };
-  }, [stationTriplet]);
+  }, [stationKey]);
 
   const current = resp?.currentData ?? null;
 

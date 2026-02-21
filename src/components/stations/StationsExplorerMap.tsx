@@ -604,7 +604,7 @@ export default function StationsExplorerMap({
               </div>
               <div className="mt-3">
                 <Link
-                  href={`/stations/${encodeURIComponent(selectedStation.stationTriplet)}`}
+                  href={`/stations/${encodeURIComponent(selectedStation.stationKey)}`}
                   className="inline-flex items-center rounded-lg border border-slate-500 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700/40"
                 >
                   Open station

@@ -8,6 +8,7 @@ export type GeoBounds = {
 };
 
 export type StationSummary = {
+  stationKey: string;
   stationTriplet: string;
   stationId: string;
   stateCode: string;

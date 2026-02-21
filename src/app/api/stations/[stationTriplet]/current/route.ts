@@ -1,8 +1,8 @@
 import {
   fetchStationByTriplet,
   findLocationByTriplet,
+  resolveTripletFromStationKey,
 } from "@/lib/server/stations";
-import { normalizeTripletInput } from "@/lib/station-triplet";
 import { fetchSnotelCurrentConditions } from "@/lib/server/snotel-current";
 import { NextResponse } from "next/server";
 
@@ -15,10 +15,10 @@ type RouteContext = {
 export async function GET(_request: Request, context: RouteContext) {
   try {
     const params = await context.params;
-    const stationTriplet = normalizeTripletInput(params.stationTriplet);
+    const stationTriplet = resolveTripletFromStationKey(params.stationTriplet);
     if (!stationTriplet) {
       return NextResponse.json(
-        { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
+        { error: "Invalid station identifier format" },
         { status: 400 },
       );
     }
@@ -27,7 +27,7 @@ export async function GET(_request: Request, context: RouteContext) {
 
     if (!station) {
       return NextResponse.json(
-        { error: "No station found matching station triplet" },
+        { error: "No station found matching station identifier" },
         { status: 404 },
       );
     }

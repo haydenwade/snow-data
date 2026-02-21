@@ -11,14 +11,14 @@ import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
 import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
-import { normalizeTripletInput } from "@/lib/station-triplet";
+import { normalizeStationKeyInput } from "@/lib/station-key";
 import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
 import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
-async function fetchStationDetail(stationTriplet: string): Promise<StationDetailResponse> {
-  const response = await fetch(`/api/stations/${encodeURIComponent(stationTriplet)}`, {
+async function fetchStationDetail(stationKey: string): Promise<StationDetailResponse> {
+  const response = await fetch(`/api/stations/${encodeURIComponent(stationKey)}`, {
     cache: "no-store",
   });
   if (!response.ok) {
@@ -37,14 +37,14 @@ async function fetchStationDetail(stationTriplet: string): Promise<StationDetail
 }
 
 async function fetchHistoric(
-  stationTriplet: string,
+  stationKey: string,
   days: number,
 ): Promise<{
   data: HistoricDay[];
   hourlyTemperature: HistoricHourlyTemperaturePoint[];
 }> {
   const response = await fetch(
-    `/api/stations/${encodeURIComponent(stationTriplet)}/historic?days=${days}`,
+    `/api/stations/${encodeURIComponent(stationKey)}/historic?days=${days}`,
     { cache: "no-store" },
   );
   if (!response.ok) {
@@ -69,7 +69,7 @@ async function fetchHistoric(
 
 export default function StationHistoricPage() {
   const params = useParams();
-  const stationTriplet = normalizeTripletInput(params.stationTriplet as string);
+  const stationKey = normalizeStationKeyInput(params.stationTriplet as string);
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
   const [unit, setUnit] = useState<Unit>("in");
@@ -82,8 +82,8 @@ export default function StationHistoricPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!stationTriplet) {
-      setError("Invalid station triplet");
+    if (!stationKey) {
+      setError("Invalid station identifier");
       setLoading(false);
       return;
     }
@@ -94,11 +94,11 @@ export default function StationHistoricPage() {
       try {
         setLoading(true);
         setError(null);
-        const detail = await fetchStationDetail(stationTriplet);
+        const detail = await fetchStationDetail(stationKey);
         if (!mounted) return;
         setLocation(detail.location);
 
-        const response = await fetchHistoric(stationTriplet, 30);
+        const response = await fetchHistoric(stationKey, 30);
         if (!mounted) return;
         setHistoric(response.data);
         setHourlyTemperature(response.hourlyTemperature);
@@ -115,7 +115,7 @@ export default function StationHistoricPage() {
     return () => {
       mounted = false;
     };
-  }, [stationTriplet]);
+  }, [stationKey]);
 
   const lastNHistoricDesc = useMemo(
     () => [...historic.slice(-range)].reverse(),
@@ -123,10 +123,10 @@ export default function StationHistoricPage() {
   );
   const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
 
-  if (!stationTriplet) {
+  if (!stationKey) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        Invalid station triplet
+        Invalid station identifier
       </div>
     );
   }
@@ -157,7 +157,7 @@ export default function StationHistoricPage() {
 
       <div className="max-w-6xl mx-auto px-4 pt-6">
         <a
-          href={`/stations/${encodeURIComponent(stationTriplet)}`}
+          href={`/stations/${encodeURIComponent(stationKey)}`}
           className="inline-block mb-4 px-2 py-1 rounded border border-slate-500 text-slate-400 text-sm hover:bg-slate-700/20 hover:text-slate-200 transition"
         >
           ← Back to Forecast

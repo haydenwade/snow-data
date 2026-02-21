@@ -17,14 +17,14 @@ import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
 import Footer from "@/components/snow-report/Footer";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
-import { normalizeTripletInput } from "@/lib/station-triplet";
+import { normalizeStationKeyInput } from "@/lib/station-key";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, ForecastGridData, Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
-async function fetchStationDetail(stationTriplet: string): Promise<StationDetailResponse> {
-  const response = await fetch(`/api/stations/${encodeURIComponent(stationTriplet)}`, {
+async function fetchStationDetail(stationKey: string): Promise<StationDetailResponse> {
+  const response = await fetch(`/api/stations/${encodeURIComponent(stationKey)}`, {
     cache: "no-store",
   });
 
@@ -45,11 +45,11 @@ async function fetchStationDetail(stationTriplet: string): Promise<StationDetail
 }
 
 async function fetchHistoric(
-  stationTriplet: string,
+  stationKey: string,
   days: number,
 ): Promise<HistoricDay[]> {
   const response = await fetch(
-    `/api/stations/${encodeURIComponent(stationTriplet)}/historic?days=${days}`,
+    `/api/stations/${encodeURIComponent(stationKey)}/historic?days=${days}`,
     { cache: "no-store" },
   );
   if (!response.ok) {
@@ -93,7 +93,7 @@ async function fetchForecastGrid(
 
 export default function StationPage() {
   const params = useParams();
-  const stationTriplet = normalizeTripletInput(params.stationTriplet as string);
+  const stationKey = normalizeStationKeyInput(params.stationTriplet as string);
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
   const [unit, setUnit] = useState<Unit>("in");
@@ -104,8 +104,8 @@ export default function StationPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!stationTriplet) {
-      setError("Invalid station triplet");
+    if (!stationKey) {
+      setError("Invalid station identifier");
       setLoading(false);
       return;
     }
@@ -117,12 +117,12 @@ export default function StationPage() {
         setLoading(true);
         setError(null);
 
-        const detail = await fetchStationDetail(stationTriplet);
+        const detail = await fetchStationDetail(stationKey);
         if (!mounted) return;
         setLocation(detail.location);
 
         const [historicData, nwsGrid] = await Promise.all([
-          fetchHistoric(stationTriplet, 30),
+          fetchHistoric(stationKey, 30),
           fetchForecastGrid(detail.location.lat, detail.location.lon),
         ]);
         if (!mounted) return;
@@ -146,12 +146,12 @@ export default function StationPage() {
     return () => {
       mounted = false;
     };
-  }, [stationTriplet]);
+  }, [stationKey]);
 
-  if (!stationTriplet) {
+  if (!stationKey) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        Invalid station triplet
+        Invalid station identifier
       </div>
     );
   }
@@ -187,13 +187,13 @@ export default function StationPage() {
       ) : null}
 
       <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
-        <CurrentConditions stationTriplet={stationTriplet} unit={unit} />
+        <CurrentConditions stationKey={stationKey} unit={unit} />
 
         <SnowSummaryStrip
           historic={historic}
           forecast={todayAndFutureForecast}
           unit={unit}
-          stationTriplet={stationTriplet}
+          stationKey={stationKey}
           loading={loading}
         />
         <ForecastTimeline data={forecast} unit={unit} loading={loading} />

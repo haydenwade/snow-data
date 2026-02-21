@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/snow-report/Header";
+import AddToHomeScreenPrompt from "@/components/AddToHomeScreenPrompt";
 
 export const metadata: Metadata = {
   title: "SNOWD",
@@ -48,6 +49,7 @@ export default function RootLayout({
       <body className="antialiased">
         <Header/>
         {children}
+        <AddToHomeScreenPrompt />
       </body>
     </html>
   );
