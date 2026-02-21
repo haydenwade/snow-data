@@ -35,8 +35,49 @@ export default function HistoricTemperatureChart({
   if (loading) {
     return (
       <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-        <div className="h-6 w-44 rounded bg-slate-700/40 animate-pulse" />
-        <div className="mt-4 h-64 rounded bg-slate-700/20 animate-pulse" />
+        <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50 animate-pulse">
+          <div className="h-5 w-5 rounded bg-slate-700/40" />
+          <div className="h-6 w-44 rounded bg-slate-700/40" />
+        </div>
+        <div className="h-72 rounded-xl border border-slate-700/40 bg-slate-900/20 p-3 animate-pulse">
+          <div className="relative h-full w-full overflow-hidden">
+            <div className="absolute inset-0 flex flex-col justify-between">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-px w-full bg-slate-700/30" />
+              ))}
+            </div>
+            <div className="absolute inset-0">
+              <svg viewBox="0 0 100 100" className="h-full w-full">
+                <polyline
+                  points="0,72 10,68 20,64 30,66 40,58 50,62 60,48 70,52 80,44 90,47 100,40"
+                  fill="none"
+                  stroke="rgba(248,113,113,0.65)"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <polyline
+                  points="0,72 10,68 20,64 30,66 40,58 50,62 60,48 70,52 80,44 90,47 100,40"
+                  fill="none"
+                  stroke="rgba(248,113,113,0.2)"
+                  strokeWidth="4.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-between">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-3 w-5 rounded bg-slate-700/35" />
+              ))}
+            </div>
+            <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-3 w-6 rounded bg-slate-700/35" />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
