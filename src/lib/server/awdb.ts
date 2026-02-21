@@ -1,5 +1,4 @@
 const AWDB_BASE_URL = "https://wcc.sc.egov.usda.gov/awdbRestApi/services/v1";
-const AWDB_USER_AGENT = "snow-data (github.com)";
 
 type QueryValue = string | number | boolean | null | undefined;
 
@@ -30,7 +29,6 @@ export async function fetchAwdbJson<T>(
   const url = buildAwdbUrl(path, params);
   const response = await fetch(url, {
     headers: {
-      "User-Agent": AWDB_USER_AGENT,
       Accept: "application/json",
     },
     cache: "no-store",
