@@ -172,4 +172,41 @@ describe('aggregateForecastToDaily', () => {
       if (exp.tMinF !== undefined) expect(row.tMinF).toBe(exp.tMinF);
     }
   });
+
+  it('derives daily min/max from hourly temperature2m when max/min series are unavailable', () => {
+    const openMeteoLikeGrid: ForecastGridData = {
+      snowfallAmount: {
+        uom: 'wmoUnit:mm',
+        points: [],
+      },
+      probabilityOfPrecipitation: {
+        uom: 'wmoUnit:percent',
+        points: [],
+      },
+      temperature2m: {
+        uom: 'wmoUnit:degC',
+        points: [
+          { start: '2026-01-01T00:00:00Z', hours: 1, value: -6 },
+          { start: '2026-01-01T12:00:00Z', hours: 1, value: 3 },
+          { start: '2026-01-02T00:00:00Z', hours: 1, value: -8 },
+          { start: '2026-01-02T12:00:00Z', hours: 1, value: 1 },
+        ],
+      },
+    };
+
+    const days = aggregateForecastToDaily(openMeteoLikeGrid, 'UTC');
+    const byDate = Object.fromEntries(days.map((d) => [d.date, d]));
+
+    expect(byDate['2026-01-01']).toBeDefined();
+    expect(byDate['2026-01-01'].tMinC).toBe(-6);
+    expect(byDate['2026-01-01'].tMaxC).toBe(3);
+    expect(byDate['2026-01-01'].tMinF).toBe(21);
+    expect(byDate['2026-01-01'].tMaxF).toBe(37);
+
+    expect(byDate['2026-01-02']).toBeDefined();
+    expect(byDate['2026-01-02'].tMinC).toBe(-8);
+    expect(byDate['2026-01-02'].tMaxC).toBe(1);
+    expect(byDate['2026-01-02'].tMinF).toBe(18);
+    expect(byDate['2026-01-02'].tMaxF).toBe(34);
+  });
 });

@@ -4,6 +4,7 @@ import { awdbDateToIso, fetchAwdbJson } from "./awdb";
 import { AwdbStation, inferTimeZone } from "./stations";
 import { MountainLocation } from "@/types/location";
 import { fetchNwsCurrentAndTimeseries } from "./nws-current";
+import { fetchOpenMeteoCurrentAndTimeseries } from "./open-meteo-current";
 
 type StationDataResponse = Array<{
   data?: Array<{
@@ -195,19 +196,30 @@ export async function fetchSnotelCurrentConditions({
   const temperatureHistoryData = toTemperatureHistorySeries(byElement, tz);
   const latestTemp = getLatestObservedTemperaturePoint(byElement);
 
-  const nws = await fetchNwsCurrentAndTimeseries({
-    latitude,
-    longitude,
-    timeZone: tz,
-    stationId: station.stationId,
-  }).catch(() => null);
+  const weatherData = await (async () => {
+    try {
+      return await fetchNwsCurrentAndTimeseries({
+        latitude,
+        longitude,
+        timeZone: tz,
+        stationId: station.stationId,
+      });
+    } catch {
+      return await fetchOpenMeteoCurrentAndTimeseries({
+        latitude,
+        longitude,
+        timeZone: tz,
+        stationId: station.stationId,
+      }).catch(() => null);
+    }
+  })();
 
   const observedAt = latestTemp?.ts ?? null;
   const ageMin = minutesSince(observedAt);
   const snotelTemperatureF =
     latestTemp?.value == null ? null : Math.round(latestTemp.value);
 
-  const baseCurrent = nws?.currentData ?? {
+  const baseCurrent = weatherData?.currentData ?? {
     stationId: station.stationId,
     source: observedAt ? ("observation" as const) : ("forecast" as const),
     observedAt,
@@ -248,7 +260,7 @@ export async function fetchSnotelCurrentConditions({
         timeZone: tz,
       },
     },
-    timeseriesData: nws?.timeseriesData ?? [],
+    timeseriesData: weatherData?.timeseriesData ?? [],
     temperatureHistoryData,
     lastUpdatedAt: observedAt,
   };
