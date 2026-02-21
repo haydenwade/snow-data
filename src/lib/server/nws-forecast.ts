@@ -1,8 +1,5 @@
 import { ForecastGridData, GridSeries, SeriesPoint } from "@/types/forecast";
 
-const NWS_USER_AGENT =
-  "AltaSnowReport/1.0 (snow-data dev; contact: support@alta-snow.local)";
-
 function parseValidTime(validTime: string): { start: string; hours: number } {
   const [start, duration] = validTime.split("/");
   let hours = 0;
@@ -37,7 +34,6 @@ function mapSeries(properties: Record<string, any>, key: string): GridSeries {
 async function fetchNwsJson(url: string) {
   const res = await fetch(url, {
     headers: {
-      "User-Agent": NWS_USER_AGENT,
       Accept: "application/geo+json",
     },
     cache: "no-store",
