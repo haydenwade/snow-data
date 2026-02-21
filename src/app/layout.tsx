@@ -4,7 +4,7 @@ import Header from "@/components/snow-report/Header";
 
 export const metadata: Metadata = {
   title: "SNOWD",
-  description: "Free snow forecast and ski conditions app powered by SNOTEL and NOAA data. Snowfall totals, snow depth, wind, and lift status. A free OpenSnow alternative.",
+  description: "Free snow forecast and ski conditions app powered by SNOTEL and NOAA data. Snowfall totals, snow depth, wind, and lift status. A free OpenSnow alternative. No ads.",
   keywords: [
     "free snow app",
     "free snow forecast",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "SNOWD",
     description:
-      "Free snow forecast and ski conditions app powered by SNOTEL and NOAA data. Snowfall totals, snow depth, wind, and lift status. A free OpenSnow alternative.",
+      "Free snow forecast and ski conditions app powered by SNOTEL and NOAA data. Snowfall totals, snow depth, wind, and lift status. A free OpenSnow alternative. No ads.",
     images: [
       {
         url: "/og-small.png",
