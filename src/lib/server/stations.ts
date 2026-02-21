@@ -126,11 +126,37 @@ function formatElevation(elevationFt: number | null | undefined) {
   return `${Math.round(elevationFt).toLocaleString("en-US")} ft`;
 }
 
-//TODO: Not radar page, fix
 function buildDefaultRadarLink(lat: number, lon: number) {
-  return `https://forecast.weather.gov/MapClick.php?lat=${encodeURIComponent(
-    lat,
-  )}&lon=${encodeURIComponent(lon)}`;
+  const settings = {
+    agenda: {
+      id: "weather",
+      center: [lon, lat],
+      location: [lon, lat],
+      zoom: 7,
+      layer: "bref_qcd",
+    },
+    animating: false,
+    base: "standard",
+    artcc: false,
+    county: false,
+    cwa: false,
+    rfc: false,
+    state: false,
+    menu: true,
+    shortFusedOnly: false,
+    opacity: {
+      alerts: 0.8,
+      local: 0.6,
+      localStations: 0.8,
+      national: 0.6,
+    },
+  };
+  const encodedSettings = Buffer.from(JSON.stringify(settings), "utf-8").toString(
+    "base64",
+  );
+  return `https://radar.weather.gov/?settings=v1_${encodeURIComponent(
+    encodedSettings,
+  )}`;
 }
 
 export function stateNameFromCode(stateCode: string) {
@@ -229,8 +255,7 @@ export function toMountainLocation(
     resortInfoLinks: locationMatch?.resortInfoLinks ?? [],
     avalancheInfoLinks: locationMatch?.avalancheInfoLinks ?? [],
     trafficInfoLinks: locationMatch?.trafficInfoLinks ?? [],
-    radarLink:
-      locationMatch?.radarLink ?? buildDefaultRadarLink(latitude, longitude),
+    radarLink: buildDefaultRadarLink(latitude, longitude),
     isHidden: locationMatch?.isHidden ?? false,
   };
 }
