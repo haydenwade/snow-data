@@ -10,7 +10,7 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 type RouteContext = {
-  params: Promise<{ stationId: string }>;
+  params: Promise<{ stationTriplet: string }>;
 };
 
 interface GetResponseType {
@@ -24,7 +24,7 @@ export async function GET(
   context: RouteContext,
 ): Promise<NextResponse<GetResponseType>> {
   const params = await context.params;
-  const stationTriplet = normalizeTripletInput(params.stationId);
+  const stationTriplet = normalizeTripletInput(params.stationTriplet);
   if (!stationTriplet) {
     return NextResponse.json(
       { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },

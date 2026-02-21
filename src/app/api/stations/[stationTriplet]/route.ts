@@ -1,21 +1,26 @@
 import {
   fetchStationByTriplet,
   findLocationByTriplet,
+  toMountainLocation,
+  toStationSummary,
 } from "@/lib/server/stations";
 import { normalizeTripletInput } from "@/lib/station-triplet";
-import { fetchSnotelCurrentConditions } from "@/lib/server/snotel-current";
+import { StationDetailResponse } from "@/types/station";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 type RouteContext = {
-  params: Promise<{ stationId: string }>;
+  params: Promise<{ stationTriplet: string }>;
 };
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(
+  _request: Request,
+  context: RouteContext,
+): Promise<NextResponse<{ error?: string } | StationDetailResponse>> {
   try {
     const params = await context.params;
-    const stationTriplet = normalizeTripletInput(params.stationId);
+    const stationTriplet = normalizeTripletInput(params.stationTriplet);
     if (!stationTriplet) {
       return NextResponse.json(
         { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
@@ -32,22 +37,18 @@ export async function GET(_request: Request, context: RouteContext) {
       );
     }
 
-    // Determine if the station is a SNOTEL or COOP station
     const locationMatch = findLocationByTriplet(station.stationTriplet);
 
-    const payload = await fetchSnotelCurrentConditions({
-      station,
+    const response: StationDetailResponse = {
+      station: toStationSummary(station, locationMatch),
+      location: toMountainLocation(station, locationMatch),
       locationMatch,
-    });
+    };
 
-    return NextResponse.json(payload, { status: 200 });
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      {
-        error:
-          (error as Error)?.message ||
-          "Failed to fetch SNOTEL current conditions",
-      },
+      { error: (error as Error)?.message || "Failed to fetch station" },
       { status: 500 },
     );
   }

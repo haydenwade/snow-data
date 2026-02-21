@@ -1,26 +1,21 @@
 import {
   fetchStationByTriplet,
   findLocationByTriplet,
-  toMountainLocation,
-  toStationSummary,
 } from "@/lib/server/stations";
 import { normalizeTripletInput } from "@/lib/station-triplet";
-import { StationDetailResponse } from "@/types/station";
+import { fetchSnotelCurrentConditions } from "@/lib/server/snotel-current";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
 type RouteContext = {
-  params: Promise<{ stationId: string }>;
+  params: Promise<{ stationTriplet: string }>;
 };
 
-export async function GET(
-  _request: Request,
-  context: RouteContext,
-): Promise<NextResponse<{ error?: string } | StationDetailResponse>> {
+export async function GET(_request: Request, context: RouteContext) {
   try {
     const params = await context.params;
-    const stationTriplet = normalizeTripletInput(params.stationId);
+    const stationTriplet = normalizeTripletInput(params.stationTriplet);
     if (!stationTriplet) {
       return NextResponse.json(
         { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
@@ -37,18 +32,22 @@ export async function GET(
       );
     }
 
+    // Determine if the station is a SNOTEL or COOP station
     const locationMatch = findLocationByTriplet(station.stationTriplet);
 
-    const response: StationDetailResponse = {
-      station: toStationSummary(station, locationMatch),
-      location: toMountainLocation(station, locationMatch),
+    const payload = await fetchSnotelCurrentConditions({
+      station,
       locationMatch,
-    };
+    });
 
-    return NextResponse.json(response, { status: 200 });
+    return NextResponse.json(payload, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { error: (error as Error)?.message || "Failed to fetch station" },
+      {
+        error:
+          (error as Error)?.message ||
+          "Failed to fetch SNOTEL current conditions",
+      },
       { status: 500 },
     );
   }
