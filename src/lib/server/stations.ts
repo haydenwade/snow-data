@@ -126,6 +126,7 @@ function formatElevation(elevationFt: number | null | undefined) {
   return `${Math.round(elevationFt).toLocaleString("en-US")} ft`;
 }
 
+//TODO: Not radar page, fix
 function buildDefaultRadarLink(lat: number, lon: number) {
   return `https://forecast.weather.gov/MapClick.php?lat=${encodeURIComponent(
     lat,
@@ -137,6 +138,8 @@ export function stateNameFromCode(stateCode: string) {
   return STATE_NAME_BY_CODE[code] ?? code;
 }
 
+//TODO: seems like we should move towards stationTriplet as unique identifier, to support
+// different networks having the same station ID
 export function findLocationByStationId(stationId: string) {
   const normalized = stationId.toUpperCase();
   return (
@@ -289,6 +292,8 @@ export async function fetchStationByTriplet(stationTriplet: string) {
   return stations[0] ?? null;
 }
 
+//TODO: investigate why this is needed - perhaps this is to support multiple networks
+// like mammoth
 export async function resolveStation(stationIdOrTriplet: string) {
   const normalizedInput = normalizeStationIdInput(stationIdOrTriplet);
   const upperInput = normalizedInput.toUpperCase();
