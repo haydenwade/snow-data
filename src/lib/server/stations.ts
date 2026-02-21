@@ -185,7 +185,6 @@ export function toStationSummary(
       station.dataTimeZone == null || Number.isNaN(station.dataTimeZone)
         ? null
         : station.dataTimeZone,
-    locationId: locationMatch?.id ?? null,
     logoUrl: locationMatch?.logoUrl ?? null,
     hasLocationDetails: Boolean(locationMatch),
   };

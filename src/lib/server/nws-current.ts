@@ -184,12 +184,12 @@ export async function fetchNwsCurrentAndTimeseries({
   latitude,
   longitude,
   timeZone,
-  locationId,
+  stationId,
 }: {
   latitude: number;
   longitude: number;
   timeZone: string;
-  locationId: string;
+  stationId: string;
 }) {
   const { response: pointsResponse, json: pointsJson } = await fetchNwsJson(
     `https://api.weather.gov/points/${latitude},${longitude}`,
@@ -328,7 +328,6 @@ export async function fetchNwsCurrentAndTimeseries({
   if (!conditionText) conditionText = "Conditions Unavailable";
 
   const currentData: ApiResp["currentData"] = {
-    locationId,
     stationId: nwsStationId,
     source: currentSource,
     observedAt,

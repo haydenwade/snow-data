@@ -20,7 +20,6 @@ export type StationSummary = {
   latitude: number;
   longitude: number;
   dataTimeZone: number | null;
-  locationId: string | null;
   logoUrl: string | null;
   hasLocationDetails: boolean;
 };

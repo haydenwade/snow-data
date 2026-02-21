@@ -177,8 +177,7 @@ export default function StationPage() {
           historic={historic}
           forecast={todayAndFutureForecast}
           unit={unit}
-          locationId={stationId}
-          historicHref={`/stations/${encodeURIComponent(stationId)}/historic`}
+          stationId={stationId}
           loading={loading}
         />
         <ForecastTimeline data={forecast} unit={unit} loading={loading} />

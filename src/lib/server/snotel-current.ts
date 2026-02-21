@@ -199,7 +199,7 @@ export async function fetchSnotelCurrentConditions({
     latitude,
     longitude,
     timeZone: tz,
-    locationId: station.stationId,
+    stationId: station.stationId,
   }).catch(() => null);
 
   const observedAt = latestTemp?.ts ?? null;
@@ -208,7 +208,6 @@ export async function fetchSnotelCurrentConditions({
     latestTemp?.value == null ? null : Math.round(latestTemp.value);
 
   const baseCurrent = nws?.currentData ?? {
-    locationId: station.stationId,
     stationId: station.stationId,
     source: observedAt ? ("observation" as const) : ("forecast" as const),
     observedAt,
@@ -229,7 +228,6 @@ export async function fetchSnotelCurrentConditions({
   return {
     currentData: {
       ...baseCurrent,
-      locationId: station.stationId,
       stationId: station.stationId,
       source: observedAt ? "observation" : baseCurrent.source,
       observedAt,

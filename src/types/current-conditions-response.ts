@@ -16,7 +16,6 @@ export type ApiResp = {
   lastUpdatedAt?: string | null;
   temperatureHistoryData?: TimeseriesPoint[];
   currentData: {
-    locationId: string;
     stationId: string | null;
     source: "observation" | "forecast";
     observedAt: string | null;
