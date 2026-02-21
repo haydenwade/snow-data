@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Menu, Share, X } from "lucide-react";
+import { useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
+import { shareStation } from "@/lib/share-station";
 
 export default function Header() {
   const pathname = usePathname();
@@ -14,6 +15,10 @@ export default function Header() {
   const isMobileMenuOpen = mobileMenuOpenPath === currentPath;
   const segments = currentPath.split("/").filter(Boolean);
   const isHome = segments.length === 0;
+  const isStationPage = segments[0] === "stations" && segments.length >= 2;
+  const handleShare = useCallback(async () => {
+    await shareStation();
+  }, []);
 
   return (
     <header className="bg-slate-900 border-b border-slate-800">
@@ -36,26 +41,39 @@ export default function Header() {
 
           {!isHome && (
             <>
-              <button
-                type="button"
-                aria-controls="mobile-nav"
-                aria-expanded={isMobileMenuOpen}
-                aria-label={
-                  isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
-                }
-                className="sm:hidden inline-flex items-center justify-center rounded-lg p-2 text-slate-300 hover:text-white transition"
-                onClick={() =>
-                  setMobileMenuOpenPath((openPath) =>
-                    openPath === currentPath ? null : currentPath
-                  )
-                }
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-5 w-5" aria-hidden="true" />
-                ) : (
-                  <Menu className="h-5 w-5" aria-hidden="true" />
+              <div className="sm:hidden flex items-center gap-1">
+                {isStationPage && (
+                  <button
+                    type="button"
+                    aria-label="Share station"
+                    title="Share station"
+                    onClick={handleShare}
+                    className="inline-flex items-center justify-center rounded-lg p-2 text-slate-300 hover:text-white transition"
+                  >
+                    <Share className="h-5 w-5" aria-hidden="true" />
+                  </button>
                 )}
-              </button>
+                <button
+                  type="button"
+                  aria-controls="mobile-nav"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-label={
+                    isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"
+                  }
+                  className="inline-flex items-center justify-center rounded-lg p-2 text-slate-300 hover:text-white transition"
+                  onClick={() =>
+                    setMobileMenuOpenPath((openPath) =>
+                      openPath === currentPath ? null : currentPath
+                    )
+                  }
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Menu className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
 
               <nav className="hidden sm:flex items-center gap-2 text-sm text-slate-300">
                 <Link
