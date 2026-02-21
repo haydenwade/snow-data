@@ -23,6 +23,7 @@ const TILE_SIZE = 256;
 const MIN_ZOOM = 4;
 const DEFAULT_CENTER = { lat: 40.7608, lon: -111.891 };
 const DEFAULT_ZOOM = 7;
+const WHEEL_ZOOM_COOLDOWN_MS = 180;
 
 type StateBounds = {
   code: string;
@@ -265,6 +266,7 @@ export default function StationsExplorerMap({
     startWorldY: number;
   } | null>(null);
   const lastViewportKeyRef = useRef("");
+  const lastWheelZoomAtRef = useRef(0);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -404,6 +406,7 @@ export default function StationsExplorerMap({
     if (!mapState) return;
     const target = event.target as HTMLElement;
     if (target.closest('[data-map-interactive="true"]')) return;
+    setSelectedStationTriplet(null);
     dragRef.current = {
       startClientX: event.clientX,
       startClientY: event.clientY,
@@ -431,8 +434,15 @@ export default function StationsExplorerMap({
 
   const onWheel = (event: WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
+    event.stopPropagation();
+
+    const now = performance.now();
+    if (now - lastWheelZoomAtRef.current < WHEEL_ZOOM_COOLDOWN_MS) return;
+    const direction = event.deltaY < 0 ? 1 : -1;
+    lastWheelZoomAtRef.current = now;
+
     setZoom((current) => {
-      const next = current + (event.deltaY < 0 ? 1 : -1);
+      const next = current + direction;
       return clamp(next, MIN_ZOOM, maxZoom);
     });
   };
@@ -493,7 +503,7 @@ export default function StationsExplorerMap({
         </div>
       </div>
 
-      <div className="relative h-[600px] w-full overflow-hidden z-0">
+      <div className="relative h-[600px] w-full overflow-hidden z-0" onWheelCapture={onWheel}>
         <div
           ref={mapRef}
           className="absolute inset-0 touch-none bg-slate-900"
@@ -501,7 +511,6 @@ export default function StationsExplorerMap({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          onWheel={onWheel}
         >
           {BASEMAPS[basemap].layers.map((layer) =>
             mapState?.tiles.map((tile) => (
