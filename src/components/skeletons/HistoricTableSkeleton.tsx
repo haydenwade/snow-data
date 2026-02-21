@@ -1,4 +1,16 @@
 export default function HistoricTableSkeleton() {
+  const headerCellClasses = [
+    "text-left font-medium py-2 pl-4",
+    "text-right font-medium py-2",
+    "text-right font-medium py-2 pr-4",
+  ];
+
+  const bodyCellClasses = [
+    "py-2 pl-4",
+    "py-2 text-right",
+    "py-2 pr-4 text-right",
+  ];
+
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden animate-pulse">
       <div className="p-4 border-b border-slate-700/50">
@@ -12,9 +24,13 @@ export default function HistoricTableSkeleton() {
           <table className="min-w-full text-sm table-fixed">
             <thead className="sticky top-0 z-10 bg-slate-800/70 backdrop-blur-sm">
               <tr>
-                {[...Array(3)].map((_, i) => (
-                  <th key={i} className="py-2">
-                    <div className="h-4 w-20 bg-slate-700/30 rounded" />
+                {headerCellClasses.map((className, i) => (
+                  <th key={className} className={className}>
+                    <div
+                      className={`h-4 w-20 bg-slate-700/30 rounded ${
+                        i === 0 ? "" : "ml-auto"
+                      }`}
+                    />
                   </th>
                 ))}
               </tr>
@@ -22,9 +38,13 @@ export default function HistoricTableSkeleton() {
             <tbody>
               {[...Array(8)].map((_, i) => (
                 <tr key={i} className="border-t border-slate-700/30">
-                  {[...Array(3)].map((_, j) => (
-                    <td key={j} className="py-2">
-                      <div className="h-4 w-16 bg-slate-700/30 rounded" />
+                  {bodyCellClasses.map((className, j) => (
+                    <td key={`${className}-${j}`} className={className}>
+                      <div
+                        className={`h-4 w-16 bg-slate-700/30 rounded ${
+                          j === 0 ? "" : "ml-auto"
+                        }`}
+                      />
                     </td>
                   ))}
                 </tr>
