@@ -6,6 +6,10 @@ type OpenMeteoHourly = {
   temperature_2m?: Array<number | null>;
   windspeed_10m?: Array<number | null>;
   wind_speed_10m?: Array<number | null>;
+  winddirection_10m?: Array<number | null>;
+  wind_direction_10m?: Array<number | null>;
+  cloudcover?: Array<number | null>;
+  cloud_cover?: Array<number | null>;
 };
 
 type OpenMeteoForecastResponse = {
@@ -95,7 +99,8 @@ export async function fetchOpenMeteoForecastGridData(
   const params = new URLSearchParams({
     latitude: String(latitude),
     longitude: String(longitude),
-    hourly: "snowfall,temperature_2m,wind_speed_10m",
+    hourly:
+      "snowfall,temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover",
     timeformat: "unixtime",
   });
 
@@ -130,6 +135,16 @@ export async function fetchOpenMeteoForecastGridData(
     : Array.isArray(hourly.wind_speed_10m)
     ? hourly.wind_speed_10m
     : undefined;
+  const windDirectionValues = Array.isArray(hourly.winddirection_10m)
+    ? hourly.winddirection_10m
+    : Array.isArray(hourly.wind_direction_10m)
+    ? hourly.wind_direction_10m
+    : undefined;
+  const skyCoverValues = Array.isArray(hourly.cloudcover)
+    ? hourly.cloudcover
+    : Array.isArray(hourly.cloud_cover)
+    ? hourly.cloud_cover
+    : undefined;
 
   return {
     snowfallAmount: {
@@ -151,10 +166,17 @@ export async function fetchOpenMeteoForecastGridData(
       uom: "wmoUnit:km_h-1",
       points: mapHourlySeries(times, windValues),
     },
+    windDirection: {
+      uom: "wmoUnit:degree_(angle)",
+      points: mapHourlySeries(times, windDirectionValues),
+    },
+    skyCover: {
+      uom: "wmoUnit:percent",
+      points: mapHourlySeries(times, skyCoverValues),
+    },
     quantitativePrecipitation: emptySeries("wmoUnit:mm"),
     maxTemperature: emptySeries("wmoUnit:degC"),
     minTemperature: emptySeries("wmoUnit:degC"),
-    windDirection: emptySeries("wmoUnit:degree_(angle)"),
-    skyCover: emptySeries("wmoUnit:percent"),
+    // Open-Meteo provides hourly temperature_2m directly; max/min are derived in aggregation.
   };
 }
