@@ -2,7 +2,8 @@ import {
   fetchHistoricByStationTriplet,
   fetchHourlyTemperatureByStationTriplet,
 } from "@/lib/server/historic";
-import { resolveStation } from "@/lib/server/stations";
+import { fetchStationByTriplet } from "@/lib/server/stations";
+import { normalizeTripletInput } from "@/lib/station-triplet";
 import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
 import { NextResponse } from "next/server";
 
@@ -23,12 +24,19 @@ export async function GET(
   context: RouteContext,
 ): Promise<NextResponse<GetResponseType>> {
   const params = await context.params;
-  const stationId = params.stationId;
-  const station = await resolveStation(stationId);
+  const stationTriplet = normalizeTripletInput(params.stationId);
+  if (!stationTriplet) {
+    return NextResponse.json(
+      { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
+      { status: 400 },
+    );
+  }
+
+  const station = await fetchStationByTriplet(stationTriplet);
 
   if (!station) {
     return NextResponse.json(
-      { error: "No station found matching stationId" },
+      { error: "No station found matching station triplet" },
       { status: 404 },
     );
   }

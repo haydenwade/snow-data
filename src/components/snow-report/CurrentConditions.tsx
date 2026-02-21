@@ -14,10 +14,10 @@ import {
 import { SkyIcon } from "./SkyIcon";
 
 export default function CurrentConditions({
-  stationId,
+  stationTriplet,
   unit = "in",
 }: {
-  stationId?: string;
+  stationTriplet?: string;
   unit?: Unit;
 }) {
   const [resp, setResp] = useState<ApiResp | null>(null);
@@ -29,12 +29,12 @@ export default function CurrentConditions({
     setLoading(true);
     setError(null);
 
-    const endpoint = stationId
-      ? `/api/stations/${encodeURIComponent(stationId)}/current`
+    const endpoint = stationTriplet
+      ? `/api/stations/${encodeURIComponent(stationTriplet)}/current`
       : null;
 
     if (!endpoint) {
-      setError("Missing location identifier");
+      setError("Missing station identifier");
       setLoading(false);
       return () => {
         mounted = false;
@@ -59,24 +59,24 @@ export default function CurrentConditions({
     return () => {
       mounted = false;
     };
-  }, [stationId]);
+  }, [stationTriplet]);
 
   const current = resp?.currentData ?? null;
 
   const observedLabel = useMemo(() => {
     if (!current) return null;
-    const observedAt = stationId
+    const observedAt = stationTriplet
       ? (resp?.lastUpdatedAt ?? current.observedAt)
       : current.observedAt;
     const t = formatObservedLabel(observedAt);
     if (!t) return null;
-    const src = stationId
+    const src = stationTriplet
       ? "Temp Obs"
       : current.source === "observation"
         ? "Obs"
         : "Forecast";
     return `${src}: ${t}`;
-  }, [current, resp?.lastUpdatedAt, stationId]);
+  }, [current, resp?.lastUpdatedAt, stationTriplet]);
 
   const sunriseLabel = useMemo(() => {
     if (!current?.sun?.sunrise) return null;
@@ -191,7 +191,7 @@ export default function CurrentConditions({
 
                   {/* Optional status line */}
                   <div className="mt-3 text-xs text-slate-400">
-                    {stationId && resp?.lastUpdatedAt
+                    {stationTriplet && resp?.lastUpdatedAt
                       ? `Temperature from SNOTEL observation (${formatObservedLabel(resp.lastUpdatedAt)}).`
                       : current.isObserved
                         ? current.isObservationStale

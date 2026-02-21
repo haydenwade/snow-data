@@ -1,8 +1,8 @@
 import {
-  findLocationByStationId,
+  fetchStationByTriplet,
   findLocationByTriplet,
-  resolveStation,
 } from "@/lib/server/stations";
+import { normalizeTripletInput } from "@/lib/station-triplet";
 import { fetchSnotelCurrentConditions } from "@/lib/server/snotel-current";
 import { NextResponse } from "next/server";
 
@@ -15,23 +15,25 @@ type RouteContext = {
 export async function GET(_request: Request, context: RouteContext) {
   try {
     const params = await context.params;
-    const stationId = params.stationId;
-    // TODO: when is this a station triplet vs station id? Should station triplet be used instead?
-    // Mammoth: MHP, others had number
-    console.log("Fetching data for stationId:", stationId);
-    const station = await resolveStation(stationId);
+    const stationTriplet = normalizeTripletInput(params.stationId);
+    if (!stationTriplet) {
+      return NextResponse.json(
+        { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
+        { status: 400 },
+      );
+    }
+
+    const station = await fetchStationByTriplet(stationTriplet);
 
     if (!station) {
       return NextResponse.json(
-        { error: "No station found matching stationId" },
+        { error: "No station found matching station triplet" },
         { status: 404 },
       );
     }
 
     // Determine if the station is a SNOTEL or COOP station
-    const locationMatch =
-      findLocationByTriplet(station.stationTriplet) ??
-      findLocationByStationId(station.stationId);
+    const locationMatch = findLocationByTriplet(station.stationTriplet);
 
     const payload = await fetchSnotelCurrentConditions({
       station,

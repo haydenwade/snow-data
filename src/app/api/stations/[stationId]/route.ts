@@ -1,10 +1,10 @@
 import {
-  findLocationByStationId,
+  fetchStationByTriplet,
   findLocationByTriplet,
-  resolveStation,
   toMountainLocation,
   toStationSummary,
 } from "@/lib/server/stations";
+import { normalizeTripletInput } from "@/lib/station-triplet";
 import { StationDetailResponse } from "@/types/station";
 import { NextResponse } from "next/server";
 
@@ -20,19 +20,24 @@ export async function GET(
 ): Promise<NextResponse<{ error?: string } | StationDetailResponse>> {
   try {
     const params = await context.params;
-    const stationId = params.stationId;
-    const station = await resolveStation(stationId);
+    const stationTriplet = normalizeTripletInput(params.stationId);
+    if (!stationTriplet) {
+      return NextResponse.json(
+        { error: "Invalid station triplet format. Expected stationId:stateCode:networkCode" },
+        { status: 400 },
+      );
+    }
+
+    const station = await fetchStationByTriplet(stationTriplet);
 
     if (!station) {
       return NextResponse.json(
-        { error: "No station found matching stationId" },
+        { error: "No station found matching station triplet" },
         { status: 404 },
       );
     }
 
-    const locationMatch =
-      findLocationByTriplet(station.stationTriplet) ??
-      findLocationByStationId(station.stationId);
+    const locationMatch = findLocationByTriplet(station.stationTriplet);
 
     const response: StationDetailResponse = {
       station: toStationSummary(station, locationMatch),

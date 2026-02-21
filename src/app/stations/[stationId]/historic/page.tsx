@@ -10,13 +10,14 @@ import HistoricTable from "@/components/snow-report/HistoricTable";
 import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
 import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
+import { normalizeTripletInput } from "@/lib/station-triplet";
 import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
 import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
-async function fetchStationDetail(stationId: string): Promise<StationDetailResponse> {
-  const response = await fetch(`/api/stations/${encodeURIComponent(stationId)}`, {
+async function fetchStationDetail(stationTriplet: string): Promise<StationDetailResponse> {
+  const response = await fetch(`/api/stations/${encodeURIComponent(stationTriplet)}`, {
     cache: "no-store",
   });
   if (!response.ok) {
@@ -35,14 +36,14 @@ async function fetchStationDetail(stationId: string): Promise<StationDetailRespo
 }
 
 async function fetchHistoric(
-  stationId: string,
+  stationTriplet: string,
   days: number,
 ): Promise<{
   data: HistoricDay[];
   hourlyTemperature: HistoricHourlyTemperaturePoint[];
 }> {
   const response = await fetch(
-    `/api/stations/${encodeURIComponent(stationId)}/historic?days=${days}`,
+    `/api/stations/${encodeURIComponent(stationTriplet)}/historic?days=${days}`,
     { cache: "no-store" },
   );
   if (!response.ok) {
@@ -67,7 +68,7 @@ async function fetchHistoric(
 
 export default function StationHistoricPage() {
   const params = useParams();
-  const stationId = params.stationId as string;
+  const stationTriplet = normalizeTripletInput(params.stationId as string);
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
   const [unit, setUnit] = useState<Unit>("in");
@@ -80,17 +81,23 @@ export default function StationHistoricPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!stationTriplet) {
+      setError("Invalid station triplet");
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     const load = async () => {
       try {
         setLoading(true);
         setError(null);
-        const detail = await fetchStationDetail(stationId);
+        const detail = await fetchStationDetail(stationTriplet);
         if (!mounted) return;
         setLocation(detail.location);
 
-        const response = await fetchHistoric(stationId, 30);
+        const response = await fetchHistoric(stationTriplet, 30);
         if (!mounted) return;
         setHistoric(response.data);
         setHourlyTemperature(response.hourlyTemperature);
@@ -107,13 +114,21 @@ export default function StationHistoricPage() {
     return () => {
       mounted = false;
     };
-  }, [stationId]);
+  }, [stationTriplet]);
 
   const lastNHistoricDesc = useMemo(
     () => [...historic.slice(-range)].reverse(),
     [historic, range],
   );
   const lastNDerived = useMemo(() => historic.slice(-range), [historic, range]);
+
+  if (!stationTriplet) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
+        Invalid station triplet
+      </div>
+    );
+  }
 
   if (!location) {
     return (
@@ -141,7 +156,7 @@ export default function StationHistoricPage() {
 
       <div className="max-w-6xl mx-auto px-4 pt-6">
         <a
-          href={`/stations/${encodeURIComponent(stationId)}`}
+          href={`/stations/${encodeURIComponent(stationTriplet)}`}
           className="inline-block mb-4 px-2 py-1 rounded border border-slate-500 text-slate-400 text-sm hover:bg-slate-700/20 hover:text-slate-200 transition"
         >
           ← Back to Forecast

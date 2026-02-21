@@ -34,6 +34,7 @@ export default function Home() {
         l.network,
         l.id,
         l.stationId,
+        l.stationTriplet,
       ]
         .filter(Boolean)
         .join(" ")
@@ -73,7 +74,7 @@ export default function Home() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, city, state, or station ID"
+              placeholder="Search by name, city, state, or station triplet"
               className="w-full pl-10 pr-4 py-2 rounded-md bg-slate-800/70 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
             />
           </div>
@@ -91,7 +92,7 @@ export default function Home() {
           {filteredLocations.map((location) => (
             <Link
               key={location.id}
-              href={`/stations/${encodeURIComponent(location.stationId)}`}
+              href={`/stations/${encodeURIComponent(location.stationTriplet)}`}
               className="block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
             >
               <div className="flex items-center gap-4 mb-3">

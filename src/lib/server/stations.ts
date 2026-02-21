@@ -1,4 +1,5 @@
 import { LOCATIONS } from "@/constants/locations";
+import { normalizeTripletInput } from "@/lib/station-triplet";
 import { MountainLocation } from "@/types/location";
 import { StationSummary } from "@/types/station";
 import { fetchAwdbJson } from "./awdb";
@@ -89,31 +90,6 @@ const stationStateCache = new Map<
   { expiresAt: number; data: AwdbStation[] }
 >();
 
-function parseStationTriplet(raw: string) {
-  const parts = raw.split(":");
-  if (parts.length !== 3) return null;
-  return {
-    stationId: parts[0] ?? "",
-    stateCode: parts[1] ?? "",
-    networkCode: parts[2] ?? "",
-  };
-}
-
-function sortStationsByPreference(stations: AwdbStation[]) {
-  const score = (station: AwdbStation) => {
-    const network = (station.networkCode ?? "").toUpperCase();
-    if (network === "SNTL") return 0;
-    if (network === "MSNT") return 1;
-    return 2;
-  };
-
-  return [...stations].sort((a, b) => score(a) - score(b));
-}
-
-function normalizeStationIdInput(stationId: string) {
-  return decodeURIComponent(stationId).trim();
-}
-
 function fallbackTimeZoneFromOffset(offsetHours: number | null | undefined) {
   if (offsetHours == null || Number.isNaN(offsetHours)) return "UTC";
   const rounded = Math.trunc(offsetHours);
@@ -162,15 +138,6 @@ function buildDefaultRadarLink(lat: number, lon: number) {
 export function stateNameFromCode(stateCode: string) {
   const code = stateCode.toUpperCase();
   return STATE_NAME_BY_CODE[code] ?? code;
-}
-
-//TODO: seems like we should move towards stationTriplet as unique identifier, to support
-// different networks having the same station ID
-export function findLocationByStationId(stationId: string) {
-  const normalized = stationId.toUpperCase();
-  return (
-    LOCATIONS.find((loc) => loc.stationId.toUpperCase() === normalized) ?? null
-  );
 }
 
 export function findLocationByTriplet(stationTriplet: string) {
@@ -310,36 +277,12 @@ export async function fetchStationsByStateCodes(stateCodes: string[]) {
 }
 
 export async function fetchStationByTriplet(stationTriplet: string) {
+  const normalizedTriplet = normalizeTripletInput(stationTriplet);
+  if (!normalizedTriplet) return null;
+
   const stations = await fetchAwdbJson<AwdbStation[]>("/stations", {
-    stationTriplets: stationTriplet,
+    stationTriplets: normalizedTriplet,
     activeOnly: true,
   });
   return stations[0] ?? null;
-}
-
-//TODO: investigate why this is needed - perhaps this is to support multiple networks
-// like mammoth
-export async function resolveStation(stationIdOrTriplet: string) {
-  const normalizedInput = normalizeStationIdInput(stationIdOrTriplet);
-  const upperInput = normalizedInput.toUpperCase();
-
-  if (!normalizedInput) return null;
-
-  if (parseStationTriplet(normalizedInput)) {
-    return await fetchStationByTriplet(upperInput);
-  }
-
-  const locationMatch = findLocationByStationId(upperInput);
-  if (locationMatch?.stationTriplet) {
-    const stationFromLocation = await fetchStationByTriplet(locationMatch.stationTriplet);
-    if (stationFromLocation) return stationFromLocation;
-  }
-
-  const byStationId = await fetchAwdbJson<AwdbStation[]>("/stations", {
-    stationTriplets: `${upperInput}:*:*`,
-    activeOnly: true,
-  });
-
-  const sorted = sortStationsByPreference(byStationId);
-  return sorted[0] ?? null;
 }

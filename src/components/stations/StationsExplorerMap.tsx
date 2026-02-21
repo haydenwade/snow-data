@@ -457,7 +457,7 @@ export default function StationsExplorerMap({
       <div className="relative z-40 min-h-[60px] px-4 py-3 border-b border-slate-700/70 bg-slate-900/95 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-slate-200">
           <MapPin className="h-5 w-5 text-orange-400" />
-          <h2 className="font-semibold">SNOTEL Station Map</h2>
+          <h2 className="font-semibold">Weather Station Map</h2>
           {isRefreshing ? (
             <span className="inline-flex items-center gap-1 text-xs text-slate-300">
               <LoaderCircle className="h-3.5 w-3.5 animate-spin text-sky-300" />
@@ -605,7 +605,7 @@ export default function StationsExplorerMap({
               </div>
               <div className="mt-3">
                 <Link
-                  href={`/stations/${encodeURIComponent(selectedStation.stationId)}`}
+                  href={`/stations/${encodeURIComponent(selectedStation.stationTriplet)}`}
                   className="inline-flex items-center rounded-lg border border-slate-500 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700/40"
                 >
                   Open station
