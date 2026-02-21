@@ -74,7 +74,7 @@ export default function Home() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, city, state, or station triplet"
+              placeholder="Search by name, city, or state"
               className="w-full pl-10 pr-4 py-2 rounded-md bg-slate-800/70 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
             />
           </div>
