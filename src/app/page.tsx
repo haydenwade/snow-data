@@ -6,6 +6,7 @@ import Footer from "@/components/snow-report/Footer";
 import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
+import StationsExplorerSection from "@/components/stations/StationsExplorerSection";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -54,16 +55,12 @@ export default function Home() {
             planners use to get stoked without being misled.
           </p>
           <RotatingFeatures />
-          <div className="mt-4">
-            <Link
-              href="/stations"
-              className="inline-flex items-center rounded-xl border border-slate-600 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800/50 transition"
-            >
-              Explore All SNOTEL Stations
-            </Link>
-          </div>
         </div>
 
+        {/* Locations grid */}
+        <h2 className="text-center text-slate-200 text-lg md:text-xl font-semibold mb-4">
+          See current conditions and snowfall at popular locations.
+        </h2>
         {/* Search */}
         <div className="max-w-xl mx-auto mb-6">
           <label htmlFor="location-search" className="sr-only">
@@ -80,15 +77,13 @@ export default function Home() {
               className="w-full pl-10 pr-4 py-2 rounded-md bg-slate-800/70 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
             />
           </div>
-          <p className="mt-2 text-xs text-slate-400">
-            {query ? `${filteredLocations.length} result${filteredLocations.length === 1 ? "" : "s"}` : `${visibleLocations.length} locations`}
-          </p>
+          {query.trim() ? (
+            <p className="mt-2 text-xs text-slate-400">
+              {filteredLocations.length} location
+              {filteredLocations.length === 1 ? "" : "s"}
+            </p>
+          ) : null}
         </div>
-
-        {/* Locations grid */}
-        <h2 className="text-center text-slate-200 text-lg md:text-xl font-semibold mb-4">
-          Select a location to see current conditions and snowfall.
-        </h2>
         <div
           id="locations"
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-w-0"
@@ -138,6 +133,9 @@ export default function Home() {
               No locations match your search.
             </div>
           )}
+        </div>
+        <div className="mt-12">
+          <StationsExplorerSection />
         </div>
         <Footer textOverride={"Don't see the location you are looking for?"} />
       </div>
