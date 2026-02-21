@@ -65,18 +65,18 @@ export default function CurrentConditions({
 
   const observedLabel = useMemo(() => {
     if (!current) return null;
-    const observedAt = stationTriplet
-      ? (resp?.lastUpdatedAt ?? current.observedAt)
-      : current.observedAt;
+    const observedAt = resp?.lastUpdatedAt ?? current.observedAt;
     const t = formatObservedLabel(observedAt);
     if (!t) return null;
-    const src = stationTriplet
-      ? "Temp Obs"
-      : current.source === "observation"
-        ? "Obs"
-        : "Forecast";
-    return `${src}: ${t}`;
-  }, [current, resp?.lastUpdatedAt, stationTriplet]);
+    return `Forecast: ${t}`;
+  }, [current, resp?.lastUpdatedAt]);
+
+  const statusLabel = useMemo(() => {
+    const updated = formatObservedLabel(resp?.lastUpdatedAt);
+    return updated
+      ? `Temperature from weather station observation (${updated}).`
+      : "Temperature from weather station observation.";
+  }, [resp?.lastUpdatedAt]);
 
   const sunriseLabel = useMemo(() => {
     if (!current?.sun?.sunrise) return null;
@@ -191,13 +191,7 @@ export default function CurrentConditions({
 
                   {/* Optional status line */}
                   <div className="mt-3 text-xs text-slate-400">
-                    {stationTriplet && resp?.lastUpdatedAt
-                      ? `Temperature from SNOTEL observation (${formatObservedLabel(resp.lastUpdatedAt)}).`
-                      : current.isObserved
-                        ? current.isObservationStale
-                          ? "Observation is stale — showing latest available."
-                          : "Live observation."
-                        : "Approximate (hourly forecast)."}
+                    {statusLabel}
                   </div>
                 </div>
 
