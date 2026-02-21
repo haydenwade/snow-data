@@ -121,18 +121,33 @@ export default function StationPage() {
         if (!mounted) return;
         setLocation(detail.location);
 
-        const [historicData, nwsGrid] = await Promise.all([
+        const [historicResult, forecastResult] = await Promise.allSettled([
           fetchHistoric(stationKey, 30),
-          fetchForecastGrid(detail.location.lat, detail.location.lon),
+          fetchForecastGrid(
+            detail.location.lat,
+            detail.location.lon,
+          ),
         ]);
         if (!mounted) return;
 
-        const dailyForecast = aggregateForecastToDaily(
-          nwsGrid,
-          detail.location.timezone,
-        );
-        setHistoric(historicData);
-        setForecast(dailyForecast);
+        if (historicResult.status === "rejected") {
+          throw historicResult.reason;
+        }
+
+        setHistoric(historicResult.value);
+
+        if (forecastResult.status === "fulfilled") {
+          const dailyForecast = aggregateForecastToDaily(
+            forecastResult.value,
+            detail.location.timezone,
+          );
+          setForecast(dailyForecast);
+        } else {
+          setForecast([]);
+          setError(
+            "Forecast unavailable for this station. Historic and current conditions are still available.",
+          );
+        }
       } catch (err) {
         if (!mounted) return;
         setError((err as Error)?.message ?? "Failed to load station data");
@@ -169,6 +184,7 @@ export default function StationPage() {
     const dayDate = new Date(`${day.date}T00:00:00`);
     return dayDate >= new Date(today.getFullYear(), today.getMonth(), today.getDate());
   });
+  const showForecastSections = loading || forecast.length > 0;
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -189,23 +205,34 @@ export default function StationPage() {
       <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
         <CurrentConditions stationKey={stationKey} unit={unit} />
 
-        <SnowSummaryStrip
-          historic={historic}
-          forecast={todayAndFutureForecast}
-          unit={unit}
-          stationKey={stationKey}
-          loading={loading}
-        />
-        <ForecastTimeline data={forecast} unit={unit} loading={loading} />
+        {showForecastSections ? (
+          <>
+            <SnowSummaryStrip
+              historic={historic}
+              forecast={todayAndFutureForecast}
+              unit={unit}
+              stationKey={stationKey}
+              loading={loading}
+            />
+            <ForecastTimeline data={forecast} unit={unit} loading={loading} />
 
-        <section className="grid md:grid-cols-2 gap-6">
-          <ForecastChart data={todayAndFutureForecast} unit={unit} loading={loading} />
-          <ForecastTable
-            data={todayAndFutureForecast}
-            unit={unit}
-            loading={loading}
-          />
-        </section>
+            <section className="grid md:grid-cols-2 gap-6">
+              <ForecastChart data={todayAndFutureForecast} unit={unit} loading={loading} />
+              <ForecastTable
+                data={todayAndFutureForecast}
+                unit={unit}
+                loading={loading}
+              />
+            </section>
+          </>
+        ) : (
+          <section className="bg-slate-800/40 rounded-2xl border border-slate-700/50 p-6">
+            <h2 className="font-semibold text-white">Forecast Unavailable</h2>
+            <p className="mt-2 text-sm text-slate-300">
+              No forecast provider currently has data for this station.
+            </p>
+          </section>
+        )}
 
         <section className="grid md:grid-cols-2 gap-6">
           <ResortInfoLinks location={location} loading={loading} />

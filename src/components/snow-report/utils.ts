@@ -107,6 +107,7 @@ export function aggregateForecastToDaily(
     {
       snowIn: number;
       pops: number[];
+      tempsC: number[];
       windSpeeds: number[];
       windDirs: { dir: number; speed: number }[];
       skyCovers: number[];
@@ -121,6 +122,7 @@ export function aggregateForecastToDaily(
       dayBuckets[day] = {
         snowIn: 0,
         pops: [],
+        tempsC: [],
         windSpeeds: [],
         windDirs: [],
         skyCovers: [],
@@ -153,6 +155,17 @@ export function aggregateForecastToDaily(
       dayBuckets[day].pops.push(p.value);
     });
   });
+
+  if (grid.temperature2m && grid.temperature2m.points) {
+    grid.temperature2m.points.forEach((p) => {
+      const hoursList = expandToHourly(p);
+      hoursList.forEach((h) => {
+        const day = dateKeyInZone(h, timeZone);
+        pushDay(day);
+        dayBuckets[day].tempsC.push(p.value);
+      });
+    });
+  }
 
   // wind speed/direction and sky cover - expand to hourly and collect
   if (grid.windSpeed && grid.windSpeed.points) {
@@ -220,10 +233,18 @@ export function aggregateForecastToDaily(
   return days.map((day) => {
     const b = dayBuckets[day];
     const pop = b.pops.length ? Math.round(Math.max(...b.pops)) : 0;
-    const tMaxF = b.tMaxF;
-    const tMinF = b.tMinF;
-    const tMaxC = b.tMaxC;
-    const tMinC = b.tMinC;
+    let tMaxF = b.tMaxF;
+    let tMinF = b.tMinF;
+    let tMaxC = b.tMaxC;
+    let tMinC = b.tMinC;
+    if ((tMaxC == null || tMinC == null) && b.tempsC.length > 0) {
+      const minObservedC = Math.min(...b.tempsC);
+      const maxObservedC = Math.max(...b.tempsC);
+      if (tMinC == null) tMinC = Math.round(minObservedC);
+      if (tMaxC == null) tMaxC = Math.round(maxObservedC);
+      if (tMinF == null) tMinF = Math.round(cToF(minObservedC));
+      if (tMaxF == null) tMaxF = Math.round(cToF(maxObservedC));
+    }
     // compute average wind speed: values from grid.windSpeed are treated as km/h
     let windMph: number | undefined = undefined;
     if (b.windSpeeds && b.windSpeeds.length) {
@@ -290,5 +311,4 @@ export function formatDateYYYYMMDD(dateStr: string) {
     timeZone: "UTC",
   });
 }
-
 
