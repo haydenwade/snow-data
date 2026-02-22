@@ -11,9 +11,9 @@ import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
 import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { normalizeStationKeyInput } from "@/lib/station-key";
 import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
-import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
@@ -72,7 +72,7 @@ export default function StationHistoricPage() {
   const stationKey = normalizeStationKeyInput(params.stationTriplet as string);
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
-  const [unit, setUnit] = useState<Unit>("in");
+  const { unit } = useUserSettings();
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
   const [hourlyTemperature, setHourlyTemperature] = useState<
@@ -142,9 +142,7 @@ export default function StationHistoricPage() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       <LocationTitle
-        unit={unit}
         range={range}
-        onUnit={setUnit}
         onRange={setRange}
         location={location}
       />
