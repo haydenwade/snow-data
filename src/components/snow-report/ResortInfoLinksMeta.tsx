@@ -9,6 +9,7 @@ import {
   Radar,
   Cloud,
   ExternalLink,
+  MountainSnow,
 } from "lucide-react";
 import React from "react";
 import { SiX } from "react-icons/si";
@@ -37,7 +38,9 @@ export function getLinkMeta(link: Link): LinkMeta {
     u.includes("utahavalanchecenter.org") ||
     u.includes("bridgertetonavalanchecenter.org") ||
     u.includes("avalanchecenter.org") ||
-    u.includes("sawtoothavalanche.com")
+    u.includes("sawtoothavalanche.com") ||
+    u.includes("mtavalanche.com") ||
+    u.includes("esavalanche.org")
   ) {
     return {
       icon: <AlertTriangle className="h-5 w-5 text-amber-400" />,
@@ -79,10 +82,26 @@ export function getLinkMeta(link: Link): LinkMeta {
   }
 
   // Label-based fallback
-  if (l.includes("lift") || l.includes("terrain")) {
+  if ((l.includes("lift") || l.includes("terrain")) && !l.includes("trail")) {
     return {
       icon: <CableCar className="h-5 w-5 text-blue-400" />,
-      description: "What’s open right now",
+      description: "What's open right now",
+      badge: "OFFICIAL",
+    };
+  }
+
+  if (l.includes("trail") && !l.includes("lift")) {
+    return {
+      icon: <MountainSnow className="h-5 w-5 text-blue-400" />,
+      description: "What's open right now",
+      badge: "OFFICIAL",
+    };
+  }
+
+  if(l.includes("lift") && l.includes("trail")) {
+     return {
+      icon: <CableCar className="h-5 w-5 text-blue-400" />,
+      description: "What's open right now",
       badge: "OFFICIAL",
     };
   }

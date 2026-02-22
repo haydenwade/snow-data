@@ -1,19 +1,23 @@
-"use client";;
+"use client";
 import { useEffect, useMemo, useState } from "react";
 import { Wind, Sunrise, Sunset, Thermometer } from "lucide-react";
 import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
 import CurrentConditionsChart from "./CurrentConditionsChart";
 import { Unit } from "@/types/forecast";
 import { ApiResp } from "@/types/current-conditions-response";
-import { celsiusFromF, formatObservedLabel, formatTimeInZone, kphFromMph } from "./utils";
+import {
+  celsiusFromF,
+  formatObservedLabel,
+  formatTimeInZone,
+  kphFromMph,
+} from "./utils";
 import { SkyIcon } from "./SkyIcon";
 
-
 export default function CurrentConditions({
-  locationId,
+  stationKey,
   unit = "in",
 }: {
-  locationId: string;
+  stationKey?: string;
   unit?: Unit;
 }) {
   const [resp, setResp] = useState<ApiResp | null>(null);
@@ -25,7 +29,19 @@ export default function CurrentConditions({
     setLoading(true);
     setError(null);
 
-    fetch(`/api/current?locationId=${encodeURIComponent(locationId)}`)
+    const endpoint = stationKey
+      ? `/api/stations/${encodeURIComponent(stationKey)}/current`
+      : null;
+
+    if (!endpoint) {
+      setError("Missing station identifier");
+      setLoading(false);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    fetch(endpoint)
       .then(async (r) => {
         if (!r.ok) throw new Error(`status:${r.status}`);
         return r.json();
@@ -43,29 +59,40 @@ export default function CurrentConditions({
     return () => {
       mounted = false;
     };
-  }, [locationId]);
+  }, [stationKey]);
 
   const current = resp?.currentData ?? null;
 
   const observedLabel = useMemo(() => {
     if (!current) return null;
-    const t = formatObservedLabel(current.observedAt);
+    const observedAt = resp?.lastUpdatedAt ?? current.observedAt;
+    const t = formatObservedLabel(observedAt);
     if (!t) return null;
-    const src = current.source === "observation" ? "Obs" : "Forecast";
-    return `${src}: ${t}`;
-  }, [current]);
+    return `Forecast: ${t}`;
+  }, [current, resp?.lastUpdatedAt]);
 
+  const statusLabel = useMemo(() => {
+    const updated = formatObservedLabel(resp?.lastUpdatedAt);
+    return updated
+      ? `Temperature from weather station observation (${updated}).`
+      : "Temperature from weather station observation.";
+  }, [resp?.lastUpdatedAt]);
 
   const sunriseLabel = useMemo(() => {
     if (!current?.sun?.sunrise) return null;
-    return formatTimeInZone(current.sun.sunrise, current.sun.timeZone ?? undefined);
+    return formatTimeInZone(
+      current.sun.sunrise,
+      current.sun.timeZone ?? undefined,
+    );
   }, [current]);
 
   const sunsetLabel = useMemo(() => {
     if (!current?.sun?.sunset) return null;
-    return formatTimeInZone(current.sun.sunset, current.sun.timeZone ?? undefined);
+    return formatTimeInZone(
+      current.sun.sunset,
+      current.sun.timeZone ?? undefined,
+    );
   }, [current]);
-
 
   if (loading) return <CurrentConditionsSkeleton />;
 
@@ -99,8 +126,8 @@ export default function CurrentConditions({
                       {current.temperatureF == null
                         ? "—"
                         : unit === "mm"
-                        ? `${celsiusFromF(current.temperatureF)}°C`
-                        : `${current.temperatureF}°F`}
+                          ? `${celsiusFromF(current.temperatureF)}°C`
+                          : `${current.temperatureF}°F`}
                     </div>
                   </div>
 
@@ -123,8 +150,8 @@ export default function CurrentConditions({
                           {current.wind?.speedMph == null
                             ? "—"
                             : unit === "mm"
-                            ? `${kphFromMph(current.wind.speedMph)} kph`
-                            : `${current.wind.speedMph} mph`}
+                              ? `${kphFromMph(current.wind.speedMph)} kph`
+                              : `${current.wind.speedMph} mph`}
                           {current.wind?.directionText ? (
                             <span className="text-slate-400 ml-2">
                               {current.wind.directionText}
@@ -164,11 +191,7 @@ export default function CurrentConditions({
 
                   {/* Optional status line */}
                   <div className="mt-3 text-xs text-slate-400">
-                    {current.isObserved
-                      ? current.isObservationStale
-                        ? "Observation is stale — showing latest available."
-                        : "Live observation."
-                      : "Approximate (hourly forecast)."}
+                    {statusLabel}
                   </div>
                 </div>
 

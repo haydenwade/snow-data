@@ -3,18 +3,21 @@ import { useState, useRef, useEffect } from "react";
 import HistoricTableSkeleton from "../skeletons/HistoricTableSkeleton";
 import { History, Info } from "lucide-react";
 import SnowCell from "./SnowCell";
-import { formatDateYYYYMMDD } from "./utils";
+import WteqEstimateIndicator from "./WteqEstimateIndicator";
+import { celsiusFromF, formatDateYYYYMMDD } from "./utils";
 import { HistoricDay } from "@/types/historic";
 import { Unit } from "@/types/forecast";
 
 export default function HistoricTable({
   data,
   unit,
-  loading
+  loading,
+  showTemperatureColumns = false,
 }: {
   data: HistoricDay[];
   unit: Unit;
   loading: boolean;
+  showTemperatureColumns?: boolean;
 }) {
   // `data` is already in the desired order (descending) from the page, so render as-is
   const rows = data;
@@ -103,6 +106,11 @@ export default function HistoricTable({
                     </div>
                   </div>
                 </th>
+                {showTemperatureColumns ? (
+                  <th className="text-right font-medium py-2 pr-4 text-slate-400">
+                    Temp ({unit === "mm" ? "°C" : "°F"})
+                  </th>
+                ) : null}
               </tr>
             </thead>
             <tbody>
@@ -122,12 +130,40 @@ export default function HistoricTable({
                     />
                   </td>
                   <td className="py-2 pr-4 text-right text-slate-400">
-                    {d.snowDepthAtStartOfDay != null
-                      ? unit === "mm"
-                        ? `${Math.round(d.snowDepthAtStartOfDay * 25.4)} mm`
-                        : `${d.snowDepthAtStartOfDay!.toFixed(0)}"`
-                      : "—"}
+                    {d.snowDepthAtStartOfDay != null ? (
+                      <div className="inline-flex items-center justify-end gap-1">
+                        <span>
+                          {unit === "mm"
+                            ? `${Math.round(d.snowDepthAtStartOfDay * 25.4)} mm`
+                            : `${d.snowDepthAtStartOfDay!.toFixed(0)}"`}
+                        </span>
+                        {d.depthSource === "WTEQ" && (
+                          <WteqEstimateIndicator tooltipAlign="right" />
+                        )}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
                   </td>
+                  {showTemperatureColumns ? (
+                    <td className="py-2 pr-4 text-right text-slate-400">
+                      {d.tempHighF == null && d.tempLowF == null
+                        ? ""
+                        : `${
+                            d.tempHighF == null
+                              ? "—"
+                              : unit === "mm"
+                              ? `${celsiusFromF(d.tempHighF)}°`
+                              : `${Math.round(d.tempHighF)}°`
+                          } / ${
+                            d.tempLowF == null
+                              ? "—"
+                              : unit === "mm"
+                              ? `${celsiusFromF(d.tempLowF)}°`
+                              : `${Math.round(d.tempLowF)}°`
+                          }`}
+                    </td>
+                  ) : null}
                 </tr>
               ))}
             </tbody>
