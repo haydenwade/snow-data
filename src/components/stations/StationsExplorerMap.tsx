@@ -24,6 +24,7 @@ const MIN_ZOOM = 4;
 const DEFAULT_CENTER = { lat: 40.7608, lon: -111.891 };
 const DEFAULT_ZOOM = 7;
 const WHEEL_ZOOM_COOLDOWN_MS = 180;
+const PINCH_ZOOM_SENSITIVITY = 1.6;
 
 type StateBounds = {
   code: string;
@@ -130,6 +131,19 @@ type MarkerCluster = {
   stations: StationSummary[];
 };
 
+type ActivePointer = {
+  clientX: number;
+  clientY: number;
+};
+
+type PinchGesture = {
+  pointerIds: [number, number];
+  startDistance: number;
+  startZoom: number;
+  anchorLat: number;
+  anchorLon: number;
+};
+
 export type StationsMapViewport = {
   stateCodes: string[];
   bounds: GeoBounds;
@@ -186,6 +200,17 @@ function roundBounds(bounds: GeoBounds): GeoBounds {
     south: Number(bounds.south.toFixed(2)),
     east: Number(bounds.east.toFixed(2)),
     north: Number(bounds.north.toFixed(2)),
+  };
+}
+
+function pointerDistance(first: ActivePointer, second: ActivePointer) {
+  return Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+}
+
+function pointerMidpoint(first: ActivePointer, second: ActivePointer) {
+  return {
+    clientX: (first.clientX + second.clientX) / 2,
+    clientY: (first.clientY + second.clientY) / 2,
   };
 }
 
@@ -265,6 +290,8 @@ export default function StationsExplorerMap({
     startWorldX: number;
     startWorldY: number;
   } | null>(null);
+  const activePointersRef = useRef<Map<number, ActivePointer>>(new Map());
+  const pinchRef = useRef<PinchGesture | null>(null);
   const lastViewportKeyRef = useRef("");
   const lastWheelZoomAtRef = useRef(0);
 
@@ -402,21 +429,109 @@ export default function StationsExplorerMap({
 
   const selectedStation = selectedCluster?.stations[0] ?? null;
 
+  const toLocalPoint = (clientX: number, clientY: number) => {
+    const rect = mapRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const startPinchGesture = (nextMapState = mapState) => {
+    if (!nextMapState) return;
+    if (size.width === 0 || size.height === 0) return;
+    const pointerEntries = Array.from(activePointersRef.current.entries());
+    if (pointerEntries.length < 2) return;
+
+    const [firstEntry, secondEntry] = pointerEntries;
+    if (!firstEntry || !secondEntry) return;
+    const [firstPointerId, firstPointer] = firstEntry;
+    const [secondPointerId, secondPointer] = secondEntry;
+
+    const distance = pointerDistance(firstPointer, secondPointer);
+    if (!Number.isFinite(distance) || distance <= 0) return;
+
+    const midpoint = pointerMidpoint(firstPointer, secondPointer);
+    const localPoint = toLocalPoint(midpoint.clientX, midpoint.clientY);
+    if (!localPoint) return;
+
+    const topLeftX = nextMapState.centerWorld.x - size.width / 2;
+    const topLeftY = nextMapState.centerWorld.y - size.height / 2;
+    const anchor = worldToLatLon(topLeftX + localPoint.x, topLeftY + localPoint.y, zoom);
+
+    pinchRef.current = {
+      pointerIds: [firstPointerId, secondPointerId],
+      startDistance: distance,
+      startZoom: zoom,
+      anchorLat: anchor.lat,
+      anchorLon: anchor.lon,
+    };
+    dragRef.current = null;
+  };
+
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (!mapState) return;
     const target = event.target as HTMLElement;
     if (target.closest('[data-map-interactive="true"]')) return;
     setSelectedStationTriplet(null);
-    dragRef.current = {
-      startClientX: event.clientX,
-      startClientY: event.clientY,
-      startWorldX: mapState.centerWorld.x,
-      startWorldY: mapState.centerWorld.y,
-    };
+    activePointersRef.current.set(event.pointerId, {
+      clientX: event.clientX,
+      clientY: event.clientY,
+    });
+
+    if (activePointersRef.current.size >= 2) {
+      startPinchGesture(mapState);
+    } else {
+      dragRef.current = {
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+        startWorldX: mapState.centerWorld.x,
+        startWorldY: mapState.centerWorld.y,
+      };
+      pinchRef.current = null;
+    }
+
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (activePointersRef.current.has(event.pointerId)) {
+      activePointersRef.current.set(event.pointerId, {
+        clientX: event.clientX,
+        clientY: event.clientY,
+      });
+    }
+
+    const pinch = pinchRef.current;
+    if (pinch) {
+      const firstPointer = activePointersRef.current.get(pinch.pointerIds[0]);
+      const secondPointer = activePointersRef.current.get(pinch.pointerIds[1]);
+      if (!firstPointer || !secondPointer || size.width === 0 || size.height === 0) {
+        return;
+      }
+
+      const distance = pointerDistance(firstPointer, secondPointer);
+      if (!Number.isFinite(distance) || distance <= 0) return;
+
+      const midpoint = pointerMidpoint(firstPointer, secondPointer);
+      const localPoint = toLocalPoint(midpoint.clientX, midpoint.clientY);
+      if (!localPoint) return;
+
+      const zoomDelta = Math.round(
+        Math.log2(distance / pinch.startDistance) * PINCH_ZOOM_SENSITIVITY,
+      );
+      const nextZoom = clamp(pinch.startZoom + zoomDelta, MIN_ZOOM, maxZoom);
+      const anchorWorld = latLonToWorld(pinch.anchorLat, pinch.anchorLon, nextZoom);
+      const nextCenterWorldX = anchorWorld.x - (localPoint.x - size.width / 2);
+      const nextCenterWorldY = anchorWorld.y - (localPoint.y - size.height / 2);
+      const nextCenter = worldToLatLon(nextCenterWorldX, nextCenterWorldY, nextZoom);
+
+      setCenter(nextCenter);
+      setZoom((current) => (current === nextZoom ? current : nextZoom));
+      return;
+    }
+
     if (!dragRef.current) return;
     const nextWorldX =
       dragRef.current.startWorldX -
@@ -428,8 +543,38 @@ export default function StationsExplorerMap({
     setCenter(nextCenter);
   };
 
-  const onPointerUp = () => {
+  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    activePointersRef.current.delete(event.pointerId);
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    const pinch = pinchRef.current;
+    if (pinch && pinch.pointerIds.includes(event.pointerId)) {
+      pinchRef.current = null;
+    }
+
     dragRef.current = null;
+
+    if (!mapState) return;
+
+    const remainingPointers = Array.from(activePointersRef.current.values());
+    if (remainingPointers.length === 1) {
+      const [pointer] = remainingPointers;
+      if (!pointer) return;
+      dragRef.current = {
+        startClientX: pointer.clientX,
+        startClientY: pointer.clientY,
+        startWorldX: mapState.centerWorld.x,
+        startWorldY: mapState.centerWorld.y,
+      };
+      return;
+    }
+
+    if (remainingPointers.length >= 2) {
+      startPinchGesture(mapState);
+    }
   };
 
   const onWheel = (event: WheelEvent<HTMLDivElement>) => {
