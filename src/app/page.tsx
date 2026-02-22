@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
+import FavoriteButton from "@/components/FavoriteButton";
 import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
@@ -93,25 +94,29 @@ export default function Home() {
             <Link
               key={location.id}
               href={`/stations/${encodeURIComponent(location.id)}`}
-              className="block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
+              className="relative block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
             >
+              <FavoriteButton
+                locationId={location.id}
+                className="absolute top-2 right-2 z-10"
+              />
               <div className="flex items-center gap-4 mb-3">
                 {location.logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={location.logoUrl}
                     alt={`${location.name} logo`}
-                    className="h-12 w-12 object-contain rounded-full flex-shrink-0 overflow-hidden"
+                    className="h-12 w-12 object-contain rounded-full shrink-0 overflow-hidden"
                   />
                 ) : (
-                  <div className="h-12 w-12 rounded-full bg-slate-700/40 flex items-center justify-center text-lg font-semibold text-slate-100 flex-shrink-0 overflow-hidden">
+                  <div className="h-12 w-12 rounded-full bg-slate-700/40 flex items-center justify-center text-lg font-semibold text-slate-100 shrink-0 overflow-hidden">
                     {String(location.name || "")
                       .split(" ")[0]
                       .charAt(0)
                       .toUpperCase()}
                   </div>
                 )}
-                <div className="min-w-0">
+                <div className="min-w-0 pr-1">
                   <h2 className="text-xl font-semibold truncate">
                     {location.name}
                   </h2>
@@ -123,7 +128,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="text-sm text-slate-400 space-y-1 break-words">
+              <div className="text-sm text-slate-400 space-y-1 wrap-break-word">
                 <p className="truncate">County: {location.county}</p>
                 <p className="truncate">Elevation: {location.elevation}</p>
               </div>

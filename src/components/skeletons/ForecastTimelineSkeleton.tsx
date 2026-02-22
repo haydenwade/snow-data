@@ -14,7 +14,7 @@ export default function ForecastTimelineSkeleton() {
           {[...Array(7)].map((_, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-40 bg-slate-800/20 rounded-md p-3 flex flex-col items-start gap-2"
+              className="shrink-0 w-40 bg-slate-800/20 rounded-md p-3 flex flex-col items-start gap-2"
             >
               <div className="w-full">
                 <div className="h-4 w-24 bg-slate-700/30 rounded mb-2" />

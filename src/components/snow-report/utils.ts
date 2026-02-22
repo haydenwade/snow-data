@@ -302,6 +302,33 @@ export function aggregateForecastToDaily(
   });
 }
 
+export type SnowBuckets = {
+  prev8_14: number;
+  prev1_7: number;
+  last24: number;
+  next24: number;
+  next1_7: number;
+};
+
+export function computeSnowBuckets(
+  historic: { date: string; derivedSnowfall?: number | null }[],
+  forecast: { date: string; snowIn: number }[]
+): SnowBuckets {
+  const todayDate = forecast[0]?.date;
+  const historicBeforeToday = todayDate
+    ? historic.filter((d) => d.date < todayDate)
+    : historic;
+  const last14 = historicBeforeToday.slice(-14);
+  const prev8_14_vals = last14.slice(0, 7).map((d) => d.derivedSnowfall ?? 0);
+  const prev1_7_vals = last14.slice(-7).map((d) => d.derivedSnowfall ?? 0);
+  const prev8_14 = prev8_14_vals.reduce((a, b) => a + b, 0);
+  const prev1_7 = prev1_7_vals.reduce((a, b) => a + b, 0);
+  const last24 = historicBeforeToday.at(-1)?.derivedSnowfall ?? 0;
+  const next24 = forecast[0]?.snowIn ?? 0;
+  const next1_7 = forecast.slice(1, 8).reduce((s, d) => s + d.snowIn, 0);
+  return { prev8_14, prev1_7, last24, next24, next1_7 };
+}
+
 export function formatDateYYYYMMDD(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
   return d.toLocaleDateString("en-US", {
