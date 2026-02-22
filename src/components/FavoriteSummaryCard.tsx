@@ -9,6 +9,7 @@ import { SnowBuckets, formatDateYYYYMMDD } from "@/components/snow-report/utils"
 import { ForecastDaily, Unit } from "@/types/forecast";
 
 type FavoriteSummaryCardProps = {
+  favoriteId: string;
   location: MountainLocation;
   buckets: SnowBuckets | null;
   forecast: ForecastDaily[];
@@ -18,6 +19,7 @@ type FavoriteSummaryCardProps = {
 };
 
 export default function FavoriteSummaryCard({
+  favoriteId,
   location,
   buckets,
   forecast,
@@ -39,7 +41,7 @@ export default function FavoriteSummaryCard({
 
   return (
     <Link
-      href={`/stations/${encodeURIComponent(location.id)}`}
+      href={`/stations/${encodeURIComponent(favoriteId)}`}
       className="block bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 hover:bg-slate-700/40 transition-colors"
     >
       {/* Header row */}
@@ -67,7 +69,7 @@ export default function FavoriteSummaryCard({
             </div>
           </div>
         </div>
-        <FavoriteButton locationId={location.id} />
+        <FavoriteButton locationId={favoriteId} />
       </div>
 
       {error ? (

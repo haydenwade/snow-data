@@ -234,6 +234,7 @@ export function toMountainLocation(
   return {
     id:
       locationMatch?.id ??
+      stationTripletToKey(station.stationTriplet) ??
       `station-${station.stationId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     stationId: station.stationId,
     name: locationMatch?.name ?? station.name,

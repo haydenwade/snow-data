@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { LOCATIONS } from "@/constants/locations";
-import { fetchHistoric, fetchForecastGrid } from "@/lib/api";
+import { fetchHistoric, fetchForecastGrid, fetchStationDetail } from "@/lib/api";
 import {
   aggregateForecastToDaily,
   computeSnowBuckets,
@@ -14,6 +14,7 @@ import {
 import FavoriteSummaryCard from "@/components/FavoriteSummaryCard";
 import Footer from "@/components/snow-report/Footer";
 import { ForecastDaily, Unit } from "@/types/forecast";
+import { MountainLocation } from "@/types/location";
 
 type LocationData = {
   buckets: SnowBuckets | null;
@@ -22,18 +23,57 @@ type LocationData = {
   error: string | null;
 };
 
+type FavoriteLocationEntry = {
+  favoriteId: string;
+  location: MountainLocation;
+};
+
 export default function FavoritesPage() {
   const { favorites } = useFavorites();
   const [unit, setUnit] = useState<Unit>("in");
   const [data, setData] = useState<Record<string, LocationData>>({});
+  const [favoriteLocations, setFavoriteLocations] = useState<FavoriteLocationEntry[]>([]);
 
-  const favoriteLocations = useMemo(
-    () =>
-      favorites
-        .map((id) => LOCATIONS.find((l) => l.id === id))
-        .filter(Boolean) as (typeof LOCATIONS)[number][],
-    [favorites]
-  );
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!favorites.length) {
+      setFavoriteLocations([]);
+      return;
+    }
+
+    const loadFavoriteLocations = async () => {
+      const results = await Promise.all(
+        favorites.map(async (favoriteId) => {
+          const curatedLocation = LOCATIONS.find((location) => location.id === favoriteId);
+          if (curatedLocation) {
+            return { favoriteId, location: curatedLocation } as FavoriteLocationEntry;
+          }
+
+          try {
+            const detail = await fetchStationDetail(favoriteId);
+            return { favoriteId, location: detail.location } as FavoriteLocationEntry;
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      if (cancelled) return;
+
+      setFavoriteLocations(
+        results.filter(
+          (entry): entry is FavoriteLocationEntry => entry !== null
+        )
+      );
+    };
+
+    void loadFavoriteLocations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [favorites]);
 
   useEffect(() => {
     if (!favoriteLocations.length) return;
@@ -41,28 +81,28 @@ export default function FavoritesPage() {
     // Initialize loading state for all favorites
     setData((prev) => {
       const next = { ...prev };
-      for (const loc of favoriteLocations) {
-        if (!next[loc.id]) {
-          next[loc.id] = { buckets: null, forecast: [], loading: true, error: null };
+      for (const { favoriteId } of favoriteLocations) {
+        if (!next[favoriteId]) {
+          next[favoriteId] = { buckets: null, forecast: [], loading: true, error: null };
         }
       }
       return next;
     });
 
     // Fetch data for each location in parallel
-    for (const loc of favoriteLocations) {
+    for (const { favoriteId, location } of favoriteLocations) {
       (async () => {
         try {
           setData((prev) => ({
             ...prev,
-            [loc.id]: { buckets: null, forecast: [], loading: true, error: null },
+            [favoriteId]: { buckets: null, forecast: [], loading: true, error: null },
           }));
 
           const [historic, grid] = await Promise.all([
-            fetchHistoric(loc.id, 30),
-            fetchForecastGrid(loc.lat, loc.lon),
+            fetchHistoric(favoriteId, 30),
+            fetchForecastGrid(location.lat, location.lon),
           ]);
-          const forecast = aggregateForecastToDaily(grid, loc.timezone);
+          const forecast = aggregateForecastToDaily(grid, location.timezone);
           const todayAndFuture = forecast.filter((d) => {
             const today = new Date();
             const dDate = new Date(`${d.date}T00:00:00`);
@@ -75,12 +115,17 @@ export default function FavoritesPage() {
 
           setData((prev) => ({
             ...prev,
-            [loc.id]: { buckets, forecast: todayAndFuture, loading: false, error: null },
+            [favoriteId]: {
+              buckets,
+              forecast: todayAndFuture,
+              loading: false,
+              error: null,
+            },
           }));
         } catch (e) {
           setData((prev) => ({
             ...prev,
-            [loc.id]: {
+            [favoriteId]: {
               buckets: null,
               forecast: [],
               loading: false,
@@ -145,8 +190,8 @@ export default function FavoritesPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {favoriteLocations.map((loc) => {
-            const d = data[loc.id] ?? {
+          {favoriteLocations.map(({ favoriteId, location }) => {
+            const d = data[favoriteId] ?? {
               buckets: null,
               forecast: [],
               loading: true,
@@ -154,8 +199,9 @@ export default function FavoritesPage() {
             };
             return (
               <FavoriteSummaryCard
-                key={loc.id}
-                location={loc}
+                key={favoriteId}
+                favoriteId={favoriteId}
+                location={location}
                 buckets={d.buckets}
                 forecast={d.forecast}
                 loading={d.loading}

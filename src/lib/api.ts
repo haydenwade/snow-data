@@ -1,5 +1,6 @@
 import { HistoricDay } from "@/types/historic";
 import { ForecastGridData } from "@/types/forecast";
+import { StationDetailResponse } from "@/types/station";
 
 export async function fetchHistoric(
   stationKey: string,
@@ -21,6 +22,27 @@ export async function fetchHistoric(
   }
   const res = await req.json();
   return res.data;
+}
+
+export async function fetchStationDetail(
+  stationKey: string
+): Promise<StationDetailResponse> {
+  const response = await fetch(`/api/stations/${encodeURIComponent(stationKey)}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let detail = "";
+    try {
+      const json = await response.json();
+      detail = json?.error || JSON.stringify(json);
+    } catch {}
+    throw new Error(
+      `Station fetch failed: ${response.status}${detail ? ` — ${detail}` : ""}`
+    );
+  }
+
+  return (await response.json()) as StationDetailResponse;
 }
 
 export async function fetchForecastGrid(
