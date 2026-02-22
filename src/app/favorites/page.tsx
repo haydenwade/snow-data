@@ -13,7 +13,8 @@ import {
 } from "@/components/snow-report/utils";
 import FavoriteSummaryCard from "@/components/FavoriteSummaryCard";
 import Footer from "@/components/snow-report/Footer";
-import { ForecastDaily, Unit } from "@/types/forecast";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { ForecastDaily } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 
 type LocationData = {
@@ -30,7 +31,7 @@ type FavoriteLocationEntry = {
 
 export default function FavoritesPage() {
   const { favorites } = useFavorites();
-  const [unit, setUnit] = useState<Unit>("in");
+  const { unit } = useUserSettings();
   const [data, setData] = useState<Record<string, LocationData>>({});
   const [favoriteLocations, setFavoriteLocations] = useState<FavoriteLocationEntry[]>([]);
 
@@ -165,28 +166,6 @@ export default function FavoritesPage() {
             <Star className="h-6 w-6 text-yellow-400 fill-yellow-400" />
             Favorites
           </h1>
-          <div className="inline-flex rounded-xl overflow-hidden border border-slate-700/50">
-            <button
-              onClick={() => setUnit("in")}
-              className={`px-4 py-2 text-sm transition-colors ${
-                unit === "in"
-                  ? "bg-slate-700/70 text-white"
-                  : "bg-slate-800/60 text-slate-300"
-              }`}
-            >
-              Imperial
-            </button>
-            <button
-              onClick={() => setUnit("mm")}
-              className={`px-4 py-2 text-sm transition-colors ${
-                unit === "mm"
-                  ? "bg-slate-700/70 text-white"
-                  : "bg-slate-800/60 text-slate-300"
-              }`}
-            >
-              Metric
-            </button>
-          </div>
         </div>
 
         <div className="flex flex-col gap-4">

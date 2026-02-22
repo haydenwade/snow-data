@@ -4,29 +4,23 @@ import Link from "next/link";
 import { Mountain, Radar, Share, Snowflake } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { shareStation } from "@/lib/share-station";
-import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type LocationTitleProps = {
-  unit: Unit;
   range: 15 | 30;
-  onUnit: (u: Unit) => void;
   onRange: (r: 15 | 30) => void;
   location: MountainLocation;
 };
 
 export default function LocationTitle({
-  unit,
   range,
-  onUnit,
   onRange,
   location,
 }: LocationTitleProps) {
-  const setIn = useCallback(() => onUnit("in"), [onUnit]);
-  const setMm = useCallback(() => onUnit("mm"), [onUnit]);
   const stationName = location?.name ?? "Station X";
   const pathname = usePathname();
+  const showHistoricRangeSelector = pathname.includes("historic");
   const handleShare = useCallback(async () => {
     await shareStation({ stationName });
   }, [stationName]);
@@ -114,33 +108,10 @@ export default function LocationTitle({
         </div>
 
         {/* Controls row */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            {/* Unit toggle */}
-            <div className="inline-flex rounded-xl overflow-hidden border border-slate-700/50">
-              <button
-                onClick={setIn}
-                className={`px-4 py-2 text-sm transition-colors ${
-                  unit === "in"
-                    ? "bg-slate-700/70 text-white"
-                    : "bg-slate-800/60 text-slate-300"
-                }`}
-              >
-                Imperial
-              </button>
-              <button
-                onClick={setMm}
-                className={`px-4 py-2 text-sm transition-colors ${
-                  unit === "mm"
-                    ? "bg-slate-700/70 text-white"
-                    : "bg-slate-800/60 text-slate-300"
-                }`}
-              >
-                Metric
-              </button>
-            </div>
-            {/* Range select */}
-            {pathname.includes("historic") && (
+        {showHistoricRangeSelector && (
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              {/* Range select */}
               <select
                 value={range}
                 onChange={(e) => onRange(Number(e.target.value) as 15 | 30)}
@@ -149,9 +120,9 @@ export default function LocationTitle({
                 <option value={15}>Past 15 days</option>
                 <option value={30}>Past 30 days</option>
               </select>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

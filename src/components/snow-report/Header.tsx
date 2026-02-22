@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, Share, Star, X } from "lucide-react";
+import { Home, Menu, Settings, Share, Star, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { usePathname } from "next/navigation";
 import { shareStation } from "@/lib/share-station";
@@ -55,6 +55,14 @@ export default function Header() {
                 <Star className="h-3.5 w-3.5" />
                 Favorites
               </Link>
+              <Link
+                href="/settings"
+                aria-label="Settings"
+                title="Settings"
+                className="inline-flex items-center justify-center rounded-lg p-1.5 hover:text-white hover:bg-slate-800/60 transition"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
             </nav>
 
             <div className="sm:hidden flex items-center gap-1">
@@ -98,24 +106,33 @@ export default function Header() {
         {isMobileMenuOpen && (
           <nav
             id="mobile-nav"
-            className="sm:hidden mb-3 rounded-lg bg-slate-800/90 p-2 text-sm"
+            className="sm:hidden mb-3 rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg"
           >
             {!isHome && (
               <Link
                 href="/"
-                className="block rounded-lg px-2 py-2 text-slate-100 hover:text-white transition"
+                className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
                 onClick={() => setMobileMenuOpenPath(null)}
               >
+                <Home className="h-4 w-4" />
                 Locations
               </Link>
             )}
             <Link
               href="/favorites"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-100 hover:text-white transition"
+              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <Star className="h-3.5 w-3.5" />
+              <Star className="h-4 w-4" />
               Favorites
+            </Link>
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              onClick={() => setMobileMenuOpenPath(null)}
+            >
+              <Settings className="h-4 w-4" />
+              Settings
             </Link>
           </nav>
         )}

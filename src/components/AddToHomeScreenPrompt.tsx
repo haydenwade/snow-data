@@ -13,7 +13,9 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISSED_SESSION_KEY = "snowd-a2hs-dismissed";
+const LAST_SHOWN_AT_KEY = "snowd-a2hs-last-shown-at";
 const SHOW_DELAY_MS = 30_000;
+const SHOW_COOLDOWN_MS = 21 * 24 * 60 * 60 * 1000; // 3 weeks
 
 function detectDeviceType(): DeviceType {
   const userAgent = window.navigator.userAgent || "";
@@ -72,10 +74,18 @@ export default function AddToHomeScreenPrompt() {
       window.sessionStorage.getItem(DISMISSED_SESSION_KEY) === "1";
     if (isDismissed || isStandaloneMode()) return;
 
+    const lastShownAtRaw = window.localStorage.getItem(LAST_SHOWN_AT_KEY);
+    const lastShownAt = lastShownAtRaw ? Number(lastShownAtRaw) : NaN;
+    const hasRecentDisplay =
+      Number.isFinite(lastShownAt) &&
+      Date.now() - lastShownAt < SHOW_COOLDOWN_MS;
+    if (hasRecentDisplay) return;
+
     const platform = detectDeviceType();
     if (platform === "other") return;
 
     const timer = window.setTimeout(() => {
+      window.localStorage.setItem(LAST_SHOWN_AT_KEY, String(Date.now()));
       setDeviceType(platform);
       setOpen(true);
     }, SHOW_DELAY_MS);

@@ -17,9 +17,10 @@ import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
 import Footer from "@/components/snow-report/Footer";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { normalizeStationKeyInput } from "@/lib/station-key";
 import { HistoricDay } from "@/types/historic";
-import { ForecastDaily, ForecastGridData, Unit } from "@/types/forecast";
+import { ForecastDaily, ForecastGridData } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
@@ -96,7 +97,7 @@ export default function StationPage() {
   const stationKey = normalizeStationKeyInput(params.stationTriplet as string);
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
-  const [unit, setUnit] = useState<Unit>("in");
+  const { unit } = useUserSettings();
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
   const [forecast, setForecast] = useState<ForecastDaily[]>([]);
@@ -189,9 +190,7 @@ export default function StationPage() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       <LocationTitle
-        unit={unit}
         range={range}
-        onUnit={setUnit}
         onRange={setRange}
         location={location}
       />
