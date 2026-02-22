@@ -12,6 +12,7 @@ export type ForecastGridData = {
   snowfallAmount: GridSeries; // mm
   quantitativePrecipitation?: GridSeries; // mm (liquid)
   probabilityOfPrecipitation: GridSeries; // %
+  temperature2m?: GridSeries; // degC (hourly fallback when max/min not available)
   maxTemperature?: GridSeries; // degC
   minTemperature?: GridSeries; // degC
   windDirection?: GridSeries; // degrees

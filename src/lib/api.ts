@@ -2,11 +2,11 @@ import { HistoricDay } from "@/types/historic";
 import { ForecastGridData } from "@/types/forecast";
 
 export async function fetchHistoric(
-  locationId: string,
+  stationKey: string,
   days: number
 ): Promise<HistoricDay[]> {
   const req = await fetch(
-    `/api/historic?locationId=${locationId}&days=${days}`,
+    `/api/stations/${encodeURIComponent(stationKey)}/historic?days=${days}`,
     { cache: "no-store" }
   );
   if (!req.ok) {
@@ -24,11 +24,15 @@ export async function fetchHistoric(
 }
 
 export async function fetchForecastGrid(
-  locationId: string
+  lat: number,
+  lon: number
 ): Promise<ForecastGridData> {
-  const res = await fetch(`/api/forecast?locationId=${locationId}`, {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `/api/forecasts/nws?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`,
+    {
+      cache: "no-store",
+    }
+  );
   if (!res.ok) {
     let detail = "";
     try {

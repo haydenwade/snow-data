@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
 import FavoriteButton from "@/components/FavoriteButton";
 import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
+import StationsExplorerSection from "@/components/stations/StationsExplorerSection";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -34,6 +35,7 @@ export default function Home() {
         l.network,
         l.id,
         l.stationId,
+        l.stationTriplet,
       ]
         .filter(Boolean)
         .join(" ")
@@ -57,6 +59,10 @@ export default function Home() {
           <RotatingFeatures />
         </div>
 
+        {/* Locations grid */}
+        <h2 className="text-center text-slate-200 text-lg md:text-xl font-semibold mb-4">
+          See current conditions and snowfall at popular locations.
+        </h2>
         {/* Search */}
         <div className="max-w-xl mx-auto mb-6">
           <label htmlFor="location-search" className="sr-only">
@@ -69,19 +75,17 @@ export default function Home() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, city, state, or station ID"
+              placeholder="Search by name, city, or state"
               className="w-full pl-10 pr-4 py-2 rounded-md bg-slate-800/70 border border-slate-700 text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
             />
           </div>
-          <p className="mt-2 text-xs text-slate-400">
-            {query ? `${filteredLocations.length} result${filteredLocations.length === 1 ? "" : "s"}` : `${visibleLocations.length} locations`}
-          </p>
+          {query.trim() ? (
+            <p className="mt-2 text-xs text-slate-400">
+              {filteredLocations.length} location
+              {filteredLocations.length === 1 ? "" : "s"}
+            </p>
+          ) : null}
         </div>
-
-        {/* Locations grid */}
-        <h2 className="text-center text-slate-200 text-lg md:text-xl font-semibold mb-4">
-          Select a location to see current conditions and snowfall.
-        </h2>
         <div
           id="locations"
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-w-0"
@@ -89,7 +93,7 @@ export default function Home() {
           {filteredLocations.map((location) => (
             <Link
               key={location.id}
-              href={`/location/${location.id}`}
+              href={`/stations/${encodeURIComponent(location.id)}`}
               className="relative block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
             >
               <FavoriteButton
@@ -135,6 +139,11 @@ export default function Home() {
               No locations match your search.
             </div>
           )}
+        </div>
+        <div className="mt-12">
+          <Suspense fallback={null}>
+            <StationsExplorerSection />
+          </Suspense>
         </div>
         <Footer textOverride={"Don't see the location you are looking for?"} />
       </div>

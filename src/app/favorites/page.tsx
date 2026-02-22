@@ -60,7 +60,7 @@ export default function FavoritesPage() {
 
           const [historic, grid] = await Promise.all([
             fetchHistoric(loc.id, 30),
-            fetchForecastGrid(loc.id),
+            fetchForecastGrid(loc.lat, loc.lon),
           ]);
           const forecast = aggregateForecastToDaily(grid, loc.timezone);
           const todayAndFuture = forecast.filter((d) => {

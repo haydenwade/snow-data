@@ -39,7 +39,7 @@ export default function FavoriteSummaryCard({
 
   return (
     <Link
-      href={`/location/${location.id}`}
+      href={`/stations/${encodeURIComponent(location.id)}`}
       className="block bg-slate-800/50 rounded-xl border border-slate-700/50 p-4 hover:bg-slate-700/40 transition-colors"
     >
       {/* Header row */}
