@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/snow-report/Header";
 import AddToHomeScreenPrompt from "@/components/AddToHomeScreenPrompt";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "SNOWD",
@@ -50,6 +51,7 @@ export default function RootLayout({
         <Header/>
         {children}
         <AddToHomeScreenPrompt />
+        <Analytics />
       </body>
     </html>
   );
