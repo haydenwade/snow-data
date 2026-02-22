@@ -2,7 +2,7 @@ export default function Footer({textOverride}: {textOverride?: string}) {
     const text = textOverride || "Have feedback?";
 	return (
 		<footer className="w-full py-4 bg-transparent flex justify-center">
-			<span className="text-xs text-slate-400">
+			<span className="text-sm text-slate-400">
 				{text}{' '}
 				<a
 					href="https://iwsm4g68769.typeform.com/to/NoB9jIfk"

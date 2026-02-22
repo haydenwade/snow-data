@@ -31,7 +31,7 @@ export default function DataNotes(props:{location:MountainLocation}) {
               <strong className="text-slate-300">SNWD (Snow Depth):</strong> The total depth of snow on the ground, measured in inches.
             </p>
             <p>
-              <strong className="text-slate-300">Daily Snowfall Calculation:</strong> Since SNOTEL doesn't directly report new snowfall, daily totals are derived from positive changes in snow depth between consecutive days. Negative changes (settlement/melt) are recorded as 0" new snow.
+              <strong className="text-slate-300">Daily Snowfall Calculation:</strong> Since SNOTEL doesn&apos;t directly report new snowfall, daily totals are derived from positive changes in snow depth between consecutive days. Negative changes (settlement/melt) are recorded as 0&quot; new snow.
             </p>
           </div>
         </details>
@@ -39,21 +39,21 @@ export default function DataNotes(props:{location:MountainLocation}) {
         <details className="group border border-slate-700/30 rounded-lg">
           <summary className="cursor-pointer list-none px-3 py-2 text-sm text-slate-300 hover:text-white flex items-center gap-2">
             <Cloud className="h-4 w-4 text-blue-400" />
-            <span>Forecast Data (NWS)</span>
+            <span>Forecast Data (NWS / Open-Meteo)</span>
             <span className="ml-auto text-slate-500 group-open:rotate-180 transition-transform">▾</span>
           </summary>
           <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
             <p>
-              <strong className="text-slate-300">Data Source:</strong> National Weather Service (NWS) via api.weather.gov, using gridpoint data for coordinates {location.lat}, {location.lon}.
+              <strong className="text-slate-300">Data Source:</strong> U.S. stations use National Weather Service (NWS) via api.weather.gov. Non-U.S. stations use Open-Meteo forecast data for coordinates {location.lat}, {location.lon}.
             </p>
             <p>
-              <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snow accumulation from NWS gridpoint data. Original values in millimeters are converted to inches (÷25.4) and aggregated into daily totals.
+              <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snowfall values are normalized to millimeters and converted to inches (÷25.4), then aggregated into daily totals.
             </p>
             <p>
               <strong className="text-slate-300">PoP (Probability of Precipitation):</strong> The maximum probability of precipitation for each forecast period within the day.
             </p>
             <p>
-              <strong className="text-slate-300">Daily Aggregation:</strong> NWS provides data in variable time windows. These are grouped by calendar day in local timezone and summed for daily totals.
+              <strong className="text-slate-300">Daily Aggregation:</strong> Forecast values are grouped by calendar day in local timezone and summed for daily totals.
             </p>
           </div>
         </details>

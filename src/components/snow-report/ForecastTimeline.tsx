@@ -51,7 +51,7 @@ export default function ForecastTimeline({
           {slice.map((d) => (
             <div
               key={d.date}
-              className="flex-shrink-0 w-40 bg-slate-800/20 rounded-md p-3 flex flex-col items-start gap-2"
+              className="flex-shrink-0 w-40 bg-slate-900/30 rounded-md p-3 flex flex-col items-start gap-2"
             >
               <div className="w-full">
                 <div className="text-sm text-slate-300 font-medium">

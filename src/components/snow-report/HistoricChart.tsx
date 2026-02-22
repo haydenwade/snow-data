@@ -1,6 +1,7 @@
 "use client";
 import { History } from "lucide-react";
 import HistoricChartSkeleton from "../skeletons/HistoricChartSkeleton";
+import WteqEstimateIndicator from "./WteqEstimateIndicator";
 import {
   BarChart,
   Bar,
@@ -32,6 +33,8 @@ export default function HistoricChart({
   unit: Unit;
   loading?: boolean;
 }) {
+  const hasEstimatedDepth = data.some((d) => d.depthSource === "WTEQ");
+
   const chartData = data.map((d) => ({
     ...d,
     displayDate: fmtShort(d.date),
@@ -81,6 +84,7 @@ export default function HistoricChart({
         <h2 className="font-semibold text-white">
           Past {data.length} Days Snowfall
         </h2>
+        {hasEstimatedDepth && <WteqEstimateIndicator />}
       </div>
 
       <div className="h-100">

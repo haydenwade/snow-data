@@ -1,8 +1,9 @@
 "use client";
 import { useCallback } from "react";
 import Link from "next/link";
-import { Mountain, Radar, Snowflake } from "lucide-react";
+import { Mountain, Radar, Share, Snowflake } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { shareStation } from "@/lib/share-station";
 import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 
@@ -25,6 +26,9 @@ export default function LocationTitle({
   const setMm = useCallback(() => onUnit("mm"), [onUnit]);
   const stationName = location?.name ?? "Station X";
   const pathname = usePathname();
+  const handleShare = useCallback(async () => {
+    await shareStation({ stationName });
+  }, [stationName]);
 
   return (
     <div className="bg-slate-900/70">
@@ -63,25 +67,38 @@ export default function LocationTitle({
                   <Mountain className="h-4 w-4" />
                   <span className="ml-1">SNOTEL + NWS Forecast Data</span>
                 </span>
-                <a
-                  href={location.radarLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Open NWS Radar Map"
-                  className="inline-flex items-center"
-                >
-                  <Radar className="h-4 w-4 text-blue-400" />
-                  <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
-                    NWS Radar
-                  </span>
-                </a>
+                {location.radarLink ? (
+                  <a
+                    href={location.radarLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Open NWS Radar Map"
+                    className="inline-flex items-center"
+                  >
+                    <Radar className="h-4 w-4 text-blue-400" />
+                    <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
+                      NWS Radar
+                    </span>
+                  </a>
+                ) : null}
               </div>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-700/50">
-            <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-            <span className="text-sm text-slate-400">Live Data</span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              aria-label={`Share ${stationName}`}
+              title={`Share ${stationName}`}
+              onClick={handleShare}
+              className="hidden sm:inline-flex items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/50 p-2 text-slate-300 hover:text-white transition"
+            >
+              <Share className="h-4 w-4" />
+            </button>
+            <div className="hidden md:flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-xl border border-slate-700/50">
+              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm text-slate-400">Live Data</span>
+            </div>
           </div>
         </div>
 
