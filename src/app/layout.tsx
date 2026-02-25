@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/snow-report/Header";
 import AddToHomeScreenPrompt from "@/components/AddToHomeScreenPrompt";
 import { Analytics } from "@vercel/analytics/next";
+import AvalanchePsa from "@/components/AvalanchePsa";
 
 export const metadata: Metadata = {
   title: "SNOWD",
@@ -49,6 +50,9 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased">
         <Header/>
+        <div className="flow-root bg-slate-900 px-4 pt-4">
+          <AvalanchePsa />
+        </div>
         {children}
         <AddToHomeScreenPrompt />
         <Analytics />

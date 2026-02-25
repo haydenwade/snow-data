@@ -8,7 +8,6 @@ import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
 import StationsExplorerSection from "@/components/stations/StationsExplorerSection";
-import AvalanchePsa from "@/components/AvalanchePsa";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -50,8 +49,6 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-28">
         {/* Hero */}
         <div className="text-center mb-6">
-          <AvalanchePsa />
-
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
             Get the Snow Truth
           </h1>
