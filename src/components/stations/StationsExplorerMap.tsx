@@ -17,6 +17,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { GeoBounds, StationSummary } from "@/types/station";
 
 const TILE_SIZE = 256;
@@ -273,17 +274,26 @@ export default function StationsExplorerMap({
   isRefreshing: boolean;
   onViewportChange: (viewport: StationsMapViewport) => void;
 }) {
+  const { lastApprovedLocation, setLastApprovedLocation } = useUserSettings();
+  const cachedCurrentLocation = lastApprovedLocation
+    ? {
+        lat: lastApprovedLocation.lat,
+        lon: lastApprovedLocation.lon,
+      }
+    : null;
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  const [center, setCenter] = useState(DEFAULT_CENTER);
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+  const [center, setCenter] = useState(
+    cachedCurrentLocation ?? DEFAULT_CENTER,
+  );
+  const [zoom, setZoom] = useState(cachedCurrentLocation ? 10 : DEFAULT_ZOOM);
   const [basemap, setBasemap] = useState<BasemapKey>("light");
   const [selectedStationTriplet, setSelectedStationTriplet] = useState<string | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{
+  const [liveCurrentLocation, setLiveCurrentLocation] = useState<{
     lat: number;
     lon: number;
   } | null>(null);
-  const [usingCurrentLocation, setUsingCurrentLocation] = useState(false);
+  const [isLocatingCurrentLocation, setIsLocatingCurrentLocation] = useState(false);
   const dragRef = useRef<{
     startClientX: number;
     startClientY: number;
@@ -294,6 +304,7 @@ export default function StationsExplorerMap({
   const pinchRef = useRef<PinchGesture | null>(null);
   const lastViewportKeyRef = useRef("");
   const lastWheelZoomAtRef = useRef(0);
+  const currentLocation = liveCurrentLocation ?? cachedCurrentLocation;
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -309,34 +320,7 @@ export default function StationsExplorerMap({
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-        };
-        setCurrentLocation(location);
-        setCenter({
-          lat: location.lat,
-          lon: location.lon,
-        });
-        setZoom(10);
-        setUsingCurrentLocation(true);
-      },
-      () => {
-        setUsingCurrentLocation(false);
-      },
-      { maximumAge: 600_000, timeout: 5_000, enableHighAccuracy: false },
-    );
-  }, []);
-
   const maxZoom = BASEMAPS[basemap].maxZoom;
-
-  useEffect(() => {
-    setZoom((current) => clamp(current, MIN_ZOOM, maxZoom));
-  }, [maxZoom]);
 
   const mapState = useMemo(() => {
     if (size.width === 0 || size.height === 0) return null;
@@ -592,10 +576,49 @@ export default function StationsExplorerMap({
     });
   };
 
-  const recenterOnCurrentLocation = () => {
-    if (!currentLocation) return;
-    setCenter(currentLocation);
+  const requestCurrentLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+    if (isLocatingCurrentLocation) return;
+
+    setIsLocatingCurrentLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+        setLiveCurrentLocation(location);
+        setCenter(location);
+        setZoom((current) => Math.max(current, 10));
+        setLastApprovedLocation({
+          ...location,
+          accuracyMeters:
+            typeof position.coords.accuracy === "number"
+              ? position.coords.accuracy
+              : null,
+        });
+        setIsLocatingCurrentLocation(false);
+      },
+      () => {
+        setIsLocatingCurrentLocation(false);
+      },
+      { maximumAge: 0, timeout: 10_000, enableHighAccuracy: false },
+    );
   };
+
+  const recenterOnCurrentLocation = () => {
+    if (currentLocation) {
+      setCenter(currentLocation);
+      setZoom((current) => Math.max(current, 10));
+      return;
+    }
+
+    requestCurrentLocation();
+  };
+
+  const canRequestBrowserLocation =
+    typeof navigator !== "undefined" && Boolean(navigator.geolocation);
+  const canUseLocateButton = Boolean(currentLocation) || canRequestBrowserLocation;
 
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
@@ -619,7 +642,12 @@ export default function StationsExplorerMap({
                 type="button"
                 data-map-interactive="true"
                 onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => setBasemap(key)}
+                onClick={() => {
+                  setBasemap(key);
+                  setZoom((current) =>
+                    clamp(current, MIN_ZOOM, BASEMAPS[key].maxZoom),
+                  );
+                }}
                 className={[
                   "px-3 py-1.5 text-xs transition",
                   basemap === key
@@ -634,15 +662,24 @@ export default function StationsExplorerMap({
           <button
             type="button"
             onClick={recenterOnCurrentLocation}
-            disabled={!currentLocation}
+            disabled={!canUseLocateButton || isLocatingCurrentLocation}
             className={[
               "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs border transition",
-              currentLocation
+              canUseLocateButton && !isLocatingCurrentLocation
                 ? "text-emerald-300 border-emerald-500/50 hover:bg-emerald-500/10"
                 : "text-slate-500 border-slate-700/70 cursor-not-allowed",
             ].join(" ")}
+            title={
+              currentLocation
+                ? "Recenter on cached location"
+                : "Request browser location"
+            }
           >
-            <LocateFixed className="h-3.5 w-3.5" />
+            {isLocatingCurrentLocation ? (
+              <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <LocateFixed className="h-3.5 w-3.5" />
+            )}
           </button>
         </div>
       </div>
