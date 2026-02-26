@@ -65,8 +65,19 @@ type AvalancheMapLayerCacheEntry = {
   features: NormalizedAvalancheFeature[];
 };
 
+type AvalancheMapLayerRequestOptions = {
+  date?: string | null;
+};
+
+const ARCHIVE_AVALANCHE_MAP_LAYER_TTL_SECONDS = 24 * 60 * 60;
+
 let avalancheMapLayerCache: AvalancheMapLayerCacheEntry | null = null;
 let avalancheMapLayerInflight: Promise<AvalancheMapLayerCacheEntry> | null = null;
+const avalancheMapLayerArchiveCache = new Map<string, AvalancheMapLayerCacheEntry>();
+const avalancheMapLayerArchiveInflight = new Map<
+  string,
+  Promise<AvalancheMapLayerCacheEntry>
+>();
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -147,36 +158,116 @@ export function getAvalancheMapLayerTtlSeconds(date = new Date()) {
   return 3 * 60 * 60;
 }
 
-async function fetchAvalancheMapLayerFromSource(): Promise<AvalancheMapLayerCacheEntry> {
-  const response = await fetch(AVALANCHE_MAP_LAYER_URL, {
-    headers: {
-      Accept: "application/json",
-    },
-    cache: "no-store",
-  });
+function buildAvalancheMapLayerSourceUrls(requestedDate: string | null) {
+  if (!requestedDate) return [AVALANCHE_MAP_LAYER_URL];
 
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(
-      `Avalanche.org map-layer request failed (${response.status}): ${body.slice(0, 300)}`,
-    );
-  }
-
-  const json = (await response.json()) as AvalancheMapLayerApiResponse;
-  const features = normalizeMapLayerResponse(json);
-  const now = Date.now();
-  const ttlSeconds = getAvalancheMapLayerTtlSeconds(new Date(now));
-
-  return {
-    fetchedAt: now,
-    expiresAt: now + ttlSeconds * 1000,
-    ttlSeconds,
-    rawJson: json,
-    features,
-  };
+  return [
+    `${AVALANCHE_MAP_LAYER_URL}?day=${encodeURIComponent(requestedDate)}`,
+    `${AVALANCHE_MAP_LAYER_URL}?date=${encodeURIComponent(requestedDate)}`,
+    `${AVALANCHE_MAP_LAYER_URL}/${requestedDate}`,
+  ];
 }
 
-export async function getCachedAvalancheMapLayer() {
+async function fetchAvalancheMapLayerFromSource(
+  requestedDate: string | null = null,
+): Promise<AvalancheMapLayerCacheEntry> {
+  const sourceUrls = buildAvalancheMapLayerSourceUrls(requestedDate);
+  let lastErrorMessage = "Avalanche.org map-layer request failed";
+
+  for (const sourceUrl of sourceUrls) {
+    const response = await fetch(sourceUrl, {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      lastErrorMessage =
+        `Avalanche.org map-layer request failed (${response.status})` +
+        `${requestedDate ? ` [${requestedDate}]` : ""}: ${body.slice(0, 300)}`;
+      continue;
+    }
+
+    const json = (await response.json()) as AvalancheMapLayerApiResponse;
+    const features = normalizeMapLayerResponse(json);
+    const now = Date.now();
+    const ttlSeconds = requestedDate
+      ? ARCHIVE_AVALANCHE_MAP_LAYER_TTL_SECONDS
+      : getAvalancheMapLayerTtlSeconds(new Date(now));
+
+    return {
+      fetchedAt: now,
+      expiresAt: now + ttlSeconds * 1000,
+      ttlSeconds,
+      rawJson: json,
+      features,
+    };
+  }
+
+  throw new Error(lastErrorMessage);
+}
+
+export async function getCachedAvalancheMapLayer(
+  options?: AvalancheMapLayerRequestOptions,
+) {
+  const requestedDate = options?.date ?? null;
+
+  if (requestedDate) {
+    const now = Date.now();
+    const cachedArchiveEntry = avalancheMapLayerArchiveCache.get(requestedDate);
+    if (
+      cachedArchiveEntry &&
+      cachedArchiveEntry.expiresAt > now &&
+      cachedArchiveEntry.features.length > 0
+    ) {
+      return {
+        ...cachedArchiveEntry,
+        cacheStatus: "hit" as const,
+      };
+    }
+
+    const inflightArchiveRequest = avalancheMapLayerArchiveInflight.get(requestedDate);
+    if (inflightArchiveRequest) {
+      const entry = await inflightArchiveRequest;
+      return {
+        ...entry,
+        cacheStatus: "hit" as const,
+      };
+    }
+
+    const archiveRequest = fetchAvalancheMapLayerFromSource(requestedDate)
+      .then((entry) => {
+        avalancheMapLayerArchiveCache.set(requestedDate, entry);
+        return entry;
+      })
+      .finally(() => {
+        avalancheMapLayerArchiveInflight.delete(requestedDate);
+      });
+
+    avalancheMapLayerArchiveInflight.set(requestedDate, archiveRequest);
+
+    try {
+      const entry = await archiveRequest;
+      return {
+        ...entry,
+        cacheStatus: "miss" as const,
+      };
+    } catch (error) {
+      const fallbackArchiveEntry = avalancheMapLayerArchiveCache.get(requestedDate);
+      if (fallbackArchiveEntry) {
+        return {
+          ...fallbackArchiveEntry,
+          cacheStatus: "stale" as const,
+          cacheError:
+            (error as Error)?.message ?? "Avalanche map-layer fetch failed",
+        };
+      }
+      throw error;
+    }
+  }
+
   const now = Date.now();
   if (avalancheMapLayerCache && avalancheMapLayerCache.expiresAt > now) {
     return {

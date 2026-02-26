@@ -2,6 +2,10 @@
 import StationsExplorerMap, {
   StationsMapViewport,
 } from "@/components/stations/StationsExplorerMap";
+import {
+  getLocalIsoDate,
+  normalizeAvalancheArchiveDate,
+} from "@/components/stations/avalanche-archive-date";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { GeoBounds, StationSummary } from "@/types/station";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -12,12 +16,23 @@ type RequestedViewport = {
   bounds: GeoBounds | null;
 };
 
+type StationsExplorerSectionProps = {
+  title?: string;
+  description?: string;
+  enableAvalancheArchive?: boolean;
+  sectionId?: string;
+};
+
 function parseStatesFromQuery(raw: string | null) {
   const parsed = (raw ?? "")
     .split(",")
     .map((value) => value.trim().toUpperCase())
     .filter((value) => /^[A-Z]{2}$/.test(value));
   return parsed.length > 0 ? Array.from(new Set(parsed)) : ["UT"];
+}
+
+function parseAvalancheArchiveDateFromQuery(raw: string | null) {
+  return normalizeAvalancheArchiveDate(raw, { maxDate: getLocalIsoDate() });
 }
 
 function toBboxParam(bounds: GeoBounds | null) {
@@ -56,13 +71,26 @@ async function fetchStations(
   return (json?.data ?? []) as StationSummary[];
 }
 
-export default function StationsExplorerSection() {
+export default function StationsExplorerSection({
+  title = "Explore Weather Stations",
+  description = "Pan and zoom the map to find mountain weather stations across the West. Click a marker to see current snow depth, recent snowfall, forecast, and long-term history for that spot.",
+  enableAvalancheArchive = false,
+  sectionId = "stations",
+}: StationsExplorerSectionProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const searchParamsString = searchParams.toString();
   const initialStates = useMemo(
     () => parseStatesFromQuery(searchParams.get("states")),
     [searchParams],
+  );
+  const initialAvalancheArchiveDate = useMemo(
+    () =>
+      enableAvalancheArchive
+        ? parseAvalancheArchiveDateFromQuery(searchParams.get("date"))
+        : null,
+    [enableAvalancheArchive, searchParams],
   );
 
   const [viewport, setViewport] = useState<RequestedViewport>({
@@ -73,6 +101,9 @@ export default function StationsExplorerSection() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [avalancheArchiveDate, setAvalancheArchiveDate] = useState<string | null>(
+    initialAvalancheArchiveDate,
+  );
 
   const stateKey = useMemo(
     () => viewport.stateCodes.join(","),
@@ -87,9 +118,29 @@ export default function StationsExplorerSection() {
   );
 
   useEffect(() => {
-    const nextUrl = `${pathname}?states=${encodeURIComponent(stateKey)}`;
+    const params = new URLSearchParams(searchParamsString);
+    params.set("states", stateKey);
+
+    if (enableAvalancheArchive) {
+      if (avalancheArchiveDate) {
+        params.set("date", avalancheArchiveDate);
+      } else {
+        params.delete("date");
+      }
+    }
+
+    const nextSearch = params.toString();
+    if (nextSearch === searchParamsString) return;
+    const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
     router.replace(nextUrl, { scroll: false });
-  }, [pathname, router, stateKey]);
+  }, [
+    avalancheArchiveDate,
+    enableAvalancheArchive,
+    pathname,
+    router,
+    searchParamsString,
+    stateKey,
+  ]);
 
   useEffect(() => {
     if (!viewport.bounds) return;
@@ -149,28 +200,31 @@ export default function StationsExplorerSection() {
   }, []);
 
   return (
-    <section id="stations" className="space-y-6 scroll-mt-20">
+    <section id={sectionId} className="space-y-6 scroll-mt-20">
       <section className="space-y-3 text-center">
         <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-          Explore Weather Stations
+          {title}
         </h2>
-        <p className="text-slate-300 max-w-3xl mx-auto">
-          Pan and zoom the map to find mountain weather stations across the
-          West. Click a marker to see current snow depth, recent snowfall,
-          forecast, and long-term history for that spot.
-        </p>
+        <p className="text-slate-300 max-w-3xl mx-auto">{description}</p>
       </section>
 
       {error ? <div className="text-xs text-red-400">{error}</div> : null}
 
       {!hasLoadedOnce && isRefreshing ? (
-        <SnowLoadingGraphic className="origin-left scale-90" />
+        <div className={enableAvalancheArchive ? "flex justify-center" : undefined}>
+          <SnowLoadingGraphic
+            className={enableAvalancheArchive ? "origin-center scale-90" : "origin-left scale-90"}
+          />
+        </div>
       ) : null}
 
       <StationsExplorerMap
         stations={stations}
         isRefreshing={isRefreshing}
         onViewportChange={onViewportChange}
+        enableAvalancheArchive={enableAvalancheArchive}
+        avalancheArchiveDate={avalancheArchiveDate}
+        onAvalancheArchiveDateChange={setAvalancheArchiveDate}
       />
     </section>
   );

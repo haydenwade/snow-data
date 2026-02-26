@@ -1,3 +1,8 @@
+const PSA_POSTED_AT = {
+  iso: "2026-02-26T08:00:00-07:00",
+  label: "Feb 26, 2026 · 8:00 AM MT",
+};
+
 export default function AvalanchePsa() {
   return (
     <details className="mb-5 max-w-4xl mx-auto rounded-lg border border-amber-400/40 bg-amber-500/10 px-4 py-3 md:px-5 md:py-4 text-left">
@@ -9,6 +14,10 @@ export default function AvalanchePsa() {
           <div className="min-w-0">
             <p className="text-sm md:text-base font-semibold text-amber-100">
               Avalanche Fatalities Are Rising
+            </p>
+            <p className="text-[11px] md:text-xs text-amber-200/80">
+              Posted{" "}
+              <time dateTime={PSA_POSTED_AT.iso}>{PSA_POSTED_AT.label}</time>
             </p>
             <p className="text-xs md:text-sm text-amber-50/90">
               <span className="font-semibold text-amber-100">

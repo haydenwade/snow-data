@@ -3,9 +3,24 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+function isIsoDate(value: string | null) {
+  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+export async function GET(request: Request) {
   try {
-    const cacheEntry = await getCachedAvalancheMapLayer();
+    const url = new URL(request.url);
+    const requestedDate = url.searchParams.get("date");
+    if (requestedDate != null && !isIsoDate(requestedDate)) {
+      return NextResponse.json(
+        { error: "Invalid date. Expected YYYY-MM-DD." },
+        { status: 400 },
+      );
+    }
+
+    const cacheEntry = await getCachedAvalancheMapLayer(
+      requestedDate ? { date: requestedDate } : undefined,
+    );
     const ttlSeconds = Math.max(60, cacheEntry.ttlSeconds);
 
     const nextResponse = NextResponse.json(cacheEntry.rawJson, { status: 200 });

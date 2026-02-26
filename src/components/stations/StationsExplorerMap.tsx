@@ -3,6 +3,10 @@
 import Link from "next/link";
 import {
   AlertTriangle,
+  CalendarDays,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   LoaderCircle,
   Layers,
   LocateFixed,
@@ -22,6 +26,12 @@ import {
 } from "react";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { GeoBounds, StationSummary } from "@/types/station";
+import {
+  addDaysToIsoDate,
+  formatAvalancheArchiveDateLabel,
+  getLocalIsoDate,
+  normalizeAvalancheArchiveDate,
+} from "@/components/stations/avalanche-archive-date";
 
 const TILE_SIZE = 256;
 const MIN_ZOOM = 4;
@@ -221,6 +231,15 @@ type PinchGesture = {
 export type StationsMapViewport = {
   stateCodes: string[];
   bounds: GeoBounds;
+};
+
+type StationsExplorerMapProps = {
+  stations: StationSummary[];
+  isRefreshing: boolean;
+  onViewportChange: (viewport: StationsMapViewport) => void;
+  enableAvalancheArchive?: boolean;
+  avalancheArchiveDate?: string | null;
+  onAvalancheArchiveDateChange?: (date: string | null) => void;
 };
 
 type AnchoredPopupLayout = {
@@ -651,11 +670,10 @@ export default function StationsExplorerMap({
   stations,
   isRefreshing,
   onViewportChange,
-}: {
-  stations: StationSummary[];
-  isRefreshing: boolean;
-  onViewportChange: (viewport: StationsMapViewport) => void;
-}) {
+  enableAvalancheArchive = false,
+  avalancheArchiveDate = null,
+  onAvalancheArchiveDateChange,
+}: StationsExplorerMapProps) {
   const {
     isClient,
     preferredLocation,
@@ -677,6 +695,7 @@ export default function StationsExplorerMap({
   const initialCenterLocation = preferredCenterLocation ?? cachedCurrentLocation;
   const mapRef = useRef<HTMLDivElement | null>(null);
   const avalanchePopupRef = useRef<HTMLDivElement | null>(null);
+  const avalancheArchiveDateInputRef = useRef<HTMLInputElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [avalanchePopupSize, setAvalanchePopupSize] = useState({
     width: 0,
@@ -712,6 +731,54 @@ export default function StationsExplorerMap({
   const lastWheelZoomAtRef = useRef(0);
   const didInitializeLocationRef = useRef(false);
   const currentLocation = liveCurrentLocation ?? cachedCurrentLocation;
+  const todayAvalancheArchiveDate = getLocalIsoDate();
+  const selectedAvalancheArchiveDate = enableAvalancheArchive
+    ? normalizeAvalancheArchiveDate(avalancheArchiveDate, {
+        maxDate: todayAvalancheArchiveDate,
+      })
+    : null;
+  const visibleAvalancheForecastDate =
+    selectedAvalancheArchiveDate ?? todayAvalancheArchiveDate;
+  const isViewingAvalancheArchive = selectedAvalancheArchiveDate != null;
+  const canAdvanceAvalancheArchiveDate =
+    visibleAvalancheForecastDate < todayAvalancheArchiveDate;
+  const avalancheMapLayerRequestUrl = selectedAvalancheArchiveDate
+    ? `/api/avalanche/map-layer?date=${encodeURIComponent(selectedAvalancheArchiveDate)}`
+    : "/api/avalanche/map-layer";
+
+  const setAvalancheArchiveDate = (nextDate: string | null) => {
+    if (!enableAvalancheArchive || !onAvalancheArchiveDateChange) return;
+
+    const normalizedNextDate = normalizeAvalancheArchiveDate(nextDate, {
+      maxDate: todayAvalancheArchiveDate,
+    });
+    onAvalancheArchiveDateChange(normalizedNextDate);
+  };
+
+  const stepAvalancheArchiveDate = (days: number) => {
+    const nextDate = addDaysToIsoDate(visibleAvalancheForecastDate, days);
+    if (!nextDate) return;
+    setAvalancheArchiveDate(nextDate);
+  };
+
+  const openAvalancheArchiveDatePicker = () => {
+    const input = avalancheArchiveDateInputRef.current as
+      | (HTMLInputElement & { showPicker?: () => void })
+      | null;
+    if (!input) return;
+
+    try {
+      if (typeof input.showPicker === "function") {
+        input.showPicker();
+        return;
+      }
+    } catch {
+      // Fallback below for browsers that block showPicker()
+    }
+
+    input.focus();
+    input.click();
+  };
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -730,7 +797,7 @@ export default function StationsExplorerMap({
   useEffect(() => {
     const abortController = new AbortController();
 
-    fetch("/api/avalanche/map-layer", {
+    fetch(avalancheMapLayerRequestUrl, {
       cache: "no-store",
       signal: abortController.signal,
     })
@@ -751,7 +818,7 @@ export default function StationsExplorerMap({
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, [avalancheMapLayerRequestUrl]);
 
   const maxZoom = BASEMAPS[basemap].maxZoom;
 
@@ -1741,6 +1808,91 @@ export default function StationsExplorerMap({
             </button>
           ) : null}
         </div>
+
+        {enableAvalancheArchive ? (
+          <>
+            {isViewingAvalancheArchive ? (
+              <div className="pointer-events-none absolute inset-x-0 top-3 z-[60] flex justify-center px-3 sm:top-4">
+                <div
+                  data-map-interactive="true"
+                  className="pointer-events-auto flex w-full max-w-2xl items-center gap-2 rounded-lg border border-red-300/30 bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xl"
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span className="min-w-0 flex-1 truncate">
+                    Not the current avalanche danger.
+                  </span>
+                  <button
+                    type="button"
+                    className="underline underline-offset-2 hover:text-red-100"
+                    onClick={() => setAvalancheArchiveDate(null)}
+                  >
+                    View today
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="pointer-events-none absolute inset-x-0 bottom-16 z-[60] flex justify-center px-3 sm:bottom-10">
+              <div
+                data-map-interactive="true"
+                className="pointer-events-auto flex items-center gap-2"
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 shadow-lg hover:bg-slate-800"
+                  onClick={() => stepAvalancheArchiveDate(-1)}
+                  aria-label="Previous avalanche forecast day"
+                  title="Previous day"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                <label
+                  className="relative flex h-9 min-w-[10.75rem] cursor-pointer items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-900/90 px-2.5 text-slate-100 shadow-lg sm:min-w-[11.75rem]"
+                  title="Select avalanche forecast date"
+                  onClick={() => openAvalancheArchiveDatePicker()}
+                >
+                  <CalendarDays className="h-4 w-4 shrink-0 text-slate-300" />
+                  <span className="truncate text-sm font-bold tracking-wide">
+                    {formatAvalancheArchiveDateLabel(visibleAvalancheForecastDate)}
+                  </span>
+                  <ChevronDown className="ml-auto h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  <input
+                    ref={avalancheArchiveDateInputRef}
+                    type="date"
+                    value={visibleAvalancheForecastDate}
+                    max={todayAvalancheArchiveDate}
+                    onChange={(event) => {
+                      setAvalancheArchiveDate(event.target.value || null);
+                    }}
+                    className="pointer-events-none absolute inset-0 opacity-0"
+                    aria-label="Select avalanche forecast date"
+                    data-map-interactive="true"
+                    onPointerDown={(event) => event.stopPropagation()}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className={[
+                    "inline-flex h-9 w-9 items-center justify-center rounded-lg border shadow-lg",
+                    canAdvanceAvalancheArchiveDate
+                      ? "border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
+                      : "cursor-not-allowed border-slate-700 bg-slate-900/70 text-slate-500",
+                  ].join(" ")}
+                  onClick={() => stepAvalancheArchiveDate(1)}
+                  disabled={!canAdvanceAvalancheArchiveDate}
+                  aria-label="Next avalanche forecast day"
+                  title={canAdvanceAvalancheArchiveDate ? "Next day" : "Already viewing today"}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </>
+        ) : null}
 
         <div className="absolute right-3 top-3 z-50 flex flex-col gap-2">
           <button
