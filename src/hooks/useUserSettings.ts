@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import { useIsClient, useLocalStorage } from "usehooks-ts";
 import { Unit } from "@/types/forecast";
 
 const STORAGE_KEY = "snowd-user-settings";
@@ -88,6 +88,7 @@ function normalizeSettings(value: Partial<UserSettings> | null | undefined): Use
 }
 
 export function useUserSettings() {
+  const isClient = useIsClient();
   const [settings, setSettings] = useLocalStorage<UserSettings>(
     STORAGE_KEY,
     DEFAULT_SETTINGS,
@@ -153,6 +154,7 @@ export function useUserSettings() {
   );
 
   return {
+    isClient,
     settings: normalizedSettings,
     unit: normalizedSettings.unit,
     preferredLocation: normalizedSettings.preferredLocation,

@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import {
+  AlertTriangle,
   LoaderCircle,
   LocateFixed,
   MapPin,
   Minus,
   Plus,
   Snowflake,
+  X,
 } from "lucide-react";
 import {
   PointerEvent,
@@ -132,6 +134,63 @@ type MarkerCluster = {
   stations: StationSummary[];
 };
 
+type AvalancheMapLayerGeometry =
+  | {
+      type: "Polygon";
+      coordinates: [number, number][][];
+    }
+  | {
+      type: "MultiPolygon";
+      coordinates: [number, number][][][];
+    };
+
+type AvalancheMapLayerFeatureProperties = {
+  name?: string | null;
+  center?: string | null;
+  center_link?: string | null;
+  timezone?: string | null;
+  state?: string | null;
+  danger?: string | null;
+  danger_level?: number | null;
+  color?: string | null;
+  stroke?: string | null;
+  font_color?: string | null;
+  link?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  fillOpacity?: number | null;
+  warning?: {
+    product?: string | null;
+  } | null;
+};
+
+type AvalancheMapLayerFeature = {
+  id: string;
+  geometry: AvalancheMapLayerGeometry;
+  properties: AvalancheMapLayerFeatureProperties;
+  bounds: GeoBounds;
+  labelLat: number;
+  labelLon: number;
+};
+
+type AvalancheMapLayerApiFeature = {
+  id?: string | number | null;
+  geometry?: AvalancheMapLayerGeometry | null;
+  properties?: AvalancheMapLayerFeatureProperties | null;
+};
+
+type AvalancheMapLayerApiResponse = {
+  type?: string;
+  features?: AvalancheMapLayerApiFeature[];
+};
+
+type ProjectedAvalancheRegion = {
+  feature: AvalancheMapLayerFeature;
+  pathData: string;
+  anchorX: number;
+  anchorY: number;
+};
+
 type ActivePointer = {
   clientX: number;
   clientY: number;
@@ -148,6 +207,14 @@ type PinchGesture = {
 export type StationsMapViewport = {
   stateCodes: string[];
   bounds: GeoBounds;
+};
+
+type AnchoredPopupLayout = {
+  left: number;
+  top: number;
+  maxHeight: number;
+  arrowSide: "top" | "bottom" | "left" | "right";
+  arrowOffset: number;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -179,6 +246,307 @@ function worldToLatLon(x: number, y: number, zoom: number) {
   const n = Math.PI - (2 * Math.PI * y) / scale;
   const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   return { lat: clampLatitude(lat), lon };
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function avalancheGeometryPolygons(geometry: AvalancheMapLayerGeometry) {
+  return geometry.type === "Polygon" ? [geometry.coordinates] : geometry.coordinates;
+}
+
+function computeAvalancheFeatureBounds(geometry: AvalancheMapLayerGeometry): GeoBounds {
+  let west = Number.POSITIVE_INFINITY;
+  let south = Number.POSITIVE_INFINITY;
+  let east = Number.NEGATIVE_INFINITY;
+  let north = Number.NEGATIVE_INFINITY;
+
+  avalancheGeometryPolygons(geometry).forEach((polygon) => {
+    polygon.forEach((ring) => {
+      ring.forEach(([lon, lat]) => {
+        if (lon < west) west = lon;
+        if (lon > east) east = lon;
+        if (lat < south) south = lat;
+        if (lat > north) north = lat;
+      });
+    });
+  });
+
+  return { west, south, east, north };
+}
+
+function computeAvalancheFeatureLabelPoint(
+  geometry: AvalancheMapLayerGeometry,
+  bounds: GeoBounds,
+) {
+  let lonSum = 0;
+  let latSum = 0;
+  let count = 0;
+
+  avalancheGeometryPolygons(geometry).forEach((polygon) => {
+    const outerRing = polygon[0];
+    if (!outerRing) return;
+    outerRing.forEach(([lon, lat]) => {
+      lonSum += lon;
+      latSum += lat;
+      count += 1;
+    });
+  });
+
+  if (count === 0) {
+    return {
+      labelLon: (bounds.west + bounds.east) / 2,
+      labelLat: (bounds.south + bounds.north) / 2,
+    };
+  }
+
+  return {
+    labelLon: lonSum / count,
+    labelLat: latSum / count,
+  };
+}
+
+function normalizeAvalancheFeature(raw: AvalancheMapLayerApiFeature): AvalancheMapLayerFeature | null {
+  const geometry = raw.geometry;
+  if (!geometry || (geometry.type !== "Polygon" && geometry.type !== "MultiPolygon")) {
+    return null;
+  }
+
+  if (!Array.isArray(geometry.coordinates)) return null;
+
+  const bounds = computeAvalancheFeatureBounds(geometry);
+  const { labelLat, labelLon } = computeAvalancheFeatureLabelPoint(geometry, bounds);
+  const properties = raw.properties ?? {};
+  const fallbackId = [
+    typeof properties.state === "string" ? properties.state : "XX",
+    typeof properties.name === "string" ? properties.name : "zone",
+  ]
+    .join(":")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+
+  return {
+    id: String(raw.id ?? fallbackId),
+    geometry,
+    properties,
+    bounds,
+    labelLat,
+    labelLon,
+  };
+}
+
+function normalizeAvalancheMapLayerResponse(raw: AvalancheMapLayerApiResponse) {
+  const features = Array.isArray(raw.features) ? raw.features : [];
+  return features
+    .map((feature) => normalizeAvalancheFeature(feature))
+    .filter((feature): feature is AvalancheMapLayerFeature => feature != null);
+}
+
+function boundsIntersect(first: GeoBounds, second: GeoBounds) {
+  if (first.east < second.west) return false;
+  if (first.west > second.east) return false;
+  if (first.north < second.south) return false;
+  if (first.south > second.north) return false;
+  return true;
+}
+
+function wrapWorldXNear(referenceWorldX: number, candidateWorldX: number, zoom: number) {
+  const scale = TILE_SIZE * 2 ** zoom;
+  let wrapped = candidateWorldX;
+  while (wrapped - referenceWorldX > scale / 2) wrapped -= scale;
+  while (wrapped - referenceWorldX < -scale / 2) wrapped += scale;
+  return wrapped;
+}
+
+function ringToSvgPath(
+  ring: [number, number][],
+  zoom: number,
+  topLeftX: number,
+  topLeftY: number,
+  viewportCenterWorldX: number,
+) {
+  if (ring.length === 0) return "";
+
+  let previousWrappedWorldX: number | null = null;
+  const commands: string[] = [];
+
+  ring.forEach(([lon, lat], index) => {
+    const pointWorld = latLonToWorld(lat, lon, zoom);
+    let wrappedWorldX = wrapWorldXNear(viewportCenterWorldX, pointWorld.x, zoom);
+    if (previousWrappedWorldX != null) {
+      wrappedWorldX = wrapWorldXNear(previousWrappedWorldX, wrappedWorldX, zoom);
+    }
+    previousWrappedWorldX = wrappedWorldX;
+
+    const x = wrappedWorldX - topLeftX;
+    const y = pointWorld.y - topLeftY;
+    commands.push(`${index === 0 ? "M" : "L"}${x} ${y}`);
+  });
+
+  return `${commands.join(" ")} Z`;
+}
+
+function geometryToSvgPath(
+  geometry: AvalancheMapLayerGeometry,
+  zoom: number,
+  topLeftX: number,
+  topLeftY: number,
+  viewportCenterWorldX: number,
+) {
+  return avalancheGeometryPolygons(geometry)
+    .map((polygon) =>
+      polygon
+        .map((ring) =>
+          ringToSvgPath(ring, zoom, topLeftX, topLeftY, viewportCenterWorldX),
+        )
+        .filter(Boolean)
+        .join(" "),
+    )
+    .filter(Boolean)
+    .join(" ");
+}
+
+function formatDangerLabel(danger: string | null | undefined, dangerLevel: number | null | undefined) {
+  const normalized = (danger ?? "").trim();
+  if (normalized) {
+    return normalized
+      .split(/\s+/)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  }
+
+  if (dangerLevel === -1) return "No Rating";
+  if (dangerLevel === 1) return "Low";
+  if (dangerLevel === 2) return "Moderate";
+  if (dangerLevel === 3) return "Considerable";
+  if (dangerLevel === 4) return "High";
+  if (dangerLevel === 5) return "Extreme";
+  return "Unknown";
+}
+
+function formatDangerHeadline(
+  danger: string | null | undefined,
+  dangerLevel: number | null | undefined,
+) {
+  const label = formatDangerLabel(danger, dangerLevel).toUpperCase();
+  if (dangerLevel == null || dangerLevel < 0) return label;
+  return `${dangerLevel} - ${label}`;
+}
+
+function formatValidityDateTime(value: string | null | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleString(undefined, {
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function formatValidityRange(
+  start: string | null | undefined,
+  end: string | null | undefined,
+  timezone: string | null | undefined,
+) {
+  const startLabel = formatValidityDateTime(start);
+  const endLabel = formatValidityDateTime(end);
+  if (!startLabel && !endLabel) return null;
+  const tzSuffix = typeof timezone === "string" && timezone.trim()
+    ? ` ${timezone.split("/").pop()?.replace(/_/g, " ") ?? timezone}`
+    : "";
+  return `Valid: ${startLabel ?? "Unknown"} - ${endLabel ?? "Unknown"}${tzSuffix}`;
+}
+
+function clampOpacity(value: number | null | undefined, fallback: number) {
+  return isFiniteNumber(value) ? clamp(value, 0, 1) : fallback;
+}
+
+function getAnchoredPopupLayout({
+  anchorX,
+  anchorY,
+  viewportWidth,
+  viewportHeight,
+  popupWidth,
+  popupHeight,
+}: {
+  anchorX: number;
+  anchorY: number;
+  viewportWidth: number;
+  viewportHeight: number;
+  popupWidth: number;
+  popupHeight: number;
+}): AnchoredPopupLayout {
+  const margin = 16;
+  const anchorGap = 14;
+  const arrowInset = 22;
+  const width = Math.max(
+    0,
+    Math.min(popupWidth, Math.max(0, viewportWidth - margin * 2)),
+  );
+  const height = Math.max(
+    0,
+    Math.min(popupHeight, Math.max(0, viewportHeight - margin * 2)),
+  );
+
+  const clampLeft = (value: number) =>
+    clamp(value, margin, Math.max(margin, viewportWidth - width - margin));
+  const clampTop = (value: number) =>
+    clamp(value, margin, Math.max(margin, viewportHeight - height - margin));
+
+  const canFitAbove = anchorY - anchorGap - height >= margin;
+  const canFitBelow = anchorY + anchorGap + height <= viewportHeight - margin;
+  const canFitRight = anchorX + anchorGap + width <= viewportWidth - margin;
+  const canFitLeft = anchorX - anchorGap - width >= margin;
+
+  let left = clampLeft(anchorX - width / 2);
+  let top = clampTop(anchorY - anchorGap - height);
+  let arrowSide: AnchoredPopupLayout["arrowSide"] = "bottom";
+
+  if (canFitAbove) {
+    left = clampLeft(anchorX - width / 2);
+    top = anchorY - anchorGap - height;
+    arrowSide = "bottom";
+  } else if (canFitBelow) {
+    left = clampLeft(anchorX - width / 2);
+    top = anchorY + anchorGap;
+    arrowSide = "top";
+  } else if (canFitRight) {
+    left = anchorX + anchorGap;
+    top = clampTop(anchorY - height / 2);
+    arrowSide = "left";
+  } else if (canFitLeft) {
+    left = anchorX - anchorGap - width;
+    top = clampTop(anchorY - height / 2);
+    arrowSide = "right";
+  } else {
+    const availableAbove = anchorY - margin;
+    const availableBelow = viewportHeight - margin - anchorY;
+    if (availableAbove >= availableBelow) {
+      left = clampLeft(anchorX - width / 2);
+      top = clampTop(anchorY - anchorGap - height);
+      arrowSide = "bottom";
+    } else {
+      left = clampLeft(anchorX - width / 2);
+      top = clampTop(anchorY + anchorGap);
+      arrowSide = "top";
+    }
+  }
+
+  const arrowOffset =
+    arrowSide === "top" || arrowSide === "bottom"
+      ? clamp(anchorX - left, arrowInset, Math.max(arrowInset, width - arrowInset))
+      : clamp(anchorY - top, arrowInset, Math.max(arrowInset, height - arrowInset));
+
+  return {
+    left,
+    top,
+    maxHeight: Math.max(0, viewportHeight - margin * 2),
+    arrowSide,
+    arrowOffset,
+  };
 }
 
 function intersects(bounds: GeoBounds, region: StateBounds) {
@@ -282,13 +650,22 @@ export default function StationsExplorerMap({
       }
     : null;
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const avalanchePopupRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const [avalanchePopupSize, setAvalanchePopupSize] = useState({
+    width: 0,
+    height: 0,
+  });
   const [center, setCenter] = useState(
     cachedCurrentLocation ?? DEFAULT_CENTER,
   );
   const [zoom, setZoom] = useState(cachedCurrentLocation ? 10 : DEFAULT_ZOOM);
   const [basemap, setBasemap] = useState<BasemapKey>("light");
   const [selectedStationTriplet, setSelectedStationTriplet] = useState<string | null>(null);
+  const [selectedAvalancheRegionId, setSelectedAvalancheRegionId] = useState<string | null>(
+    null,
+  );
+  const [avalancheFeatures, setAvalancheFeatures] = useState<AvalancheMapLayerFeature[]>([]);
   const [liveCurrentLocation, setLiveCurrentLocation] = useState<{
     lat: number;
     lon: number;
@@ -318,6 +695,32 @@ export default function StationsExplorerMap({
     });
     observer.observe(mapRef.current);
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    fetch("/api/avalanche/map-layer", {
+      cache: "no-store",
+      signal: abortController.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`Avalanche map-layer fetch failed: ${response.status}`);
+        }
+        const json = (await response.json()) as AvalancheMapLayerApiResponse;
+        return normalizeAvalancheMapLayerResponse(json);
+      })
+      .then((features) => {
+        setAvalancheFeatures(features);
+      })
+      .catch((error: unknown) => {
+        if ((error as Error)?.name === "AbortError") return;
+      });
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   const maxZoom = BASEMAPS[basemap].maxZoom;
@@ -388,8 +791,45 @@ export default function StationsExplorerMap({
         })()
       : null;
 
-    return { centerWorld, tiles, bounds, clusters, currentLocationPoint };
-  }, [center.lat, center.lon, currentLocation, size.height, size.width, stations, zoom]);
+    const avalancheRegions: ProjectedAvalancheRegion[] = avalancheFeatures
+      .filter((feature) => boundsIntersect(bounds, feature.bounds))
+      .map((feature) => {
+        const pathData = geometryToSvgPath(
+          feature.geometry,
+          zoom,
+          topLeftX,
+          topLeftY,
+          centerWorld.x,
+        );
+        const labelWorld = latLonToWorld(feature.labelLat, feature.labelLon, zoom);
+        const wrappedLabelWorldX = wrapWorldXNear(centerWorld.x, labelWorld.x, zoom);
+        return {
+          feature,
+          pathData,
+          anchorX: wrappedLabelWorldX - topLeftX,
+          anchorY: labelWorld.y - topLeftY,
+        };
+      })
+      .filter((region) => region.pathData.length > 0);
+
+    return {
+      centerWorld,
+      tiles,
+      bounds,
+      clusters,
+      currentLocationPoint,
+      avalancheRegions,
+    };
+  }, [
+    avalancheFeatures,
+    center.lat,
+    center.lon,
+    currentLocation,
+    size.height,
+    size.width,
+    stations,
+    zoom,
+  ]);
 
   useEffect(() => {
     if (!mapState) return;
@@ -412,6 +852,61 @@ export default function StationsExplorerMap({
   );
 
   const selectedStation = selectedCluster?.stations[0] ?? null;
+  const selectedAvalancheRegion = useMemo(
+    () =>
+      mapState?.avalancheRegions.find(
+        (region) => region.feature.id === selectedAvalancheRegionId,
+      ) ?? null,
+    [mapState?.avalancheRegions, selectedAvalancheRegionId],
+  );
+
+  const selectedAvalanchePopupTargetWidth = useMemo(() => {
+    if (size.width <= 0) return 360;
+    return clamp(Math.round(size.width * 0.22), 300, 440);
+  }, [size.width]);
+
+  useEffect(() => {
+    if (!selectedAvalancheRegion || !avalanchePopupRef.current) return;
+    const popupElement = avalanchePopupRef.current;
+
+    const updateSize = () => {
+      setAvalanchePopupSize({
+        width: Math.ceil(popupElement.offsetWidth),
+        height: Math.ceil(popupElement.offsetHeight),
+      });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(() => {
+      updateSize();
+    });
+    observer.observe(popupElement);
+    return () => observer.disconnect();
+  }, [selectedAvalancheRegion]);
+
+  const selectedAvalanchePopupLayout = useMemo(() => {
+    if (!selectedAvalancheRegion) return null;
+    if (size.width <= 0 || size.height <= 0) return null;
+
+    const fallbackWidth = Math.min(selectedAvalanchePopupTargetWidth, Math.max(0, size.width - 24));
+    const fallbackHeight = 260;
+
+    return getAnchoredPopupLayout({
+      anchorX: selectedAvalancheRegion.anchorX,
+      anchorY: selectedAvalancheRegion.anchorY,
+      viewportWidth: size.width,
+      viewportHeight: size.height,
+      popupWidth: avalanchePopupSize.width > 0 ? avalanchePopupSize.width : fallbackWidth,
+      popupHeight: avalanchePopupSize.height > 0 ? avalanchePopupSize.height : fallbackHeight,
+    });
+  }, [
+    selectedAvalancheRegion,
+    size.width,
+    size.height,
+    avalanchePopupSize,
+    selectedAvalanchePopupTargetWidth,
+  ]);
 
   const toLocalPoint = (clientX: number, clientY: number) => {
     const rect = mapRef.current?.getBoundingClientRect();
@@ -459,6 +954,7 @@ export default function StationsExplorerMap({
     const target = event.target as HTMLElement;
     if (target.closest('[data-map-interactive="true"]')) return;
     setSelectedStationTriplet(null);
+    setSelectedAvalancheRegionId(null);
     activePointersRef.current.set(event.pointerId, {
       clientX: event.clientX,
       clientY: event.clientY,
@@ -712,6 +1208,53 @@ export default function StationsExplorerMap({
             )),
           )}
 
+          {mapState?.avalancheRegions.length ? (
+            <svg
+              className="absolute inset-0 z-20 pointer-events-none"
+              viewBox={`0 0 ${size.width} ${size.height}`}
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              {mapState.avalancheRegions.map((region) => {
+                const selected = region.feature.id === selectedAvalancheRegionId;
+                const dangerLevel = region.feature.properties.danger_level ?? null;
+                const isExtreme = dangerLevel === 5;
+                const hasWarning = Boolean(region.feature.properties.warning?.product);
+                const fillColor = region.feature.properties.color ?? "transparent";
+                const strokeColor = region.feature.properties.stroke ?? "#000000";
+                const baseFillOpacity = clampOpacity(
+                  region.feature.properties.fillOpacity,
+                  fillColor === "transparent" ? 0 : 0.5,
+                );
+
+                return (
+                  <path
+                    key={region.feature.id}
+                    data-map-interactive="true"
+                    d={region.pathData}
+                    fillRule="evenodd"
+                    className={[
+                      "pointer-events-auto cursor-pointer motion-reduce:animate-none",
+                      hasWarning ? "animate-pulse [animation-duration:3s]" : "",
+                    ].join(" ")}
+                    fill={fillColor}
+                    fillOpacity={
+                      selected ? Math.min(baseFillOpacity + 0.15, 0.9) : baseFillOpacity
+                    }
+                    stroke={strokeColor}
+                    strokeOpacity={1}
+                    strokeWidth={selected ? (isExtreme ? 4.5 : 3) : isExtreme ? 3.2 : 1.8}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={() => {
+                      setSelectedStationTriplet(null);
+                      setSelectedAvalancheRegionId(region.feature.id);
+                    }}
+                  />
+                );
+              })}
+            </svg>
+          ) : null}
+
           {mapState?.clusters.map((cluster) => {
             if (cluster.count > 1) {
               return (
@@ -724,6 +1267,7 @@ export default function StationsExplorerMap({
                   onPointerDown={(event) => event.stopPropagation()}
                   onClick={() => {
                     setSelectedStationTriplet(null);
+                    setSelectedAvalancheRegionId(null);
                     setCenter({ lat: cluster.lat, lon: cluster.lon });
                     setZoom((current) => clamp(current + 1, MIN_ZOOM, maxZoom));
                   }}
@@ -748,7 +1292,10 @@ export default function StationsExplorerMap({
                 className="absolute -translate-x-1/2 -translate-y-[85%] z-40"
                 style={{ left: cluster.x, top: cluster.y }}
                 onPointerDown={(event) => event.stopPropagation()}
-                onClick={() => setSelectedStationTriplet(station.stationTriplet)}
+                onClick={() => {
+                  setSelectedAvalancheRegionId(null);
+                  setSelectedStationTriplet(station.stationTriplet);
+                }}
                 aria-label={`Station ${station.stationId}`}
               >
                 <div
@@ -791,6 +1338,184 @@ export default function StationsExplorerMap({
                 >
                   Open station
                 </Link>
+              </div>
+            </div>
+          ) : null}
+
+          {selectedAvalancheRegion && selectedAvalanchePopupLayout ? (
+            <div
+              ref={avalanchePopupRef}
+              data-map-interactive="true"
+              className="absolute z-50 max-w-[calc(100%-1rem)]"
+              style={{
+                width: selectedAvalanchePopupTargetWidth,
+                left: selectedAvalanchePopupLayout.left,
+                top: selectedAvalanchePopupLayout.top,
+              }}
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute h-3 w-3 rotate-45 border border-slate-300 bg-white shadow-sm"
+                style={{
+                  ...(selectedAvalanchePopupLayout.arrowSide === "top"
+                    ? {
+                        top: -6,
+                        left: selectedAvalanchePopupLayout.arrowOffset - 6,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "bottom"
+                    ? {
+                        bottom: -6,
+                        left: selectedAvalanchePopupLayout.arrowOffset - 6,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "left"
+                    ? {
+                        left: -6,
+                        top: selectedAvalanchePopupLayout.arrowOffset - 6,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "right"
+                    ? {
+                        right: -6,
+                        top: selectedAvalanchePopupLayout.arrowOffset - 6,
+                      }
+                    : {}),
+                }}
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute z-20 bg-white"
+                style={{
+                  ...(selectedAvalanchePopupLayout.arrowSide === "top"
+                    ? {
+                        top: 0,
+                        left: selectedAvalanchePopupLayout.arrowOffset - 8,
+                        width: 16,
+                        height: 2,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "bottom"
+                    ? {
+                        bottom: 0,
+                        left: selectedAvalanchePopupLayout.arrowOffset - 8,
+                        width: 16,
+                        height: 2,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "left"
+                    ? {
+                        left: 0,
+                        top: selectedAvalanchePopupLayout.arrowOffset - 8,
+                        width: 2,
+                        height: 16,
+                      }
+                    : {}),
+                  ...(selectedAvalanchePopupLayout.arrowSide === "right"
+                    ? {
+                        right: 0,
+                        top: selectedAvalanchePopupLayout.arrowOffset - 8,
+                        width: 2,
+                        height: 16,
+                      }
+                    : {}),
+                }}
+              />
+
+              <button
+                type="button"
+                className="absolute right-1.5 top-1.5 z-30 inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-900 shadow-sm hover:bg-slate-100"
+                onClick={() => setSelectedAvalancheRegionId(null)}
+                aria-label="Close avalanche forecast popup"
+              >
+                <X className="h-4 w-4" />
+              </button>
+
+              <div
+                className="relative z-10 overflow-y-auto rounded-xl border border-slate-300 bg-white p-3 text-sm text-slate-900 shadow-2xl"
+                style={{
+                  maxHeight: selectedAvalanchePopupLayout.maxHeight,
+                }}
+              >
+                <div className="relative rounded-md bg-slate-200 px-3 py-3 pr-20 sm:px-4 sm:pr-24">
+                  <div className="text-[12px] font-bold tracking-wide text-slate-900 sm:text-[13px]">
+                    {formatDangerHeadline(
+                      selectedAvalancheRegion.feature.properties.danger ?? null,
+                      selectedAvalancheRegion.feature.properties.danger_level ?? null,
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-[11px] font-bold tracking-wide text-slate-800 sm:text-[12px]">
+                    AVALANCHE DANGER
+                  </div>
+                  <div className="absolute right-2.5 top-1/2 flex h-10 w-14 -translate-y-1/2 items-center justify-center overflow-hidden rounded-md border-2 border-slate-400 bg-white sm:right-3 sm:h-12 sm:w-16">
+                    <img
+                      src={`/danger-icons/${
+                        selectedAvalancheRegion.feature.properties.danger_level != null &&
+                        selectedAvalancheRegion.feature.properties.danger_level >= 1 &&
+                        selectedAvalancheRegion.feature.properties.danger_level <= 5
+                          ? selectedAvalancheRegion.feature.properties.danger_level
+                          : 0
+                      }.png`}
+                      alt=""
+                      aria-hidden="true"
+                      className="max-h-full max-w-full object-contain p-1"
+                      draggable={false}
+                    />
+                  </div>
+                </div>
+
+                {selectedAvalancheRegion.feature.properties.warning?.product ? (
+                  <div className="mt-2 flex items-center gap-2 rounded-sm bg-red-600 px-2.5 py-2 text-[11px] font-extrabold tracking-wide text-white sm:text-xs">
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <span>AVALANCHE WARNING IN EFFECT</span>
+                  </div>
+                ) : null}
+
+                <div className="mt-3 space-y-1.5">
+                  <div className="text-lg font-black leading-tight tracking-wide uppercase text-slate-900 sm:text-xl">
+                    {selectedAvalancheRegion.feature.properties.name ?? "Avalanche Region"}
+                  </div>
+                  <div className="text-sm font-bold tracking-wide uppercase text-slate-600 sm:text-base">
+                    {selectedAvalancheRegion.feature.properties.center ?? "Avalanche Center"}
+                    {selectedAvalancheRegion.feature.properties.state
+                      ? ` · ${selectedAvalancheRegion.feature.properties.state}`
+                      : ""}
+                  </div>
+                  {formatValidityRange(
+                    selectedAvalancheRegion.feature.properties.start_date ?? null,
+                    selectedAvalancheRegion.feature.properties.end_date ?? null,
+                    selectedAvalancheRegion.feature.properties.timezone ?? null,
+                  ) ? (
+                    <div className="text-xs italic text-slate-700 sm:text-sm">
+                      {formatValidityRange(
+                        selectedAvalancheRegion.feature.properties.start_date ?? null,
+                        selectedAvalancheRegion.feature.properties.end_date ?? null,
+                        selectedAvalancheRegion.feature.properties.timezone ?? null,
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+
+                {(selectedAvalancheRegion.feature.properties.link ||
+                  selectedAvalancheRegion.feature.properties.center_link) ? (
+                  <div className="mt-4">
+                    <a
+                      href={
+                        selectedAvalancheRegion.feature.properties.link ??
+                        selectedAvalancheRegion.feature.properties.center_link ??
+                        "#"
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex w-full items-center justify-center rounded-md bg-slate-700 px-4 py-2.5 text-xs font-extrabold tracking-wide text-white hover:bg-slate-800 sm:text-sm"
+                    >
+                      {selectedAvalancheRegion.feature.properties.link
+                        ? "GET THE FORECAST ↗"
+                        : "OPEN AVALANCHE CENTER ↗"}
+                    </a>
+                  </div>
+                ) : null}
               </div>
             </div>
           ) : null}
