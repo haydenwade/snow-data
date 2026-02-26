@@ -13,20 +13,11 @@ import StationsExplorerSection from "@/components/stations/StationsExplorerSecti
 export default function Home() {
   const [query, setQuery] = useState("");
 
-  const visibleLocations = useMemo(
-    () => LOCATIONS.filter((l) => !l.isHidden),
-    []
-  );
-
   const filteredLocations = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return visibleLocations;
+    if (!q) return LOCATIONS;
 
-    // Special case: show hidden emigrantsummit if user searches exactly "emigrant"
-    const searchPool =
-      q === "emigrant" ? LOCATIONS : visibleLocations;
-
-    return searchPool.filter((l) => {
+    return LOCATIONS.filter((l) => {
       const haystack = [
         l.name,
         l.city,
@@ -43,7 +34,7 @@ export default function Home() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query, visibleLocations]);
+  }, [query]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">

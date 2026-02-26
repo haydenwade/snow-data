@@ -253,7 +253,6 @@ export function toMountainLocation(
     resortInfoLinks: locationMatch?.resortInfoLinks ?? [],
     trafficInfoLinks: locationMatch?.trafficInfoLinks ?? [],
     radarLink: buildDefaultRadarLink(latitude, longitude),
-    isHidden: locationMatch?.isHidden ?? false,
   };
 }
 

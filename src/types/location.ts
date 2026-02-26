@@ -23,5 +23,4 @@ export type MountainLocation = {
   resortInfoLinks: GenericLink[];
   trafficInfoLinks: GenericLink[];
   radarLink: string;
-  isHidden: boolean;
 };
