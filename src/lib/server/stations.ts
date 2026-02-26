@@ -251,7 +251,6 @@ export function toMountainLocation(
     logoUrl: locationMatch?.logoUrl,
     socialMediaLinks: locationMatch?.socialMediaLinks ?? [],
     resortInfoLinks: locationMatch?.resortInfoLinks ?? [],
-    avalancheInfoLinks: locationMatch?.avalancheInfoLinks ?? [],
     trafficInfoLinks: locationMatch?.trafficInfoLinks ?? [],
     radarLink: buildDefaultRadarLink(latitude, longitude),
     isHidden: locationMatch?.isHidden ?? false,

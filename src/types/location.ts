@@ -21,7 +21,6 @@ export type MountainLocation = {
   logoUrl?: string;
   socialMediaLinks: GenericLink[];
   resortInfoLinks: GenericLink[];
-  avalancheInfoLinks: GenericLink[];
   trafficInfoLinks: GenericLink[];
   radarLink: string;
   isHidden: boolean;

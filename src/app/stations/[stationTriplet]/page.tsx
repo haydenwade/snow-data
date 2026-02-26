@@ -22,7 +22,11 @@ import { normalizeStationKeyInput } from "@/lib/station-key";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, ForecastGridData } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
-import { StationAvalancheRegion, StationDetailResponse } from "@/types/station";
+import {
+  StationAvalancheRegion,
+  StationDetailResponse,
+  StationNearbyAvalancheRegion,
+} from "@/types/station";
 
 async function fetchStationDetail(stationKey: string): Promise<StationDetailResponse> {
   const response = await fetch(`/api/stations/${encodeURIComponent(stationKey)}`, {
@@ -98,6 +102,9 @@ export default function StationPage() {
 
   const [location, setLocation] = useState<MountainLocation | null>(null);
   const [avalancheRegion, setAvalancheRegion] = useState<StationAvalancheRegion | null>(null);
+  const [nearbyAvalancheRegions, setNearbyAvalancheRegions] = useState<
+    StationNearbyAvalancheRegion[]
+  >([]);
   const { unit } = useUserSettings();
   const [range, setRange] = useState<15 | 30>(15);
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
@@ -119,11 +126,13 @@ export default function StationPage() {
         setLoading(true);
         setError(null);
         setAvalancheRegion(null);
+        setNearbyAvalancheRegions([]);
 
         const detail = await fetchStationDetail(stationKey);
         if (!mounted) return;
         setLocation(detail.location);
         setAvalancheRegion(detail.avalancheRegion ?? null);
+        setNearbyAvalancheRegions(detail.nearbyAvalancheRegions ?? []);
 
         const [historicResult, forecastResult] = await Promise.allSettled([
           fetchHistoric(stationKey, 30),
@@ -240,9 +249,9 @@ export default function StationPage() {
           <ResortInfoLinks location={location} loading={loading} />
             <section className="w-full min-w-0 flex flex-col gap-6">
             <AvalancheInfo
-              location={location}
               loading={loading}
               avalancheRegion={avalancheRegion}
+              nearbyAvalancheRegions={nearbyAvalancheRegions}
             />
             <TrafficInfo location={location} loading={loading} />
           </section>

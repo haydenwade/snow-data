@@ -45,9 +45,14 @@ export type StationAvalancheRegion = {
   warningInEffect: boolean;
 };
 
+export type StationNearbyAvalancheRegion = StationAvalancheRegion & {
+  distanceMiles: number;
+};
+
 export type StationDetailResponse = {
   station: StationSummary;
   location: MountainLocation;
   locationMatch: MountainLocation | null;
   avalancheRegion?: StationAvalancheRegion | null;
+  nearbyAvalancheRegions?: StationNearbyAvalancheRegion[];
 };

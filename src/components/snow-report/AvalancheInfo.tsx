@@ -1,8 +1,6 @@
 "use client";
 
-import { MountainLocation } from "@/types/location";
-import { StationAvalancheRegion } from "@/types/station";
-import ResourceCard from "./ResourceCard";
+import { StationAvalancheRegion, StationNearbyAvalancheRegion } from "@/types/station";
 import { AlertTriangle } from "lucide-react";
 
 function formatDangerLabel(
@@ -54,17 +52,26 @@ function formatValidityRange(region: StationAvalancheRegion) {
   return `Valid: ${startLabel ?? "Unknown"} - ${endLabel ?? "Unknown"}${tzSuffix}`;
 }
 
+function getDangerIconSrc(dangerLevel: number | null | undefined) {
+  if (dangerLevel != null && dangerLevel >= 1 && dangerLevel <= 5) {
+    return `/danger-icons/${dangerLevel}.png`;
+  }
+  return "/danger-icons/0.png";
+}
+
 export default function AvalancheInfo({
-  location,
   loading,
   avalancheRegion,
+  nearbyAvalancheRegions,
 }: {
-  location: MountainLocation;
   loading: boolean;
   avalancheRegion?: StationAvalancheRegion | null;
+  nearbyAvalancheRegions?: StationNearbyAvalancheRegion[];
 }) {
-  const links = location.avalancheInfoLinks ?? [];
-  if (loading || (links.length === 0 && !avalancheRegion)) return null;
+  const nearbyRegions = nearbyAvalancheRegions ?? [];
+  if (loading || (!avalancheRegion && nearbyRegions.length === 0)) {
+    return null;
+  }
 
   const validityRange = avalancheRegion ? formatValidityRange(avalancheRegion) : null;
   const forecastUrl = avalancheRegion?.link ?? avalancheRegion?.centerLink ?? null;
@@ -78,49 +85,60 @@ export default function AvalancheInfo({
         </div>
       </div>
 
-      <div className="p-4 pt-3 space-y-2">
+      <div className="p-4 pt-3">
         {avalancheRegion ? (
-          <div className="rounded-xl border border-slate-700/50 bg-slate-900/30 p-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+          <div className="space-y-3">
+            <div className="relative pr-24 sm:pr-28">
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">
                 Current Danger
-              </span>
-              <span
-                className="inline-flex items-center rounded-md border px-2 py-1 text-xs font-extrabold tracking-wide"
-                style={{
-                  backgroundColor: avalancheRegion.color ?? "#1f2937",
-                  borderColor: avalancheRegion.stroke ?? "#475569",
-                  color: avalancheRegion.fontColor ?? "#ffffff",
-                }}
-              >
-                {formatDangerHeadline(avalancheRegion)}
-              </span>
-            </div>
-
-            {avalancheRegion.warningInEffect ? (
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-red-400/40 bg-red-500/15 px-2 py-1 text-xs font-semibold text-red-300">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                Avalanche Warning in Effect
               </div>
-            ) : null}
+              <div className="mt-3 text-sm font-semibold text-white">
+                {avalancheRegion.name ?? "Avalanche Region"}
+              </div>
+              <div className="mt-1 text-xs text-slate-300">
+                {avalancheRegion.center ?? "Avalanche Center"}
+                {avalancheRegion.state ? ` · ${avalancheRegion.state}` : ""}
+              </div>
+              <div className="absolute right-0 top-0 flex h-14 w-[4.5rem] items-center justify-center overflow-hidden rounded-md border border-slate-600/70 bg-white/90 sm:h-16 sm:w-20">
+                <img
+                  src={getDangerIconSrc(avalancheRegion.dangerLevel)}
+                  alt=""
+                  aria-hidden="true"
+                  className="max-h-full max-w-full object-contain p-1"
+                  draggable={false}
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span
+                  className="inline-flex items-center rounded-md border px-2 py-1 text-xs font-extrabold tracking-wide"
+                  style={{
+                    backgroundColor: avalancheRegion.color ?? "#1f2937",
+                    borderColor: avalancheRegion.stroke ?? "#475569",
+                    color: avalancheRegion.fontColor ?? "#ffffff",
+                  }}
+                >
+                  {formatDangerHeadline(avalancheRegion)}
+                </span>
 
-            <div className="mt-3 text-sm font-semibold text-white">
-              {avalancheRegion.name ?? "Avalanche Region"}
+                {avalancheRegion.warningInEffect ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-red-400/40 bg-red-500/15 px-2 py-1 text-xs font-semibold text-red-300">
+                    <AlertTriangle className="h-3.5 w-3.5" />
+                    Avalanche Warning in Effect
+                  </span>
+                ) : null}
+              </div>
+
+              {validityRange ? (
+                <div className="mt-2 text-xs italic text-slate-400">{validityRange}</div>
+              ) : null}
             </div>
-            <div className="mt-1 text-xs text-slate-300">
-              {avalancheRegion.center ?? "Avalanche Center"}
-              {avalancheRegion.state ? ` · ${avalancheRegion.state}` : ""}
-            </div>
-            {validityRange ? (
-              <div className="mt-1 text-xs italic text-slate-400">{validityRange}</div>
-            ) : null}
 
             {forecastUrl ? (
               <a
                 href={forecastUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center rounded-lg border border-slate-500 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700/40"
+                className="inline-flex items-center rounded-lg border border-slate-500 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700/40"
               >
                 {avalancheRegion.link ? "View forecast ↗" : "Open avalanche center ↗"}
               </a>
@@ -128,9 +146,90 @@ export default function AvalancheInfo({
           </div>
         ) : null}
 
-        {links.map((link) => (
-          <ResourceCard key={link.url} link={link} />
-        ))}
+        {!avalancheRegion && nearbyRegions.length > 0 ? (
+          <div className="space-y-3">
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+              Nearby avalanche regions (within 50 miles)
+            </div>
+            <p className="mt-1 text-xs text-slate-400">
+              This station is not inside an official avalanche forecast area. Nearest forecast regions:
+            </p>
+
+            <div className="divide-y divide-slate-700/40 border-t border-slate-700/40">
+              {nearbyRegions.map((region) => {
+                const nearbyForecastUrl = region.link ?? region.centerLink ?? null;
+                const nearbyValidityRange = formatValidityRange(region);
+
+                return (
+                  <div
+                    key={`${region.id}-${region.distanceMiles}`}
+                    className="relative py-3 first:pt-3 last:pb-0 pr-20 sm:pr-24"
+                  >
+                    <div className="flex flex-wrap items-center gap-2 min-w-0">
+                      <div className="text-sm font-semibold text-white">
+                        {region.name ?? "Avalanche Region"}
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        {region.distanceMiles.toFixed(1)} mi away
+                      </span>
+                    </div>
+
+                    <div className="mt-1 text-xs text-slate-300">
+                      {region.center ?? "Avalanche Center"}
+                      {region.state ? ` · ${region.state}` : ""}
+                    </div>
+                    <div className="absolute right-0 top-3 flex h-12 w-16 items-center justify-center overflow-hidden rounded-md border border-slate-600/70 bg-white/90 sm:h-14 sm:w-[4.5rem]">
+                      <img
+                        src={getDangerIconSrc(region.dangerLevel)}
+                        alt=""
+                        aria-hidden="true"
+                        className="max-h-full max-w-full object-contain p-1"
+                        draggable={false}
+                      />
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span
+                        className="inline-flex items-center rounded-md border px-2 py-1 text-xs font-extrabold tracking-wide"
+                        style={{
+                          backgroundColor: region.color ?? "#1f2937",
+                          borderColor: region.stroke ?? "#475569",
+                          color: region.fontColor ?? "#ffffff",
+                        }}
+                      >
+                        {formatDangerHeadline(region)}
+                      </span>
+
+                      {region.warningInEffect ? (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-red-400/40 bg-red-500/15 px-2 py-1 text-xs font-semibold text-red-300">
+                          <AlertTriangle className="h-3 w-3" />
+                          Warning in Effect
+                        </span>
+                      ) : null}
+                    </div>
+
+                    {nearbyValidityRange ? (
+                      <div className="mt-2 text-xs italic text-slate-400">
+                        {nearbyValidityRange}
+                      </div>
+                    ) : null}
+
+                    {nearbyForecastUrl ? (
+                      <a
+                        href={nearbyForecastUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center rounded-lg border border-slate-500 px-3 py-1.5 text-xs font-semibold text-slate-100 hover:bg-slate-700/40"
+                      >
+                        {region.link ? "View nearby forecast ↗" : "Open avalanche center ↗"}
+                      </a>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

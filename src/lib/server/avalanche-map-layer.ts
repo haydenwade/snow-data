@@ -1,4 +1,8 @@
-import { GeoBounds, StationAvalancheRegion } from "@/types/station";
+import {
+  GeoBounds,
+  StationAvalancheRegion,
+  StationNearbyAvalancheRegion,
+} from "@/types/station";
 
 export const AVALANCHE_MAP_LAYER_URL =
   "https://api.avalanche.org/v2/public/products/map-layer";
@@ -294,6 +298,96 @@ function geometryContainsPoint(
   );
 }
 
+function degreesToRadians(value: number) {
+  return (value * Math.PI) / 180;
+}
+
+function pointToSegmentDistanceMiles(
+  pointLon: number,
+  pointLat: number,
+  aLon: number,
+  aLat: number,
+  bLon: number,
+  bLat: number,
+) {
+  const milesPerLatDegree = 69.0;
+  const cosLat = Math.cos(degreesToRadians(pointLat));
+  const milesPerLonDegree = Math.max(0.0001, 69.172 * cosLat);
+
+  const px = 0;
+  const py = 0;
+  const ax = (aLon - pointLon) * milesPerLonDegree;
+  const ay = (aLat - pointLat) * milesPerLatDegree;
+  const bx = (bLon - pointLon) * milesPerLonDegree;
+  const by = (bLat - pointLat) * milesPerLatDegree;
+
+  const abx = bx - ax;
+  const aby = by - ay;
+  const abLengthSquared = abx * abx + aby * aby;
+  if (abLengthSquared <= Number.EPSILON) {
+    return Math.hypot(px - ax, py - ay);
+  }
+
+  const t = Math.max(
+    0,
+    Math.min(1, ((px - ax) * abx + (py - ay) * aby) / abLengthSquared),
+  );
+  const closestX = ax + t * abx;
+  const closestY = ay + t * aby;
+  return Math.hypot(px - closestX, py - closestY);
+}
+
+function ringDistanceMilesToPoint(
+  lon: number,
+  lat: number,
+  ring: [number, number][],
+) {
+  if (ring.length < 2) return Number.POSITIVE_INFINITY;
+
+  let minDistanceMiles = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < ring.length; index += 1) {
+    const start = ring[index];
+    const end = ring[(index + 1) % ring.length];
+    if (!start || !end) continue;
+
+    const [aLon, aLat] = start;
+    const [bLon, bLat] = end;
+    const distanceMiles = pointToSegmentDistanceMiles(
+      lon,
+      lat,
+      aLon,
+      aLat,
+      bLon,
+      bLat,
+    );
+
+    if (distanceMiles < minDistanceMiles) {
+      minDistanceMiles = distanceMiles;
+    }
+  }
+
+  return minDistanceMiles;
+}
+
+function geometryDistanceMilesToPoint(
+  lon: number,
+  lat: number,
+  geometry: AvalancheMapLayerGeometry,
+) {
+  let minDistanceMiles = Number.POSITIVE_INFINITY;
+
+  avalancheGeometryPolygons(geometry).forEach((polygon) => {
+    polygon.forEach((ring) => {
+      const ringDistanceMiles = ringDistanceMilesToPoint(lon, lat, ring);
+      if (ringDistanceMiles < minDistanceMiles) {
+        minDistanceMiles = ringDistanceMiles;
+      }
+    });
+  });
+
+  return minDistanceMiles;
+}
+
 function toStationAvalancheRegion(
   feature: NormalizedAvalancheFeature,
 ): StationAvalancheRegion {
@@ -332,4 +426,41 @@ export async function findAvalancheRegionForPoint(lat: number, lon: number) {
   });
 
   return match ? toStationAvalancheRegion(match) : null;
+}
+
+export async function findNearbyAvalancheRegionsForPoint(
+  lat: number,
+  lon: number,
+  options?: {
+    maxDistanceMiles?: number;
+    limit?: number;
+  },
+): Promise<StationNearbyAvalancheRegion[]> {
+  if (!isFiniteNumber(lat) || !isFiniteNumber(lon)) return [];
+
+  const maxDistanceMiles = options?.maxDistanceMiles ?? 50;
+  const limit = options?.limit ?? 3;
+  const { features } = await getCachedAvalancheMapLayer();
+
+  const nearby = features
+    .map((feature) => {
+      if (pointWithinBounds(lat, lon, feature.bounds) && geometryContainsPoint(lon, lat, feature.geometry)) {
+        return null;
+      }
+
+      const distanceMiles = geometryDistanceMilesToPoint(lon, lat, feature.geometry);
+      if (!Number.isFinite(distanceMiles) || distanceMiles > maxDistanceMiles) {
+        return null;
+      }
+
+      return {
+        ...toStationAvalancheRegion(feature),
+        distanceMiles: Number(distanceMiles.toFixed(1)),
+      } satisfies StationNearbyAvalancheRegion;
+    })
+    .filter((region): region is StationNearbyAvalancheRegion => region != null)
+    .sort((a, b) => a.distanceMiles - b.distanceMiles)
+    .slice(0, Math.max(0, limit));
+
+  return nearby;
 }

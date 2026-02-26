@@ -57,12 +57,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://x.com/wasatchbackudot",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/salt-lake",
-      },
-    ],
     isHidden: false,
   },
   {
@@ -113,12 +107,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Parking",
         url: "https://www.alta.com/getting-here/parking-info",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/salt-lake",
       },
     ],
     trafficInfoLinks: [
@@ -187,12 +175,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://www.snowbird.com/the-mountain/mountain-report/parking-status/",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/salt-lake",
-      },
-    ],
     trafficInfoLinks: [
       {
         label: "Cottonwood Canyons Traffic Info | UDOT on X",
@@ -249,12 +231,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Parking",
         url: "https://www.brightonresort.com/getting-here#parking",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/salt-lake",
       },
     ],
     trafficInfoLinks: [
@@ -318,12 +294,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://powdermountain.com/parking",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/ogden",
-      },
-    ],
     trafficInfoLinks: [
       {
         label: "Traffic Info | UDOT",
@@ -351,12 +321,6 @@ export const LOCATIONS: MountainLocation[] = [
 
     socialMediaLinks: [],
     resortInfoLinks: [],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/uintas",
-      },
-    ],
     trafficInfoLinks: [],
     isHidden: false,
   },
@@ -378,12 +342,6 @@ export const LOCATIONS: MountainLocation[] = [
       "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS40MTIsNDAuNTA4XSwibG9jYXRpb24iOlstMTExLjQxMiw0MC41MDhdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [],
     resortInfoLinks: [],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/uintas",
-      },
-    ],
     trafficInfoLinks: [],
     isHidden: false,
   },
@@ -431,12 +389,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Parking and Parking Lot Status",
         url: "https://www.jacksonhole.com/by-car",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast (Tetons)",
-        url: "https://bridgertetonavalanchecenter.org/forecasts/#/tetons",
       },
     ],
     trafficInfoLinks: [],
@@ -488,12 +440,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://www.skiheavenly.com/explore-the-resort/about-the-resort/getting-here-and-parking.aspx",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
-      },
-    ],
     trafficInfoLinks: [],
     isHidden: false,
   },
@@ -541,12 +487,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Parking",
         url: "https://www.palisadestahoe.com/mountain-information/parking-and-road-conditions",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
       },
     ],
     trafficInfoLinks: [],
@@ -602,12 +542,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQWNiBrrz1TOMRDnh4v4szob_nKany9HhE-YyXU-Mg1h9vCstNG4MlRDAAhVGxtuaoXEdbjbUltkzok/pubhtml#gid=1268759607",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://www.esavalanche.org/forecasts/#/eastside-region",
-      },
-    ],
     trafficInfoLinks: [
       {
         label: "Road Conditions",
@@ -651,12 +585,6 @@ export const LOCATIONS: MountainLocation[] = [
         url: "https://skirose.com/trail-maps/",
       },
     ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://www.sierraavalanchecenter.org/forecasts/avalanche/central-sierra-nevada#/central-sierra-nevada/",
-      },
-    ],
     trafficInfoLinks: [
       {
         label: "Traffic Cameras | NDOT",
@@ -683,12 +611,6 @@ export const LOCATIONS: MountainLocation[] = [
       "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41Niw0Mi4zNTZdLCJsb2NhdGlvbiI6Wy0xMTEuNTYsNDIuMzU2XSwiem9vbSI6OC4yOTMzMzMzMzMzMzMzMzEsImxheWVyIjoiYnJlZl9xY2QifSwiYW5pbWF0aW5nIjpmYWxzZSwiYmFzZSI6InN0YW5kYXJkIiwiYXJ0Y2MiOmZhbHNlLCJjb3VudHkiOmZhbHNlLCJjd2EiOmZhbHNlLCJyZmMiOmZhbHNlLCJzdGF0ZSI6ZmFsc2UsIm1lbnUiOnRydWUsInNob3J0RnVzZWRPbmx5IjpmYWxzZSwib3BhY2l0eSI6eyJhbGVydHMiOjAuOCwibG9jYWwiOjAuNiwibG9jYWxTdGF0aW9ucyI6MC44LCJuYXRpb25hbCI6MC42fX0%3D",
     socialMediaLinks: [],
     resortInfoLinks: [],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/logan",
-      },
-    ],
     trafficInfoLinks: [],
     isHidden: true,
   },
@@ -728,20 +650,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Trail Map",
         url: "https://pebblecreekskiarea.com/the-mountain/trails-grooming/",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast (Logan UAC)",
-        url: "https://utahavalanchecenter.org/forecast/logan",
-      },
-      {
-        label: "Avalanche Forecast (Bridger Teton)",
-        url: "https://bridgertetonavalanchecenter.org/forecasts/#/salt-river-and-wyoming-ranges/",
-      },
-      {
-        label: "Avalanche Forecast (Sawtooth)",
-        url: "https://www.sawtoothavalanche.com/forecasts/avalanche/soldier-&-wood-river-valley-mtns#/soldier-%26-wood-river-valley-mtns",
       },
     ],
     trafficInfoLinks: [],
@@ -787,12 +695,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Parking",
         url: "https://www.snowbasin.com/about/getting-here/",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast",
-        url: "https://utahavalanchecenter.org/forecast/ogden",
       },
     ],
     trafficInfoLinks: [],
@@ -843,12 +745,6 @@ export const LOCATIONS: MountainLocation[] = [
       {
         label: "Hours of Operation",
         url: "https://www.bigskyresort.com/hours",
-      },
-    ],
-    avalancheInfoLinks: [
-      {
-        label: "Avalanche Forecast (Northern Madison Range)",
-        url: "https://www.mtavalanche.com/avalanche-forecast#/northern-madison-range/",
       },
     ],
     trafficInfoLinks: [],

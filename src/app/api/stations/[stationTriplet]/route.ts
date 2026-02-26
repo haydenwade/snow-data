@@ -1,4 +1,7 @@
-import { findAvalancheRegionForPoint } from "@/lib/server/avalanche-map-layer";
+import {
+  findAvalancheRegionForPoint,
+  findNearbyAvalancheRegionsForPoint,
+} from "@/lib/server/avalanche-map-layer";
 import {
   fetchStationByTriplet,
   findLocationByTriplet,
@@ -40,12 +43,34 @@ export async function GET(
 
     const locationMatch = findLocationByTriplet(station.stationTriplet);
     const location = toMountainLocation(station, locationMatch);
+    const stationLat =
+      typeof station.latitude === "number" && Number.isFinite(station.latitude)
+        ? station.latitude
+        : location.lat;
+    const stationLon =
+      typeof station.longitude === "number" && Number.isFinite(station.longitude)
+        ? station.longitude
+        : location.lon;
 
     let avalancheRegion = null;
+    let nearbyAvalancheRegions = [] as NonNullable<
+      StationDetailResponse["nearbyAvalancheRegions"]
+    >;
     try {
-      avalancheRegion = await findAvalancheRegionForPoint(location.lat, location.lon);
+      avalancheRegion = await findAvalancheRegionForPoint(stationLat, stationLon);
+      if (!avalancheRegion) {
+        nearbyAvalancheRegions = await findNearbyAvalancheRegionsForPoint(
+          stationLat,
+          stationLon,
+          {
+            maxDistanceMiles: 50,
+            limit: 3,
+          },
+        );
+      }
     } catch {
       avalancheRegion = null;
+      nearbyAvalancheRegions = [];
     }
 
     const response: StationDetailResponse = {
@@ -53,6 +78,7 @@ export async function GET(
       location,
       locationMatch,
       avalancheRegion,
+      nearbyAvalancheRegions,
     };
 
     return NextResponse.json(response, { status: 200 });
