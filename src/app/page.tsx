@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
+import SubmitPrompt from "@/components/snow-report/SubmitPrompt";
 import FavoriteButton from "@/components/FavoriteButton";
 import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
@@ -139,6 +140,11 @@ export default function Home() {
               No locations match your search.
             </div>
           )}
+        </div>
+        <div className="mt-4">
+          <div className="flex justify-center">
+            <SubmitPrompt text="Don't see the location you are looking for?" />
+          </div>
         </div>
         <div className="mt-12">
           <Suspense fallback={null}>
