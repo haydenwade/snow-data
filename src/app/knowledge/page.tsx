@@ -10,6 +10,7 @@ import {
   Mountain,
 } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import Footer from "@/components/snow-report/Footer";
 
 type KnowledgeResource = {
   title: string;
@@ -241,6 +242,8 @@ export default function KnowledgePage() {
             />
           </div>
         </section>
+
+        <Footer />
       </div>
     </div>
   );

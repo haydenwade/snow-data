@@ -22,7 +22,7 @@ export default function MapPage() {
             showHeader={false}
           />
         </Suspense>
-        <Footer textOverride="Don't see the location you are looking for?" />
+        <Footer />
       </div>
     </div>
   );

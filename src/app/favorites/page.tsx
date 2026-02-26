@@ -141,18 +141,21 @@ export default function FavoritesPage() {
   if (!favorites.length) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100">
-        <div className="max-w-6xl mx-auto px-4 py-20 text-center">
-          <Star className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">No favorites yet</h1>
-          <p className="text-slate-400 mb-6">
-            Star locations to see them here for quick comparison.
-          </p>
-          <Link
-            href="/"
-            className="inline-block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-sm"
-          >
-            Browse Locations
-          </Link>
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-28">
+          <div className="text-center">
+            <Star className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold mb-2">No favorites yet</h1>
+            <p className="text-slate-400 mb-6">
+              Star locations to see them here for quick comparison.
+            </p>
+            <Link
+              href="/"
+              className="inline-block px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition text-sm"
+            >
+              Browse Locations
+            </Link>
+          </div>
+          <Footer />
         </div>
       </div>
     );

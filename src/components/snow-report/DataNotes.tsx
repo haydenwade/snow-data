@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { MountainLocation } from "@/types/location";
-import { Info, Database, Cloud } from "lucide-react";
+import { Info, Database, Cloud, AlertTriangle, Map } from "lucide-react";
 
 export default function DataNotes(props:{location:MountainLocation}) {
   const { location } = props;
@@ -57,10 +58,52 @@ export default function DataNotes(props:{location:MountainLocation}) {
             </p>
           </div>
         </details>
+
+        <details className="group border border-slate-700/30 rounded-lg">
+          <summary className="cursor-pointer list-none px-3 py-2 text-sm text-slate-300 hover:text-white flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-amber-400" />
+            <span>Avalanche Forecast Regions (Current / Historic)</span>
+            <span className="ml-auto text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
+            <p>
+              <strong className="text-slate-300">Data Source:</strong> Avalanche.org public map-layer data is used for regional avalanche forecast polygons and forecast metadata shown in SNOWD.
+            </p>
+            <p>
+              <strong className="text-slate-300">Current vs Historic:</strong> Current avalanche region context uses the latest map-layer response. Historic avalanche map views request archive dates when supported by Avalanche.org endpoints.
+            </p>
+            <p>
+              <strong className="text-slate-300">Important:</strong> SNOWD surfaces regional context and links to official forecasts. Always read the full official avalanche center forecast before traveling in avalanche terrain.
+            </p>
+          </div>
+        </details>
+
+        <details className="group border border-slate-700/30 rounded-lg">
+          <summary className="cursor-pointer list-none px-3 py-2 text-sm text-slate-300 hover:text-white flex items-center gap-2">
+            <Map className="h-4 w-4 text-emerald-400" />
+            <span>Maps & Attribution</span>
+            <span className="ml-auto text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+          </summary>
+          <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
+            <p>
+              <strong className="text-slate-300">Station Pages:</strong> Station location maps use an embedded OpenStreetMap view.
+            </p>
+            <p>
+              <strong className="text-slate-300">Map Page Basemaps:</strong> SNOWD&apos;s avalanche map supports Carto Positron, Esri World Imagery, and OpenTopoMap basemaps with on-map attribution labels.
+            </p>
+            <p>
+              <strong className="text-slate-300">Full Attribution:</strong> See the <Link href="/data" className="underline hover:text-slate-200">Data &amp; Attribution page</Link> for source links and methodology details.
+            </p>
+          </div>
+        </details>
       </div>
 
       <p className="text-xs text-slate-500 mt-4 text-center">
-        Data refreshed from live sources. Forecast accuracy decreases beyond 3 days.
+        Data refreshed from live sources. Forecast accuracy decreases beyond 3 days.{" "}
+        <Link href="/data" className="underline hover:text-slate-300">
+          Full source attribution & methodology
+        </Link>
+        .
       </p>
     </div>
   );
