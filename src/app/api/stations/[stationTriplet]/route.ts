@@ -1,3 +1,4 @@
+import { findAvalancheRegionForPoint } from "@/lib/server/avalanche-map-layer";
 import {
   fetchStationByTriplet,
   findLocationByTriplet,
@@ -38,11 +39,20 @@ export async function GET(
     }
 
     const locationMatch = findLocationByTriplet(station.stationTriplet);
+    const location = toMountainLocation(station, locationMatch);
+
+    let avalancheRegion = null;
+    try {
+      avalancheRegion = await findAvalancheRegionForPoint(location.lat, location.lon);
+    } catch {
+      avalancheRegion = null;
+    }
 
     const response: StationDetailResponse = {
       station: toStationSummary(station, locationMatch),
-      location: toMountainLocation(station, locationMatch),
+      location,
       locationMatch,
+      avalancheRegion,
     };
 
     return NextResponse.json(response, { status: 200 });

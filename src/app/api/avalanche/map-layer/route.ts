@@ -1,32 +1,24 @@
+import { getCachedAvalancheMapLayer } from "@/lib/server/avalanche-map-layer";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-const AVALANCHE_MAP_LAYER_URL =
-  "https://api.avalanche.org/v2/public/products/map-layer";
-
 export async function GET() {
   try {
-    const response = await fetch(AVALANCHE_MAP_LAYER_URL, {
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
+    const cacheEntry = await getCachedAvalancheMapLayer();
+    const ttlSeconds = Math.max(60, cacheEntry.ttlSeconds);
 
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      return NextResponse.json(
-        {
-          error: `Avalanche.org map-layer request failed (${response.status}): ${body.slice(0, 300)}`,
-        },
-        { status: 502 },
-      );
-    }
-
-    const json = await response.json();
-    const nextResponse = NextResponse.json(json, { status: 200 });
-    nextResponse.headers.set("Cache-Control", "public, max-age=300");
+    const nextResponse = NextResponse.json(cacheEntry.rawJson, { status: 200 });
+    nextResponse.headers.set(
+      "Cache-Control",
+      `public, max-age=60, s-maxage=${ttlSeconds}, stale-while-revalidate=300`,
+    );
+    nextResponse.headers.set("CDN-Cache-Control", `public, s-maxage=${ttlSeconds}`);
+    nextResponse.headers.set(
+      "Vercel-CDN-Cache-Control",
+      `public, s-maxage=${ttlSeconds}, stale-while-revalidate=300`,
+    );
+    nextResponse.headers.set("X-Snowd-Cache", cacheEntry.cacheStatus);
     return nextResponse;
   } catch (error) {
     return NextResponse.json(
