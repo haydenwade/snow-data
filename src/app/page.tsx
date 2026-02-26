@@ -38,7 +38,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <div className="max-w-6xl mx-auto px-4 pt-8 pb-28">
+      <div className="max-w-6xl mx-auto px-4 pt-4 pb-28">
         {/* Hero */}
         <div className="text-center mb-6">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">

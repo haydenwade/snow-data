@@ -21,6 +21,7 @@ type StationsExplorerSectionProps = {
   description?: string;
   enableAvalancheArchive?: boolean;
   sectionId?: string;
+  showHeader?: boolean;
 };
 
 function parseStatesFromQuery(raw: string | null) {
@@ -76,6 +77,7 @@ export default function StationsExplorerSection({
   description = "Pan and zoom the map to find mountain weather stations across the West. Click a marker to see current snow depth, recent snowfall, forecast, and long-term history for that spot.",
   enableAvalancheArchive = false,
   sectionId = "stations",
+  showHeader = true,
 }: StationsExplorerSectionProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -201,12 +203,14 @@ export default function StationsExplorerSection({
 
   return (
     <section id={sectionId} className="space-y-6 scroll-mt-20">
-      <section className="space-y-3 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-          {title}
-        </h2>
-        <p className="text-slate-300 max-w-3xl mx-auto">{description}</p>
-      </section>
+      {showHeader ? (
+        <section className="space-y-3 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+            {title}
+          </h2>
+          <p className="text-slate-300 max-w-3xl mx-auto">{description}</p>
+        </section>
+      ) : null}
 
       {error ? <div className="text-xs text-red-400">{error}</div> : null}
 

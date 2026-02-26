@@ -9,6 +9,7 @@ import {
   Info,
   Mountain,
 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 type KnowledgeResource = {
   title: string;
@@ -162,20 +163,12 @@ function ExplainerCard({
 export default function KnowledgePage() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <div className="mx-auto max-w-5xl px-4 pt-8 pb-20">
-        <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-800/40 p-6">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs font-medium text-slate-300">
-            <BookOpen className="h-3.5 w-3.5" />
-            Knowledge & Reference
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">
-            Avalanche Knowledge & SNOWD Data Guide
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
-            Learn how to read avalanche forecasts, understand danger ratings and
-            roses, and interpret how SNOWD displays snow and forecast data.
-          </p>
-        </div>
+      <div className="mx-auto max-w-5xl px-4 pt-4 pb-20">
+        <PageHeader
+          icon={BookOpen}
+          title="Avalanche Knowledge & SNOWD Data Guide"
+          description="Learn how to read avalanche forecasts, understand danger ratings and roses, and interpret how SNOWD displays snow and forecast data."
+        />
 
         <div className="mb-8 rounded-xl border border-amber-400/30 bg-amber-500/10 p-4">
           <div className="flex items-center gap-2.5">

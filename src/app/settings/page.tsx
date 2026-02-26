@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { LocateFixed, MapPin, Ruler, Settings, Star, Trash2 } from "lucide-react";
 import LocationPickerMap from "@/components/settings/LocationPickerMap";
 import Footer from "@/components/snow-report/Footer";
+import PageHeader from "@/components/PageHeader";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useUserSettings } from "@/hooks/useUserSettings";
 
@@ -161,18 +162,13 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
-      <div className="max-w-4xl mx-auto px-4 pt-8 pb-28">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/50">
-            <Settings className="h-5 w-5 text-slate-200" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
-            <p className="text-sm text-slate-400">
-              Manage app-wide preferences for snow reports and favorites.
-            </p>
-          </div>
-        </div>
+      <div className="max-w-4xl mx-auto px-4 pt-4 pb-28">
+        <PageHeader
+          icon={Settings}
+          title="Settings"
+          description="Manage app-wide preferences for snow reports and favorites."
+          className="mb-6"
+        />
 
         <div className="space-y-4">
           <section className="rounded-2xl border border-slate-700/50 bg-slate-800/40 p-5">
