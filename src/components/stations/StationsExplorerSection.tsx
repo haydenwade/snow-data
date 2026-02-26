@@ -6,7 +6,7 @@ import {
   getLocalIsoDate,
   normalizeAvalancheArchiveDate,
 } from "@/components/stations/avalanche-archive-date";
-import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
+import StationsExplorerSkeleton from "@/components/skeletons/StationsExplorerSkeleton";
 import { GeoBounds, StationSummary } from "@/types/station";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -152,9 +152,15 @@ export default function StationsExplorerSection({
       stateCodes: viewport.stateCodes,
       bounds: viewport.bounds,
     };
-    const timer = setTimeout(() => {
+    if (!hasLoadedOnce) {
       setIsRefreshing(true);
       setError(null);
+    }
+    const timer = setTimeout(() => {
+      if (hasLoadedOnce) {
+        setIsRefreshing(true);
+        setError(null);
+      }
 
       fetchStations(requestViewport, abortController.signal)
         .then((data) => {
@@ -200,6 +206,7 @@ export default function StationsExplorerSection({
       };
     });
   }, []);
+  const showInitialMapLoading = !hasLoadedOnce && (viewport.bounds == null || isRefreshing);
 
   return (
     <section id={sectionId} className="space-y-6 scroll-mt-20">
@@ -214,22 +221,27 @@ export default function StationsExplorerSection({
 
       {error ? <div className="text-xs text-red-400">{error}</div> : null}
 
-      {!hasLoadedOnce && isRefreshing ? (
-        <div className={enableAvalancheArchive ? "flex justify-center" : undefined}>
-          <SnowLoadingGraphic
-            className={enableAvalancheArchive ? "origin-center scale-90" : "origin-left scale-90"}
+      <div className="relative">
+        {showInitialMapLoading ? (
+          <div className="pointer-events-none absolute inset-0 z-10">
+            <StationsExplorerSkeleton />
+          </div>
+        ) : null}
+
+        <div
+          className={showInitialMapLoading ? "opacity-0 pointer-events-none" : undefined}
+          aria-hidden={showInitialMapLoading}
+        >
+          <StationsExplorerMap
+            stations={stations}
+            isRefreshing={isRefreshing}
+            onViewportChange={onViewportChange}
+            enableAvalancheArchive={enableAvalancheArchive}
+            avalancheArchiveDate={avalancheArchiveDate}
+            onAvalancheArchiveDateChange={setAvalancheArchiveDate}
           />
         </div>
-      ) : null}
-
-      <StationsExplorerMap
-        stations={stations}
-        isRefreshing={isRefreshing}
-        onViewportChange={onViewportChange}
-        enableAvalancheArchive={enableAvalancheArchive}
-        avalancheArchiveDate={avalancheArchiveDate}
-        onAvalancheArchiveDateChange={setAvalancheArchiveDate}
-      />
+      </div>
     </section>
   );
 }

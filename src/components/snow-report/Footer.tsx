@@ -9,7 +9,7 @@ export default function Footer({textOverride}: {textOverride?: string}) {
 				<div className="flex justify-center">
 					<SubmitPrompt text={textOverride} />
 				</div>
-				<div className="mt-2 flex justify-start">
+				<div className="mt-4 sm:mt-2 flex justify-start">
 					<Link
 						href="/data"
 						className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 transition"

@@ -187,7 +187,13 @@ export default function StationPage() {
   if (!location) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        {loading ? <SnowLoadingGraphic /> : "Station not found"}
+        {loading ? (
+          <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+            <SnowLoadingGraphic />
+          </div>
+        ) : (
+          "Station not found"
+        )}
       </div>
     );
   }
@@ -198,6 +204,7 @@ export default function StationPage() {
     return dayDate >= new Date(today.getFullYear(), today.getMonth(), today.getDate());
   });
   const showForecastSections = loading || forecast.length > 0;
+  const showAvalancheInfo = !loading && (avalancheRegion != null || nearbyAvalancheRegions.length > 0);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -214,7 +221,15 @@ export default function StationPage() {
       ) : null}
 
       <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
-        <CurrentConditions stationKey={stationKey} unit={unit} />
+        <CurrentConditions stationKey={stationKey} unit={unit}>
+          {showAvalancheInfo ? (
+            <AvalancheInfo
+              loading={loading}
+              avalancheRegion={avalancheRegion}
+              nearbyAvalancheRegions={nearbyAvalancheRegions}
+            />
+          ) : null}
+        </CurrentConditions>
 
         {showForecastSections ? (
           <>
@@ -247,14 +262,7 @@ export default function StationPage() {
 
         <section className="grid md:grid-cols-2 gap-6">
           <ResortInfoLinks location={location} loading={loading} />
-            <section className="w-full min-w-0 flex flex-col gap-6">
-            <AvalancheInfo
-              loading={loading}
-              avalancheRegion={avalancheRegion}
-              nearbyAvalancheRegions={nearbyAvalancheRegions}
-            />
-            <TrafficInfo location={location} loading={loading} />
-          </section>
+          <TrafficInfo location={location} loading={loading} />
         </section>
 
         {!loading ? (

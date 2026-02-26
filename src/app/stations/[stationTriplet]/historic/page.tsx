@@ -134,7 +134,13 @@ export default function StationHistoricPage() {
   if (!location) {
     return (
       <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center">
-        {loading ? <SnowLoadingGraphic /> : "Station not found"}
+        {loading ? (
+          <div className="fixed inset-0 z-0 flex items-center justify-center pointer-events-none">
+            <SnowLoadingGraphic />
+          </div>
+        ) : (
+          "Station not found"
+        )}
       </div>
     );
   }

@@ -20,7 +20,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="bg-slate-900 border-b border-slate-800">
+    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-900">
       <div className="mx-auto max-w-6xl px-4">
         <div className="h-14 flex items-center justify-between gap-4">
           <Link

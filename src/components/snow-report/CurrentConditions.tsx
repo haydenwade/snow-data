@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Wind, Sunrise, Sunset, Thermometer } from "lucide-react";
 import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
 import CurrentConditionsChart from "./CurrentConditionsChart";
@@ -16,9 +16,11 @@ import { SkyIcon } from "./SkyIcon";
 export default function CurrentConditions({
   stationKey,
   unit = "in",
+  children,
 }: {
   stationKey?: string;
   unit?: Unit;
+  children?: ReactNode;
 }) {
   const [resp, setResp] = useState<ApiResp | null>(null);
   const [loading, setLoading] = useState(true);
@@ -202,7 +204,20 @@ export default function CurrentConditions({
               </div>
             </div>
 
-            <CurrentConditionsChart resp={resp} unit={unit} />
+            {children ? (
+              <div className="border-t border-slate-700/50 pt-4">
+                <div className="grid gap-4 lg:grid-cols-2 items-start">
+                  <div className="min-w-0">
+                    <CurrentConditionsChart resp={resp} unit={unit} />
+                  </div>
+                  <div className="min-w-0">
+                    {children}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <CurrentConditionsChart resp={resp} unit={unit} />
+            )}
           </div>
         )}
       </div>
