@@ -656,13 +656,25 @@ export default function StationsExplorerMap({
   isRefreshing: boolean;
   onViewportChange: (viewport: StationsMapViewport) => void;
 }) {
-  const { lastApprovedLocation, setLastApprovedLocation } = useUserSettings();
+  const {
+    isClient,
+    preferredLocation,
+    lastApprovedLocation,
+    setLastApprovedLocation,
+  } = useUserSettings();
+  const preferredCenterLocation = preferredLocation
+    ? {
+        lat: preferredLocation.lat,
+        lon: preferredLocation.lon,
+      }
+    : null;
   const cachedCurrentLocation = lastApprovedLocation
     ? {
         lat: lastApprovedLocation.lat,
         lon: lastApprovedLocation.lon,
       }
     : null;
+  const initialCenterLocation = preferredCenterLocation ?? cachedCurrentLocation;
   const mapRef = useRef<HTMLDivElement | null>(null);
   const avalanchePopupRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -671,9 +683,9 @@ export default function StationsExplorerMap({
     height: 0,
   });
   const [center, setCenter] = useState(
-    cachedCurrentLocation ?? DEFAULT_CENTER,
+    initialCenterLocation ?? DEFAULT_CENTER,
   );
-  const [zoom, setZoom] = useState(cachedCurrentLocation ? 10 : DEFAULT_ZOOM);
+  const [zoom, setZoom] = useState(initialCenterLocation ? 10 : DEFAULT_ZOOM);
   const [basemap, setBasemap] = useState<BasemapKey>("light");
   const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false);
   const [isStationLayerVisible, setIsStationLayerVisible] = useState(true);
@@ -698,6 +710,7 @@ export default function StationsExplorerMap({
   const pinchRef = useRef<PinchGesture | null>(null);
   const lastViewportKeyRef = useRef("");
   const lastWheelZoomAtRef = useRef(0);
+  const didInitializeLocationRef = useRef(false);
   const currentLocation = liveCurrentLocation ?? cachedCurrentLocation;
 
   useEffect(() => {
@@ -1120,6 +1133,57 @@ export default function StationsExplorerMap({
     );
   };
 
+  const applyCachedCurrentLocation = (location: { lat: number; lon: number }) => {
+    setCenter(location);
+    setZoom((current) => Math.max(current, 10));
+  };
+
+  const hasStoredLocationInUserSettingsCache = () => {
+    if (typeof window === "undefined") return false;
+
+    const isStoredLocationShape = (value: unknown) => {
+      if (!value || typeof value !== "object") return false;
+      const candidate = value as { lat?: unknown; lon?: unknown };
+      return typeof candidate.lat === "number" && typeof candidate.lon === "number";
+    };
+
+    try {
+      const raw = window.localStorage.getItem("snowd-user-settings");
+      if (!raw) return false;
+      const parsed = JSON.parse(raw) as {
+        preferredLocation?: unknown;
+        lastApprovedLocation?: unknown;
+      };
+
+      return (
+        isStoredLocationShape(parsed?.preferredLocation) ||
+        isStoredLocationShape(parsed?.lastApprovedLocation)
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (!isClient) return;
+    if (didInitializeLocationRef.current) return;
+
+    if (initialCenterLocation) {
+      didInitializeLocationRef.current = true;
+      queueMicrotask(() => {
+        applyCachedCurrentLocation(initialCenterLocation);
+      });
+      return;
+    }
+
+    if (hasStoredLocationInUserSettingsCache()) return;
+
+    didInitializeLocationRef.current = true;
+    queueMicrotask(() => {
+      requestCurrentLocation();
+    });
+  }, [initialCenterLocation, isClient, requestCurrentLocation]);
+
   const recenterOnCurrentLocation = () => {
     if (currentLocation) {
       setCenter(currentLocation);
@@ -1131,7 +1195,7 @@ export default function StationsExplorerMap({
   };
 
   const canRequestBrowserLocation =
-    typeof navigator !== "undefined" && Boolean(navigator.geolocation);
+    isClient && typeof navigator !== "undefined" && Boolean(navigator.geolocation);
   const canUseLocateButton = Boolean(currentLocation) || canRequestBrowserLocation;
 
   return (
