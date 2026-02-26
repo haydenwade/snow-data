@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   AlertTriangle,
   LoaderCircle,
+  Layers,
   LocateFixed,
   MapPin,
   Minus,
@@ -117,6 +118,19 @@ const BASEMAPS: Record<BasemapKey, BasemapConfig> = {
   },
 };
 const BASEMAP_ORDER: BasemapKey[] = ["light", "satellite", "topo"];
+
+const AVALANCHE_DANGER_LEGEND_ITEMS: Array<{
+  label: string;
+  color: string;
+  textColor?: string;
+}> = [
+  { label: "General Info", color: "#6ea4db" },
+  { label: "1 Low", color: "#00C346" },
+  { label: "2 Moderate", color: "#FCFC00", textColor: "#111827" },
+  { label: "3 Considerable", color: "#FF9100", textColor: "#111827" },
+  { label: "4 High", color: "#CC332C" },
+  { label: "5 Extreme", color: "#222222" },
+];
 
 type ProjectedStation = {
   station: StationSummary;
@@ -661,6 +675,9 @@ export default function StationsExplorerMap({
   );
   const [zoom, setZoom] = useState(cachedCurrentLocation ? 10 : DEFAULT_ZOOM);
   const [basemap, setBasemap] = useState<BasemapKey>("light");
+  const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false);
+  const [isStationLayerVisible, setIsStationLayerVisible] = useState(true);
+  const [isAvalancheLayerVisible, setIsAvalancheLayerVisible] = useState(true);
   const [selectedStationTriplet, setSelectedStationTriplet] = useState<string | null>(null);
   const [selectedAvalancheRegionId, setSelectedAvalancheRegionId] = useState<string | null>(
     null,
@@ -953,6 +970,7 @@ export default function StationsExplorerMap({
     if (!mapState) return;
     const target = event.target as HTMLElement;
     if (target.closest('[data-map-interactive="true"]')) return;
+    setIsLayerMenuOpen(false);
     setSelectedStationTriplet(null);
     setSelectedAvalancheRegionId(null);
     activePointersRef.current.set(event.pointerId, {
@@ -1177,6 +1195,126 @@ export default function StationsExplorerMap({
               <LocateFixed className="h-3.5 w-3.5" />
             )}
           </button>
+          <div className="relative">
+            <button
+              type="button"
+              data-map-interactive="true"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => setIsLayerMenuOpen((current) => !current)}
+              aria-haspopup="menu"
+              aria-expanded={isLayerMenuOpen}
+              className={[
+                "inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-xs border transition",
+                isLayerMenuOpen
+                  ? "text-slate-100 border-slate-400 bg-slate-800"
+                  : "text-slate-300 border-slate-600/70 bg-slate-900/60 hover:bg-slate-800/80",
+              ].join(" ")}
+              title="Layer visibility"
+            >
+              <Layers className="h-3.5 w-3.5" />
+              Layers
+            </button>
+
+            {isLayerMenuOpen ? (
+              <div
+                data-map-interactive="true"
+                className="absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-slate-600 bg-slate-900/95 p-2 shadow-2xl"
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                <div className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                  Map Layers
+                </div>
+
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left hover:bg-slate-800/80"
+                  role="switch"
+                  aria-checked={isStationLayerVisible}
+                  onClick={() => {
+                    setIsStationLayerVisible((current) => {
+                      const next = !current;
+                      if (!next) setSelectedStationTriplet(null);
+                      return next;
+                    });
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={[
+                        "h-2 w-2 rounded-full",
+                        isStationLayerVisible ? "bg-emerald-300" : "bg-slate-500",
+                      ].join(" ")}
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs font-medium text-slate-100">Station dots</span>
+                  </div>
+                  <span
+                    className={[
+                      "relative inline-flex h-5 w-9 items-center rounded-full border transition",
+                      isStationLayerVisible
+                        ? "border-emerald-400/60 bg-emerald-500/20"
+                        : "border-slate-600 bg-slate-800",
+                    ].join(" ")}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={[
+                        "inline-block h-3.5 w-3.5 rounded-full transition",
+                        isStationLayerVisible
+                          ? "translate-x-4 bg-emerald-300"
+                          : "translate-x-0.5 bg-slate-400",
+                      ].join(" ")}
+                    />
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  className="mt-1 flex w-full items-center justify-between rounded-md px-2 py-2 text-left hover:bg-slate-800/80"
+                  role="switch"
+                  aria-checked={isAvalancheLayerVisible}
+                  onClick={() => {
+                    setIsAvalancheLayerVisible((current) => {
+                      const next = !current;
+                      if (!next) setSelectedAvalancheRegionId(null);
+                      return next;
+                    });
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={[
+                        "h-2 w-2 rounded-full",
+                        isAvalancheLayerVisible ? "bg-sky-300" : "bg-slate-500",
+                      ].join(" ")}
+                      aria-hidden="true"
+                    />
+                    <span className="text-xs font-medium text-slate-100">
+                      Avalanche danger
+                    </span>
+                  </div>
+                  <span
+                    className={[
+                      "relative inline-flex h-5 w-9 items-center rounded-full border transition",
+                      isAvalancheLayerVisible
+                        ? "border-sky-400/60 bg-sky-500/20"
+                        : "border-slate-600 bg-slate-800",
+                    ].join(" ")}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className={[
+                        "inline-block h-3.5 w-3.5 rounded-full transition",
+                        isAvalancheLayerVisible
+                          ? "translate-x-4 bg-sky-300"
+                          : "translate-x-0.5 bg-slate-400",
+                      ].join(" ")}
+                    />
+                  </span>
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -1208,7 +1346,7 @@ export default function StationsExplorerMap({
             )),
           )}
 
-          {mapState?.avalancheRegions.length ? (
+          {isAvalancheLayerVisible && mapState?.avalancheRegions.length ? (
             <svg
               className="absolute inset-0 z-20 pointer-events-none"
               viewBox={`0 0 ${size.width} ${size.height}`}
@@ -1255,7 +1393,7 @@ export default function StationsExplorerMap({
             </svg>
           ) : null}
 
-          {mapState?.clusters.map((cluster) => {
+          {isStationLayerVisible ? mapState?.clusters.map((cluster) => {
             if (cluster.count > 1) {
               return (
                 <button
@@ -1310,9 +1448,9 @@ export default function StationsExplorerMap({
                 </div>
               </button>
             );
-          })}
+          }) : null}
 
-          {selectedCluster && selectedStation ? (
+          {isStationLayerVisible && selectedCluster && selectedStation ? (
             <div
               data-map-interactive="true"
               className="absolute z-50 w-72 -translate-x-1/2 -translate-y-[118%] rounded-xl border border-slate-600 bg-slate-900/95 p-3 text-sm shadow-2xl"
@@ -1342,7 +1480,7 @@ export default function StationsExplorerMap({
             </div>
           ) : null}
 
-          {selectedAvalancheRegion && selectedAvalanchePopupLayout ? (
+          {isAvalancheLayerVisible && selectedAvalancheRegion && selectedAvalanchePopupLayout ? (
             <div
               ref={avalanchePopupRef}
               data-map-interactive="true"
@@ -1565,9 +1703,31 @@ export default function StationsExplorerMap({
           </button>
         </div>
 
-        <div className="absolute left-3 bottom-3 z-50 rounded-lg border border-slate-600 bg-slate-900/85 px-2 py-1 text-[11px] text-slate-400">
+        <div className="absolute left-3 bottom-20 z-50 rounded-lg border border-slate-600 bg-slate-900/85 px-2 py-1 text-[11px] text-slate-400 sm:bottom-12">
           {BASEMAPS[basemap].attribution}
         </div>
+
+        {isAvalancheLayerVisible ? (
+          <div className="absolute inset-x-0 bottom-0 z-50 border-t border-slate-700/70 bg-slate-900/90 shadow-xl">
+            <div className="grid grid-cols-3 sm:grid-cols-6">
+              {AVALANCHE_DANGER_LEGEND_ITEMS.map((item) => (
+                <div
+                  key={item.label}
+                  className="flex min-h-5 items-center justify-center border-r border-black/20 px-1 py-0 text-center last:border-r-0 sm:min-h-6"
+                  style={{ backgroundColor: item.color }}
+                  title={item.label}
+                >
+                  <span
+                    className="text-[8px] font-bold uppercase leading-tight tracking-wide sm:text-[9px]"
+                    style={{ color: item.textColor ?? "#ffffff" }}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
 
         {!isRefreshing && stations.length === 0 ? (
           <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border border-slate-600 bg-slate-900/90 px-3 py-1 text-xs text-slate-300">
