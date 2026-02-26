@@ -46,6 +46,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Data:** snow depth (SNWD), snow water equivalent (WTEQ)
 - **Logic:** daily snowfall derived from consecutive snow depth differences
 
+### Avalanche Danger Map
+- **Source:** [Avalanche.org Public API](https://api.avalanche.org/v2/public/products/map-layer)
+- **Data:** GeoJSON forecast zone polygons, current avalanche danger, and avalanche warning status
+- **Coverage:** All U.S. avalanche centers (powers the national danger map at avalanche.org)
+
 
 ## Helpful Links:
 1. [UI - MAP](https://nwcc-apps.sc.egov.usda.gov/imap/#version=2&elements=&networks=!&states=!&counties=!&hucs=&minElevation=&maxElevation=&elementSelectType=any&activeOnly=true&activeForecastPointsOnly=false&hucLabels=false&hucIdLabels=false&hucParameterLabels=true&stationLabels=&overlays=&hucOverlays=2&basinOpacity=75&basinNoDataOpacity=25&basemapOpacity=100&maskOpacity=0&mode=data&openSections=dataElement,parameter,date,basin,options,elements,location,networks&controlsOpen=true&popup=1308:UT:SNTL&popupMulti=&popupBasin=&base=esriNgwm&displayType=station&basinType=6&dataElement=SNWD&depth=-2&parameter=OBS&frequency=DAILY&duration=I&customDuration=&dayPart=E&monthPart=E&forecastPubDay=1&forecastExceedance=50&useMixedPast=true&seqColor=1&divColor=7&scaleType=D&scaleMin=&scaleMax=&referencePeriodType=POR&referenceBegin=1991&referenceEnd=2020&minimumYears=20&hucAssociations=true&relativeDate=-2&lat=40.5965&lon=-111.5548&zoom=12.0)
@@ -54,4 +59,5 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## References:
 [SNOTEL API Swagger Docs](https://wcc.sc.egov.usda.gov/awdbRestApi/swagger-ui/index.html#/)
+[Avalanche.org Public API Docs](https://github.com/NationalAvalancheCenter/Avalanche.org-Public-API-Docs)
 [SNOTEL MCP Server](https://mcpservers.org/servers/jymmyt/snotel-mcp-server)
