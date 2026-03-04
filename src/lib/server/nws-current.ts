@@ -1,4 +1,5 @@
 import { TimeseriesPoint, ApiResp } from "@/types/current-conditions-response";
+import { cToF } from "@/components/snow-report/utils";
 
 const NWS_USER_AGENT = "snow-data (github.com)";
 const NWS_OBSERVATION_STALE_MINUTES = 60;
@@ -26,10 +27,6 @@ function minutesSince(iso?: string | null): number | null {
   const ts = Date.parse(iso);
   if (Number.isNaN(ts)) return null;
   return Math.max(0, Math.round((Date.now() - ts) / 60000));
-}
-
-function cToF(celsius: number) {
-  return (celsius * 9) / 5 + 32;
 }
 
 function msToMph(ms?: number | null) {
