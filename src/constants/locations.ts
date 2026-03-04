@@ -3,7 +3,6 @@ import { CuratedLocation } from "@/types/location";
 export const LOCATIONS: CuratedLocation[] = [
   {
     id: "parkcity",
-    stationId: "814",
     name: "Park City Mountain Resort",
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
@@ -49,7 +48,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "alta",
-    stationId: "1308",
     name: "Alta",
     logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
@@ -99,7 +97,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "snowbird",
-    stationId: "766",
     name: "Snowbird",
     logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
@@ -153,7 +150,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "brighton",
-    stationId: "366",
     name: "Brighton Resort",
     logoUrl: "/brighton-logo.png",
     stationTriplet: "366:UT:SNTL",
@@ -203,7 +199,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "powdermountain",
-    stationId: "1300",
     name: "Powder Mountain",
     logoUrl: "/powdermtn-logo.svg",
     stationTriplet: "1300:UT:SNTL",
@@ -244,7 +239,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "jacksonhole",
-    stationId: "689",
     name: "Jackson Hole",
     stationTriplet: "689:WY:SNTL",
     logoUrl: "/jacksonhole-logo.webp",
@@ -281,7 +275,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "heavenly",
-    stationId: "518",
     name: "Heavenly",
     stationTriplet: "518:CA:SNTL",
     logoUrl: "/heavenly-logo.png",
@@ -318,7 +311,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "palisades",
-    stationId: "784",
     name: "Palisades",
     stationTriplet: "784:CA:SNTL",
     logoUrl: "/palisades-logo.jpg",
@@ -355,7 +347,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "mammothmountain",
-    stationId: "MHP",
     name: "Mammoth Mountain",
     stationTriplet: "MHP:CA:MSNT",
     logoUrl: "/mammoth-logo.jpg",
@@ -401,7 +392,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "mtrose",
-    stationId: "652",
     name: "Mt Rose",
     stationTriplet: "652:NV:SNTL",
     logoUrl: "/mtrose-logo.jpg",
@@ -432,7 +422,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "pebblecreek",
-    stationId: "1299",
     name: "Pebble Creek",
     stationTriplet: "1299:ID:SNTL",
     logoUrl: "/pebblecreek-logo.png",
@@ -461,7 +450,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "snowbasin",
-    stationId: "332",
     name: "Snowbasin",
     logoUrl: "/snowbasin-logo.webp",
     stationTriplet: "332:UT:SNTL",
@@ -494,7 +482,6 @@ export const LOCATIONS: CuratedLocation[] = [
   },
   {
     id: "bigsky",
-    stationId: "590",
     name: "Big Sky",
     stationTriplet: "590:MT:SNTL",
     logoUrl: "/bigsky-logo.webp",

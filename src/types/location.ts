@@ -6,7 +6,6 @@ export type GenericLink = {
 
 export type CuratedLocation = {
   id: string;
-  stationId: string;
   name: string;
   stationTriplet: string;
   logoUrl?: string;
