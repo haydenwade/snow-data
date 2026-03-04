@@ -215,8 +215,8 @@ export default function SnowSummaryStrip({
                   return (
                     <div key={i} className="flex-1 text-center">
                       <div className="font-medium text-slate-300">{displayVal}</div>
-                      <div className="opacity-70">{dayOfMonth(bar.date)}</div>
                       <div className="text-[9px] opacity-60">{dayOfWeek(bar.date)}</div>
+                      <div className="opacity-70">{dayOfMonth(bar.date)}</div>
                     </div>
                   );
                 })}
