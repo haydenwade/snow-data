@@ -1,4 +1,9 @@
-import { ForecastDaily, ForecastGridData, SeriesPoint } from "@/types/forecast";
+import {
+  ForecastDaily,
+  ForecastGridData,
+  SeriesPoint,
+  Unit,
+} from "@/types/forecast";
 
 // Return YYYY-MM-DD string for a given date in the provided IANA time zone
 export function dateKeyInZone(d: Date, timeZone: string = "America/Denver") {
@@ -51,6 +56,22 @@ export function celsiusFromF(f: number) {
 
 export function kphFromMph(mph: number) {
   return Math.round(mph * 1.60934);
+}
+
+export function metersFromFeet(feet: number) {
+  return Math.round(feet * 0.3048);
+}
+
+export function formatElevationForUnit(
+  elevationFt: number | null | undefined,
+  unit: Unit,
+  fallback = "Unknown",
+) {
+  if (elevationFt == null || !Number.isFinite(elevationFt)) return fallback;
+  if (unit === "mm") {
+    return `${metersFromFeet(elevationFt).toLocaleString("en-US")} m`;
+  }
+  return `${Math.round(elevationFt).toLocaleString("en-US")} ft`;
 }
 
 
@@ -338,4 +359,3 @@ export function formatDateYYYYMMDD(dateStr: string) {
     timeZone: "UTC",
   });
 }
-

@@ -2,7 +2,6 @@ import SunCalc from "suncalc";
 import { ApiResp, TimeseriesPoint } from "@/types/current-conditions-response";
 import { awdbDateToIso, fetchAwdbJson } from "./awdb";
 import { AwdbStation, inferTimeZone } from "./stations";
-import { MountainLocation } from "@/types/location";
 import { fetchNwsCurrentAndTimeseries } from "./nws-current";
 import { fetchOpenMeteoCurrentAndTimeseries } from "./open-meteo-current";
 
@@ -171,13 +170,11 @@ function getLatestObservedTemperaturePoint(
 
 export async function fetchSnotelCurrentConditions({
   station,
-  locationMatch,
 }: {
   station: AwdbStation;
-  locationMatch: MountainLocation | null;
 }): Promise<SnotelCurrentResponse> {
-  const latitude = station.latitude ?? locationMatch?.lat ?? null;
-  const longitude = station.longitude ?? locationMatch?.lon ?? null;
+  const latitude = station.latitude ?? null;
+  const longitude = station.longitude ?? null;
   if (latitude == null || longitude == null) {
     throw new Error("Station is missing latitude/longitude");
   }
@@ -191,7 +188,7 @@ export async function fetchSnotelCurrentConditions({
     unitSystem: "ENGLISH",
   });
 
-  const tz = inferTimeZone(station, locationMatch);
+  const tz = inferTimeZone(station);
   const byElement = toSeriesMap(hourlyData, station.dataTimeZone ?? null);
   const temperatureHistoryData = toTemperatureHistorySeries(byElement, tz);
   const latestTemp = getLatestObservedTemperaturePoint(byElement);

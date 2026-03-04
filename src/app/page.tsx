@@ -1,40 +1,71 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Footer from "@/components/snow-report/Footer";
 import SubmitPrompt from "@/components/snow-report/SubmitPrompt";
 import FavoriteButton from "@/components/FavoriteButton";
-import { LOCATIONS } from "@/constants/locations";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
 import StationsExplorerSection from "@/components/stations/StationsExplorerSection";
+import { fetchCuratedLocations } from "@/lib/api";
+import { MountainLocation } from "@/types/location";
+import { formatElevationForUnit } from "@/components/snow-report/utils";
+import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
+import { useUserSettings } from "@/hooks/useUserSettings";
 
 export default function Home() {
   const [query, setQuery] = useState("");
+  const { unit } = useUserSettings();
+  const [locations, setLocations] = useState<MountainLocation[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLocations = async () => {
+      try {
+        const data = await fetchCuratedLocations();
+        if (cancelled) return;
+        setLocations(data);
+      } catch {
+        if (cancelled) return;
+        setLocations([]);
+      } finally {
+        if (cancelled) return;
+        setLoadingLocations(false);
+      }
+    };
+
+    void loadLocations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredLocations = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return LOCATIONS;
+    if (!q) return locations;
 
-    return LOCATIONS.filter((l) => {
+    return locations.filter((location) => {
       const haystack = [
-        l.name,
-        l.city,
-        l.state,
-        l.county,
-        l.elevation,
-        l.network,
-        l.id,
-        l.stationId,
-        l.stationTriplet,
+        location.name,
+        location.city,
+        location.state,
+        location.county,
+        formatElevationForUnit(location.elevationFt, unit),
+        location.network,
+        location.id,
+        location.stationId,
+        location.stationTriplet,
       ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query]);
+  }, [locations, query, unit]);
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
@@ -82,51 +113,59 @@ export default function Home() {
           id="locations"
           className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 min-w-0"
         >
-          {filteredLocations.map((location) => (
-            <Link
-              key={location.id}
-              href={`/stations/${encodeURIComponent(location.id)}`}
-              className="relative block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
-            >
-              <FavoriteButton
-                locationId={location.id}
-                className="absolute top-2 right-2 z-10"
-              />
-              <div className="flex items-center gap-4 mb-3">
-                {location.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={location.logoUrl}
-                    alt={`${location.name} logo`}
-                    className="h-12 w-12 object-contain rounded-full shrink-0 overflow-hidden"
-                  />
-                ) : (
-                  <div className="h-12 w-12 rounded-full bg-slate-700/40 flex items-center justify-center text-lg font-semibold text-slate-100 shrink-0 overflow-hidden">
-                    {String(location.name || "")
-                      .split(" ")[0]
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
-                )}
-                <div className="min-w-0 pr-1">
-                  <h2 className="text-xl font-semibold truncate">
-                    {location.name}
-                  </h2>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
-                    <Mountain className="h-3.5 w-3.5" />
-                    <span className="truncate">
-                      {location.city}, {location.state}
-                    </span>
+          {loadingLocations ? (
+            <div className="col-span-full text-center text-slate-400 py-8">
+              <SnowLoadingGraphic className="mx-auto" />
+            </div>
+          ) : (
+            filteredLocations.map((location) => (
+              <Link
+                key={location.id}
+                href={`/stations/${encodeURIComponent(location.id)}`}
+                className="relative block w-full min-w-0 p-6 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 hover:border-slate-600"
+              >
+                <FavoriteButton
+                  locationId={location.id}
+                  className="absolute top-2 right-2 z-10"
+                />
+                <div className="flex items-center gap-4 mb-3">
+                  {location.logoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={location.logoUrl}
+                      alt={`${location.name} logo`}
+                      className="h-12 w-12 object-contain rounded-full shrink-0 overflow-hidden"
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-slate-700/40 flex items-center justify-center text-lg font-semibold text-slate-100 shrink-0 overflow-hidden">
+                      {String(location.name || "")
+                        .split(" ")[0]
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0 pr-1">
+                    <h2 className="text-xl font-semibold truncate">
+                      {location.name}
+                    </h2>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+                      <Mountain className="h-3.5 w-3.5" />
+                      <span className="truncate">
+                        {location.city}, {location.state}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-sm text-slate-400 space-y-1 wrap-break-word">
-                <p className="truncate">County: {location.county}</p>
-                <p className="truncate">Elevation: {location.elevation}</p>
-              </div>
-            </Link>
-          ))}
-          {filteredLocations.length === 0 && (
+                <div className="text-sm text-slate-400 space-y-1 wrap-break-word">
+                  <p className="truncate">County: {location.county}</p>
+                  <p className="truncate">
+                    Elevation: {formatElevationForUnit(location.elevationFt, unit)}
+                  </p>
+                </div>
+              </Link>
+            ))
+          )}
+          {!loadingLocations && filteredLocations.length === 0 && (
             <div className="col-span-full text-center text-slate-400 py-8">
               No locations match your search.
             </div>

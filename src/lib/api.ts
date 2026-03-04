@@ -1,5 +1,6 @@
 import { HistoricDay } from "@/types/historic";
 import { ForecastGridData } from "@/types/forecast";
+import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
 export async function fetchHistoric(
@@ -43,6 +44,26 @@ export async function fetchStationDetail(
   }
 
   return (await response.json()) as StationDetailResponse;
+}
+
+export async function fetchCuratedLocations(): Promise<MountainLocation[]> {
+  const response = await fetch("/api/stations/curated", {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let detail = "";
+    try {
+      const json = await response.json();
+      detail = json?.error || JSON.stringify(json);
+    } catch {}
+    throw new Error(
+      `Curated stations fetch failed: ${response.status}${detail ? ` — ${detail}` : ""}`
+    );
+  }
+
+  const payload = await response.json();
+  return (payload?.data ?? []) as MountainLocation[];
 }
 
 export async function fetchForecastGrid(

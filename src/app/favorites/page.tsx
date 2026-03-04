@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
-import { LOCATIONS } from "@/constants/locations";
 import { fetchHistoric, fetchForecastGrid, fetchStationDetail } from "@/lib/api";
 import {
   aggregateForecastToDaily,
@@ -46,11 +45,6 @@ export default function FavoritesPage() {
     const loadFavoriteLocations = async () => {
       const results = await Promise.all(
         favorites.map(async (favoriteId) => {
-          const curatedLocation = LOCATIONS.find((location) => location.id === favoriteId);
-          if (curatedLocation) {
-            return { favoriteId, location: curatedLocation } as FavoriteLocationEntry;
-          }
-
           try {
             const detail = await fetchStationDetail(favoriteId);
             return { favoriteId, location: detail.location } as FavoriteLocationEntry;

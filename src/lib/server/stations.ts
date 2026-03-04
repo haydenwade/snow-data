@@ -5,7 +5,7 @@ import {
   stationTripletToKey,
 } from "@/lib/station-key";
 import { normalizeTripletInput } from "@/lib/station-triplet";
-import { MountainLocation } from "@/types/location";
+import { CuratedLocation, MountainLocation } from "@/types/location";
 import { StationSummary } from "@/types/station";
 import { fetchAwdbJson } from "./awdb";
 
@@ -102,11 +102,6 @@ function fallbackTimeZoneFromOffset(offsetHours: number | null | undefined) {
   return `Etc/GMT${sign}${Math.abs(rounded)}`;
 }
 
-function formatElevation(elevationFt: number | null | undefined) {
-  if (elevationFt == null || Number.isNaN(elevationFt)) return "Unknown";
-  return `${Math.round(elevationFt).toLocaleString("en-US")} ft`;
-}
-
 function buildDefaultRadarLink(lat: number, lon: number) {
   const settings = {
     agenda: {
@@ -173,9 +168,7 @@ export function resolveTripletFromStationKey(stationKey: string) {
 
 export function inferTimeZone(
   station: Pick<AwdbStation, "stateCode" | "dataTimeZone">,
-  locationMatch: MountainLocation | null,
 ) {
-  if (locationMatch?.timezone) return locationMatch.timezone;
   const byState = DEFAULT_TZ_BY_STATE[(station.stateCode ?? "").toUpperCase()];
   if (byState) return byState;
   return fallbackTimeZoneFromOffset(station.dataTimeZone ?? null);
@@ -183,7 +176,7 @@ export function inferTimeZone(
 
 export function toStationSummary(
   station: AwdbStation,
-  locationMatch: MountainLocation | null,
+  locationMatch: CuratedLocation | null,
 ): StationSummary {
   const derivedStationKey =
     stationTripletToKey(station.stationTriplet) ??
@@ -218,18 +211,20 @@ export function toStationSummary(
 
 export function toMountainLocation(
   station: AwdbStation,
-  locationMatch: MountainLocation | null,
+  locationMatch: CuratedLocation | null,
 ): MountainLocation {
   const latitude =
-    locationMatch?.lat ??
-    (station.latitude == null || Number.isNaN(station.latitude)
+    station.latitude == null || Number.isNaN(station.latitude)
       ? 0
-      : station.latitude);
+      : station.latitude;
   const longitude =
-    locationMatch?.lon ??
-    (station.longitude == null || Number.isNaN(station.longitude)
+    station.longitude == null || Number.isNaN(station.longitude)
       ? 0
-      : station.longitude);
+      : station.longitude;
+  const stationElevationFt =
+    station.elevation == null || Number.isNaN(station.elevation)
+      ? null
+      : station.elevation;
 
   return {
     id:
@@ -238,16 +233,16 @@ export function toMountainLocation(
       `station-${station.stationId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
     stationId: station.stationId,
     name: locationMatch?.name ?? station.name,
-    city: locationMatch?.city ?? station.countyName ?? stateNameFromCode(station.stateCode),
-    state: locationMatch?.state ?? stateNameFromCode(station.stateCode),
-    network: locationMatch?.network ?? station.networkCode,
-    county: locationMatch?.county ?? station.countyName ?? "Unknown",
-    elevation: locationMatch?.elevation ?? formatElevation(station.elevation),
+    city: station.countyName ?? stateNameFromCode(station.stateCode),
+    state: stateNameFromCode(station.stateCode),
+    network: station.networkCode,
+    county: station.countyName ?? "Unknown",
+    elevationFt: stationElevationFt,
     lat: latitude,
     lon: longitude,
-    huc: locationMatch?.huc ?? station.huc ?? "Unknown",
-    timezone: inferTimeZone(station, locationMatch),
-    stationTriplet: locationMatch?.stationTriplet ?? station.stationTriplet,
+    huc: station.huc ?? "Unknown",
+    timezone: inferTimeZone(station),
+    stationTriplet: station.stationTriplet,
     logoUrl: locationMatch?.logoUrl,
     socialMediaLinks: locationMatch?.socialMediaLinks ?? [],
     resortInfoLinks: locationMatch?.resortInfoLinks ?? [],

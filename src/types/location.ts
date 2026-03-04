@@ -4,6 +4,17 @@ export type GenericLink = {
   url: string;
 };
 
+export type CuratedLocation = {
+  id: string;
+  stationId: string;
+  name: string;
+  stationTriplet: string;
+  logoUrl?: string;
+  socialMediaLinks: GenericLink[];
+  resortInfoLinks: GenericLink[];
+  trafficInfoLinks: GenericLink[];
+};
+
 export type MountainLocation = {
   id: string;
   stationId: string;
@@ -12,7 +23,7 @@ export type MountainLocation = {
   state: string;
   network: string;
   county: string;
-  elevation: string;
+  elevationFt?: number | null;
   lat: number;
   lon: number;
   huc: string;

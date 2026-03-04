@@ -1,23 +1,12 @@
-import { MountainLocation } from "@/types/location";
+import { CuratedLocation } from "@/types/location";
 
-export const LOCATIONS: MountainLocation[] = [
+export const LOCATIONS: CuratedLocation[] = [
   {
     id: "parkcity",
     stationId: "814",
     name: "Park City Mountain Resort",
-    city: "Park City",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Summit",
-    elevation: "9,260 ft",
-    lat: 40.62,
-    lon: -111.53,
-    huc: "160201020101",
-    timezone: "America/Denver", //TODO: update to use variable instead of magic string - find library or use constant from utils
     logoUrl: "/parkcity-logo.png",
     stationTriplet: "814:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41MDgsNDAuNjUxXSwibG9jYXRpb24iOlstMTExLjUwOCw0MC42NTFdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -62,19 +51,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "alta",
     stationId: "1308",
     name: "Alta",
-    city: "Alta",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Salt Lake",
-    elevation: "8,750 ft",
-    lat: 40.59,
-    lon: -111.64,
-    huc: "160202040202",
-    timezone: "America/Denver",
     logoUrl: "/alta-logo.png",
     stationTriplet: "1308:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS42NDUsNDAuNTg5XSwibG9jYXRpb24iOlstMTExLjY0NSw0MC41ODldLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -123,19 +101,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "snowbird",
     stationId: "766",
     name: "Snowbird",
-    city: "Snowbird",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Salt Lake",
-    elevation: "9,170 ft",
-    lat: 40.57,
-    lon: -111.66,
-    huc: "160202040202",
-    timezone: "America/Denver",
     logoUrl: "/snowbird-logo.png",
     stationTriplet: "766:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS42NTYsNDAuNTgyXSwibG9jYXRpb24iOlstMTExLjY1Niw0MC41ODJdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -188,19 +155,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "brighton",
     stationId: "366",
     name: "Brighton Resort",
-    city: "Brighton",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Salt Lake",
-    elevation: "8,790 ft",
-    lat: 40.6,
-    lon: -111.58,
-    huc: "160202040201",
-    timezone: "America/Denver",
     logoUrl: "/brighton-logo.png",
     stationTriplet: "366:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS41OTMsNDAuNjEyXSwibG9jYXRpb24iOlstMTExLjU5Myw0MC42MTJdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -249,19 +205,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "powdermountain",
     stationId: "1300",
     name: "Powder Mountain",
-    city: "Eden",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Cache",
-    elevation: "8,490 ft",
-    lat: 41.37,
-    lon: -111.77,
-    huc: "160102030102",
-    timezone: "America/Denver",
     logoUrl: "/powdermtn-logo.svg",
     stationTriplet: "1300:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS44MTMsNDEuMjk5XSwibG9jYXRpb24iOlstMTExLjgxMyw0MS4yOTldLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -301,19 +246,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "jacksonhole",
     stationId: "689",
     name: "Jackson Hole",
-    city: "Teton Village",
-    state: "Wyoming",
-    network: "SNOTEL",
-    county: "Teton",
-    elevation: "8,170 ft",
-    lat: 43.52,
-    lon: -110.91,
-    huc: "170401030504",
-    timezone: "America/Denver",
     stationTriplet: "689:WY:SNTL",
     logoUrl: "/jacksonhole-logo.webp",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMC43MzgsNDMuNjA3XSwibG9jYXRpb24iOlstMTEwLjczOCw0My42MDddLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -349,19 +283,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "heavenly",
     stationId: "518",
     name: "Heavenly",
-    city: "South Lake Tahoe",
-    state: "California",
-    network: "SNOTEL",
-    county: "El Dorado",
-    elevation: "8,540 ft",
-    lat: 38.92,
-    lon: -119.92,
-    huc: "160501010302",
-    timezone: "America/Los_Angeles",
     stationTriplet: "518:CA:SNTL",
     logoUrl: "/heavenly-logo.png",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/skiheavenly/" },
     ],
@@ -397,19 +320,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "palisades",
     stationId: "784",
     name: "Palisades",
-    city: "Olympic Valley",
-    state: "California",
-    network: "SNOTEL",
-    county: "Placer",
-    elevation: "8,010 ft",
-    lat: 39.19,
-    lon: -120.27,
-    huc: "160501020202",
-    timezone: "America/Los_Angeles",
     stationTriplet: "784:CA:SNTL",
     logoUrl: "/palisades-logo.jpg",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/palisadestahoe/" },
     ],
@@ -445,19 +357,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "mammothmountain",
     stationId: "MHP",
     name: "Mammoth Mountain",
-    city: "Mammoth Lakes",
-    state: "California",
-    network: "Cooperator Snow Sensors",
-    county: "Mono",
-    elevation: "9,400 ft",
-    lat: 37.61,
-    lon: -119.03,
-    huc: "180901020204",
-    timezone: "America/Los_Angeles",
     stationTriplet: "MHP:CA:MSNT",
     logoUrl: "/mammoth-logo.jpg",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExOC45NjgsMzcuNjQ3XSwibG9jYXRpb24iOlstMTE4Ljk2OCwzNy42NDddLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -502,19 +403,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "mtrose",
     stationId: "652",
     name: "Mt Rose",
-    city: "Incline Village",
-    state: "Nevada",
-    network: "SNOTEL",
-    county: "Washoe",
-    elevation: "8,810 ft",
-    lat: 39.32,
-    lon: -119.89,
-    huc: "160501020304",
-    timezone: "America/Los_Angeles",
     stationTriplet: "652:NV:SNTL",
     logoUrl: "/mtrose-logo.jpg",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTEyMC4wMzUsMzkuMzI2XSwibG9jYXRpb24iOlstMTIwLjAzMSwzOS4xMDFdLCJ6b29tIjo3LjkzOTk5OTk5OTk5OTk4OSwibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       { label: "Instagram", url: "https://www.instagram.com/mtroseskitahoe/" },
       { label: "X", url: "https://x.com/MtRoseSkiTahoe" },
@@ -544,19 +434,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "pebblecreek",
     stationId: "1299",
     name: "Pebble Creek",
-    city: "Inkom",
-    state: "Idaho",
-    network: "SNOTEL",
-    county: "Caribou",
-    elevation: "6,520 ft",
-    lat: 42.77,
-    lon: -112.11,
-    huc: "170402080206",
-    timezone: "America/Boise",
     stationTriplet: "1299:ID:SNTL",
     logoUrl: "/pebblecreek-logo.png",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMi4yNTIsNDIuNzk4XSwibG9jYXRpb24iOlstMTEyLjI1Miw0Mi43OThdLCJ6b29tIjo3LCJsYXllciI6ImJyZWZfcWNkIn0sImFuaW1hdGluZyI6ZmFsc2UsImJhc2UiOiJzdGFuZGFyZCIsImFydGNjIjpmYWxzZSwiY291bnR5IjpmYWxzZSwiY3dhIjpmYWxzZSwicmZjIjpmYWxzZSwic3RhdGUiOmZhbHNlLCJtZW51Ijp0cnVlLCJzaG9ydEZ1c2VkT25seSI6ZmFsc2UsIm9wYWNpdHkiOnsiYWxlcnRzIjowLjgsImxvY2FsIjowLjYsImxvY2FsU3RhdGlvbnMiOjAuOCwibmF0aW9uYWwiOjAuNn19",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -584,19 +463,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "snowbasin",
     stationId: "332",
     name: "Snowbasin",
-    city: "Huntsville",
-    state: "Utah",
-    network: "SNOTEL",
-    county: "Weber",
-    elevation: "7,690 ft",
-    lat: 41.22,
-    lon: -111.86,
-    huc: "160201020302",
-    timezone: "America/Denver",
     logoUrl: "/snowbasin-logo.webp",
     stationTriplet: "332:UT:SNTL",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS44Niw0MS4yMl0sImxvY2F0aW9uIjpbLTExMS44Niw0MS4yMl0sInpvb20iOjcsImxheWVyIjoiYnJlZl9xY2QifSwiYW5pbWF0aW5nIjpmYWxzZSwiYmFzZSI6InN0YW5kYXJkIiwiYXJ0Y2MiOmZhbHNlLCJjb3VudHkiOmZhbHNlLCJjd2EiOmZhbHNlLCJyZmMiOmZhbHNlLCJzdGF0ZSI6ZmFsc2UsIm1lbnUiOnRydWUsInNob3J0RnVzZWRPbmx5IjpmYWxzZSwib3BhY2l0eSI6eyJhbGVydHMiOjAuOCwibG9jYWwiOjAuNiwibG9jYWxTdGF0aW9ucyI6MC44LCJuYXRpb25hbCI6MC42fX0=",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -628,19 +496,8 @@ export const LOCATIONS: MountainLocation[] = [
     id: "bigsky",
     stationId: "590",
     name: "Big Sky",
-    city: "Big Sky",
-    state: "Montana",
-    network: "SNOTEL",
-    county: "Madison",
-    elevation: "8,820 ft",
-    lat: 45.27,
-    lon: -111.43,
-    huc: "100200080201",
-    timezone: "America/Denver",
     stationTriplet: "590:MT:SNTL",
     logoUrl: "/bigsky-logo.webp",
-    radarLink:
-      "https://radar.weather.gov/?settings=v1_eyJhZ2VuZGEiOnsiaWQiOiJ3ZWF0aGVyIiwiY2VudGVyIjpbLTExMS4zMSw0NS4yNTldLCJsb2NhdGlvbiI6Wy0xMTEuMzEsNDUuMjU5XSwiem9vbSI6NywibGF5ZXIiOiJicmVmX3FjZCJ9LCJhbmltYXRpbmciOmZhbHNlLCJiYXNlIjoic3RhbmRhcmQiLCJhcnRjYyI6ZmFsc2UsImNvdW50eSI6ZmFsc2UsImN3YSI6ZmFsc2UsInJmYyI6ZmFsc2UsInN0YXRlIjpmYWxzZSwibWVudSI6dHJ1ZSwic2hvcnRGdXNlZE9ubHkiOmZhbHNlLCJvcGFjaXR5Ijp7ImFsZXJ0cyI6MC44LCJsb2NhbCI6MC42LCJsb2NhbFN0YXRpb25zIjowLjgsIm5hdGlvbmFsIjowLjZ9fQ%3D%3D",
     socialMediaLinks: [
       {
         label: "Instagram",

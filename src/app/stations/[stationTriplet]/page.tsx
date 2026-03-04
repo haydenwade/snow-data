@@ -212,6 +212,7 @@ export default function StationPage() {
         range={range}
         onRange={setRange}
         location={location}
+        unit={unit}
       />
 
       {error ? (
@@ -272,7 +273,11 @@ export default function StationPage() {
                 <StationMap location={location} loading={loading} />
               </div>
               <div className="md:col-span-1 h-full">
-                <StationMetadata location={location} loading={loading} />
+                <StationMetadata
+                  location={location}
+                  loading={loading}
+                  unit={unit}
+                />
               </div>
             </section>
 

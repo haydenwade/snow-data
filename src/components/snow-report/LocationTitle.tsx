@@ -4,19 +4,23 @@ import Link from "next/link";
 import { Mountain, Radar, Share, Snowflake } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { shareStation } from "@/lib/share-station";
+import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
 import FavoriteButton from "@/components/FavoriteButton";
+import { formatElevationForUnit } from "./utils";
 
 type LocationTitleProps = {
   range: 15 | 30;
   onRange: (r: 15 | 30) => void;
   location: MountainLocation;
+  unit: Unit;
 };
 
 export default function LocationTitle({
   range,
   onRange,
   location,
+  unit,
 }: LocationTitleProps) {
   const stationName = location?.name ?? "Station X";
   const pathname = usePathname();
@@ -65,7 +69,10 @@ export default function LocationTitle({
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mt-1">
                 <span className="flex items-center text-slate-400 text-sm">
                   <Mountain className="h-4 w-4" />
-                  <span className="ml-1">SNOTEL + NWS Forecast Data</span>
+                  <span className="ml-1">
+                    Elevation{" "}
+                    {formatElevationForUnit(location.elevationFt, unit)}
+                  </span>
                 </span>
                 {location.radarLink ? (
                   <a

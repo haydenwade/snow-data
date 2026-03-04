@@ -7,14 +7,18 @@ import {
   Layers,
   Hash,
 } from "lucide-react";
+import { Unit } from "@/types/forecast";
 import { MountainLocation } from "@/types/location";
+import { formatElevationForUnit } from "./utils";
 
 export default function StationMetadata({
   location,
   loading,
+  unit,
 }: {
   location: MountainLocation;
   loading: boolean;
+  unit: Unit;
 }) {
   if (loading) return null;
   const items = [
@@ -36,7 +40,11 @@ export default function StationMetadata({
     },
     { icon: Database, label: "Network", value: location.network },
     { icon: MapPin, label: "County", value: location.county },
-    { icon: Mountain, label: "Elevation", value: location.elevation },
+    {
+      icon: Mountain,
+      label: "Elevation",
+      value: formatElevationForUnit(location.elevationFt, unit),
+    },
     {
       icon: Compass,
       label: "Coordinates",

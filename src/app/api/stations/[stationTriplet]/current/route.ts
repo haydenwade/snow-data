@@ -1,6 +1,5 @@
 import {
   fetchStationByTriplet,
-  findLocationByTriplet,
   resolveTripletFromStationKey,
 } from "@/lib/server/stations";
 import { fetchSnotelCurrentConditions } from "@/lib/server/snotel-current";
@@ -32,12 +31,8 @@ export async function GET(_request: Request, context: RouteContext) {
       );
     }
 
-    // Determine if the station is a SNOTEL or COOP station
-    const locationMatch = findLocationByTriplet(station.stationTriplet);
-
     const payload = await fetchSnotelCurrentConditions({
       station,
-      locationMatch,
     });
 
     return NextResponse.json(payload, { status: 200 });
