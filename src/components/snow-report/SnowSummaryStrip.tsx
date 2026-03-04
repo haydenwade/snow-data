@@ -136,22 +136,22 @@ export default function SnowSummaryStrip({
   }
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
-      <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">
-        <CalendarDays className="h-5 w-5 text-blue-400" />
-        <div className="flex items-center gap-1">
+      <div className="mb-4 flex items-center justify-between border-b border-slate-700/50 pb-4">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="h-5 w-5 text-blue-400" />
           <h2 className="font-semibold text-white">Snow Summary</h2>
-          <div className="group relative">
-            <button
-              type="button"
-              aria-label="Snow summary daily aggregation info"
-              className="rounded-full p-0.5 text-slate-400 hover:bg-slate-700/30 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <Info className="h-4 w-4" />
-            </button>
-            <div className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-64 -translate-x-1/2 rounded border border-slate-700/50 bg-slate-800/95 px-2 py-1 text-[10px] leading-tight text-slate-200 shadow-lg group-hover:block group-focus-within:block">
-              Forecast values are grouped by calendar day in local timezone and
-              summed for daily totals.
-            </div>
+        </div>
+        <div className="group relative">
+          <button
+            type="button"
+            aria-label="Snow summary daily aggregation info"
+            className="rounded-full p-0.5 text-slate-400 hover:bg-slate-700/30 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <Info className="h-4 w-4" />
+          </button>
+          <div className="pointer-events-none absolute right-0 top-full z-20 mt-2 hidden w-64 rounded border border-slate-700/50 bg-slate-800/95 px-2 py-1 text-[10px] leading-tight text-slate-200 shadow-lg group-hover:block group-focus-within:block">
+            Snow totals are by local calendar day, showing when snow
+            has fallen and when it is forecast to fall.
           </div>
         </div>
       </div>
