@@ -80,13 +80,13 @@ export default function SettingsPage() {
       return;
     }
 
-    setPreferredLocation({ lat, lon });
+    setPreferredLocation({ latitude: lat, longitude: lon });
     setLocationError(null);
     setLocationStatus("Selected location saved.");
   }, [setPreferredLocation]);
 
   const handleMapSelect = useCallback(
-    (location: { lat: number; lon: number }) => {
+    (location: { latitude: number; longitude: number }) => {
       setPreferredLocation(location);
       setLocationError(null);
       setLocationStatus("Selected location updated from map.");
@@ -98,8 +98,8 @@ export default function SettingsPage() {
     if (!lastApprovedLocation) return;
 
     const nextLocation = {
-      lat: lastApprovedLocation.lat,
-      lon: lastApprovedLocation.lon,
+      latitude: lastApprovedLocation.latitude,
+      longitude: lastApprovedLocation.longitude,
     };
     setPreferredLocation(nextLocation);
     setLocationError(null);
@@ -131,8 +131,8 @@ export default function SettingsPage() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const nextLocation = {
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
         };
 
         setLastApprovedLocation({
@@ -157,7 +157,7 @@ export default function SettingsPage() {
   }, [setLastApprovedLocation, setPreferredLocation]);
 
   const locationInputKey = preferredLocation
-    ? `${preferredLocation.lat.toFixed(6)},${preferredLocation.lon.toFixed(6)},${preferredLocation.updatedAt}`
+    ? `${preferredLocation.latitude.toFixed(6)},${preferredLocation.longitude.toFixed(6)},${preferredLocation.updatedAt}`
     : "no-location";
 
   return (
@@ -271,7 +271,9 @@ export default function SettingsPage() {
                   min={-90}
                   max={90}
                   defaultValue={
-                    preferredLocation ? formatCoordinate(preferredLocation.lat) : ""
+                    preferredLocation
+                      ? formatCoordinate(preferredLocation.latitude)
+                      : ""
                   }
                   placeholder="40.760800"
                   className="w-full rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
@@ -290,7 +292,9 @@ export default function SettingsPage() {
                   min={-180}
                   max={180}
                   defaultValue={
-                    preferredLocation ? formatCoordinate(preferredLocation.lon) : ""
+                    preferredLocation
+                      ? formatCoordinate(preferredLocation.longitude)
+                      : ""
                   }
                   placeholder="-111.891000"
                   className="w-full rounded-xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
@@ -319,23 +323,26 @@ export default function SettingsPage() {
               <LocationPickerMap
                 key={`${
                   preferredLocation
-                    ? `${preferredLocation.lat.toFixed(6)},${preferredLocation.lon.toFixed(6)}`
+                    ? `${preferredLocation.latitude.toFixed(6)},${preferredLocation.longitude.toFixed(6)}`
                     : "none"
                 }|${
                   lastApprovedLocation
-                    ? `${lastApprovedLocation.lat.toFixed(6)},${lastApprovedLocation.lon.toFixed(6)}`
+                    ? `${lastApprovedLocation.latitude.toFixed(6)},${lastApprovedLocation.longitude.toFixed(6)}`
                     : "none"
                 }`}
                 selectedLocation={
                   preferredLocation
-                    ? { lat: preferredLocation.lat, lon: preferredLocation.lon }
+                    ? {
+                        latitude: preferredLocation.latitude,
+                        longitude: preferredLocation.longitude,
+                      }
                     : null
                 }
                 lastApprovedLocation={
                   lastApprovedLocation
                     ? {
-                        lat: lastApprovedLocation.lat,
-                        lon: lastApprovedLocation.lon,
+                        latitude: lastApprovedLocation.latitude,
+                        longitude: lastApprovedLocation.longitude,
                       }
                     : null
                 }
@@ -359,8 +366,8 @@ export default function SettingsPage() {
                 <span className="text-slate-400">Selected:</span>{" "}
                 {preferredLocation ? (
                   <>
-                    {formatCoordinate(preferredLocation.lat)},{" "}
-                    {formatCoordinate(preferredLocation.lon)}
+                    {formatCoordinate(preferredLocation.latitude)},{" "}
+                    {formatCoordinate(preferredLocation.longitude)}
                     <span className="text-slate-500">
                       {" "}
                       · updated {formatTimestamp(preferredLocation.updatedAt)}
@@ -374,8 +381,8 @@ export default function SettingsPage() {
                 <span className="text-slate-400">Last approved:</span>{" "}
                 {lastApprovedLocation ? (
                   <>
-                    {formatCoordinate(lastApprovedLocation.lat)},{" "}
-                    {formatCoordinate(lastApprovedLocation.lon)}
+                    {formatCoordinate(lastApprovedLocation.latitude)},{" "}
+                    {formatCoordinate(lastApprovedLocation.longitude)}
                     <span className="text-slate-500">
                       {" "}
                       · updated {formatTimestamp(lastApprovedLocation.updatedAt)}

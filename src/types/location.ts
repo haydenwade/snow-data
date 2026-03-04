@@ -23,8 +23,8 @@ export type MountainLocation = {
   network: string;
   county: string;
   elevationFt?: number | null;
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
   huc: string;
   timezone: string;
   stationTriplet: string;

@@ -13,14 +13,14 @@ import {
 const TILE_SIZE = 256;
 const MIN_ZOOM = 2;
 const MAX_ZOOM = 16;
-const DEFAULT_CENTER = { lat: 39.5, lon: -111.9 };
+const DEFAULT_CENTER = { latitude: 39.5, longitude: -111.9 };
 const DEFAULT_ZOOM = 5;
 const CLICK_MOVE_THRESHOLD = 6;
 const WHEEL_ZOOM_COOLDOWN_MS = 140;
 
 type Coordinates = {
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
 };
 
 type MarkerPoint = Coordinates & {
@@ -37,8 +37,8 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function clampLatitude(lat: number) {
-  return clamp(lat, -85.05112878, 85.05112878);
+function clampLatitude(latitude: number) {
+  return clamp(latitude, -85.05112878, 85.05112878);
 }
 
 function wrapTileX(tileX: number, zoom: number) {
@@ -46,10 +46,10 @@ function wrapTileX(tileX: number, zoom: number) {
   return ((tileX % count) + count) % count;
 }
 
-function latLonToWorld(lat: number, lon: number, zoom: number) {
-  const boundedLat = clampLatitude(lat);
+function latLonToWorld(latitude: number, longitude: number, zoom: number) {
+  const boundedLat = clampLatitude(latitude);
   const scale = TILE_SIZE * 2 ** zoom;
-  const x = ((lon + 180) / 360) * scale;
+  const x = ((longitude + 180) / 360) * scale;
   const sinLat = Math.sin((boundedLat * Math.PI) / 180);
   const y =
     (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale;
@@ -58,10 +58,11 @@ function latLonToWorld(lat: number, lon: number, zoom: number) {
 
 function worldToLatLon(x: number, y: number, zoom: number) {
   const scale = TILE_SIZE * 2 ** zoom;
-  const lon = (x / scale) * 360 - 180;
+  const longitude = (x / scale) * 360 - 180;
   const n = Math.PI - (2 * Math.PI * y) / scale;
-  const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
-  return { lat: clampLatitude(lat), lon };
+  const latitude =
+    (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
+  return { latitude: clampLatitude(latitude), longitude };
 }
 
 function getInitialCenter(
@@ -128,7 +129,7 @@ export default function LocationPickerMap({
   const mapState = useMemo(() => {
     if (size.width === 0 || size.height === 0) return null;
 
-    const centerWorld = latLonToWorld(center.lat, center.lon, zoom);
+    const centerWorld = latLonToWorld(center.latitude, center.longitude, zoom);
     const topLeftX = centerWorld.x - size.width / 2;
     const topLeftY = centerWorld.y - size.height / 2;
     const minTileX = Math.floor(topLeftX / TILE_SIZE);
@@ -152,7 +153,7 @@ export default function LocationPickerMap({
 
     const projectLocation = (location: Coordinates | null): MarkerPoint | null => {
       if (!location) return null;
-      const world = latLonToWorld(location.lat, location.lon, zoom);
+      const world = latLonToWorld(location.latitude, location.longitude, zoom);
       return {
         ...location,
         x: world.x - topLeftX,
@@ -167,8 +168,8 @@ export default function LocationPickerMap({
       lastApprovedPoint: projectLocation(lastApprovedLocation),
     };
   }, [
-    center.lat,
-    center.lon,
+    center.latitude,
+    center.longitude,
     lastApprovedLocation,
     selectedLocation,
     size.height,
@@ -193,8 +194,8 @@ export default function LocationPickerMap({
     const topLeftY = mapState.centerWorld.y - size.height / 2;
     const location = worldToLatLon(topLeftX + localPoint.x, topLeftY + localPoint.y, zoom);
     onSelect({
-      lat: Number(location.lat.toFixed(6)),
-      lon: Number(location.lon.toFixed(6)),
+      latitude: Number(location.latitude.toFixed(6)),
+      longitude: Number(location.longitude.toFixed(6)),
     });
   };
 
@@ -269,7 +270,7 @@ export default function LocationPickerMap({
 
   const centerOnLocation = (location: Coordinates | null) => {
     if (!location) return;
-    setCenter({ lat: location.lat, lon: location.lon });
+    setCenter({ latitude: location.latitude, longitude: location.longitude });
     setZoom((current) => Math.max(current, 9));
   };
 

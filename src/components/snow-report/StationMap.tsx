@@ -7,10 +7,10 @@ export default function StationMap(props: {
   loading: boolean;
 }) {
   const { location, loading } = props;
-  const lat = location.lat,
-    lon = location.lon;
-  const bbox = `${lon - 0.05},${lat - 0.03},${lon + 0.05},${lat + 0.03}`;
-  const marker = `${lat},${lon}`;
+  const latitude = location.latitude;
+  const longitude = location.longitude;
+  const bbox = `${longitude - 0.05},${latitude - 0.03},${longitude + 0.05},${latitude + 0.03}`;
+  const marker = `${latitude},${longitude}`;
   const src = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(
     bbox
   )}&layer=mapnik&marker=${encodeURIComponent(marker)}`;

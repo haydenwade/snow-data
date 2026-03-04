@@ -25,7 +25,8 @@ import {
   useState,
 } from "react";
 import { useUserSettings } from "@/hooks/useUserSettings";
-import { GeoBounds, StationSummary } from "@/types/station";
+import { MountainLocation } from "@/types/location";
+import { GeoBounds } from "@/types/station";
 import {
   addDaysToIsoDate,
   formatAvalancheArchiveDateLabel,
@@ -143,7 +144,7 @@ const AVALANCHE_DANGER_LEGEND_ITEMS: Array<{
 ];
 
 type ProjectedStation = {
-  station: StationSummary;
+  station: MountainLocation;
   x: number;
   y: number;
 };
@@ -155,7 +156,7 @@ type MarkerCluster = {
   y: number;
   lat: number;
   lon: number;
-  stations: StationSummary[];
+  stations: MountainLocation[];
 };
 
 type AvalancheMapLayerGeometry =
@@ -234,7 +235,7 @@ export type StationsMapViewport = {
 };
 
 type StationsExplorerMapProps = {
-  stations: StationSummary[];
+  stations: MountainLocation[];
   isRefreshing: boolean;
   onViewportChange: (viewport: StationsMapViewport) => void;
   enableAvalancheArchive?: boolean;
@@ -628,7 +629,7 @@ function clusterProjectedStations(
       ySum: number;
       latSum: number;
       lonSum: number;
-      stations: StationSummary[];
+      stations: MountainLocation[];
     }
   >();
 
@@ -682,14 +683,14 @@ export default function StationsExplorerMap({
   } = useUserSettings();
   const preferredCenterLocation = preferredLocation
     ? {
-        lat: preferredLocation.lat,
-        lon: preferredLocation.lon,
+        lat: preferredLocation.latitude,
+        lon: preferredLocation.longitude,
       }
     : null;
   const cachedCurrentLocation = lastApprovedLocation
     ? {
-        lat: lastApprovedLocation.lat,
-        lon: lastApprovedLocation.lon,
+        lat: lastApprovedLocation.latitude,
+        lon: lastApprovedLocation.longitude,
       }
     : null;
   const initialCenterLocation = preferredCenterLocation ?? cachedCurrentLocation;
@@ -949,6 +950,8 @@ export default function StationsExplorerMap({
   );
 
   const selectedStation = selectedCluster?.stations[0] ?? null;
+  const selectedStationStateCode =
+    selectedStation?.stationTriplet.split(":")[1] ?? selectedStation?.state ?? null;
   const selectedAvalancheRegion = useMemo(
     () =>
       mapState?.avalancheRegions.find(
@@ -1185,7 +1188,8 @@ export default function StationsExplorerMap({
         setCenter(location);
         setZoom((current) => Math.max(current, 10));
         setLastApprovedLocation({
-          ...location,
+          latitude: location.lat,
+          longitude: location.lon,
           accuracyMeters:
             typeof position.coords.accuracy === "number"
               ? position.coords.accuracy
@@ -1210,8 +1214,18 @@ export default function StationsExplorerMap({
 
     const isStoredLocationShape = (value: unknown) => {
       if (!value || typeof value !== "object") return false;
-      const candidate = value as { lat?: unknown; lon?: unknown };
-      return typeof candidate.lat === "number" && typeof candidate.lon === "number";
+      const candidate = value as {
+        latitude?: unknown;
+        longitude?: unknown;
+        lat?: unknown;
+        lon?: unknown;
+      };
+      const hasLatitudeLongitude =
+        typeof candidate.latitude === "number" &&
+        typeof candidate.longitude === "number";
+      const hasLatLon =
+        typeof candidate.lat === "number" && typeof candidate.lon === "number";
+      return hasLatitudeLongitude || hasLatLon;
     };
 
     try {
@@ -1592,17 +1606,17 @@ export default function StationsExplorerMap({
                 {selectedStation.name}
               </div>
               <div className="text-xs text-slate-300 mt-1">
-                Station {selectedStation.stationId} · {selectedStation.stateCode}
+                Station {selectedStation.stationId} · {selectedStationStateCode}
               </div>
               <div className="text-xs text-slate-400 mt-1">
-                {selectedStation.countyName}
+                {selectedStation.county}
                 {selectedStation.elevationFt != null
                   ? ` · ${Math.round(selectedStation.elevationFt).toLocaleString()} ft`
                   : ""}
               </div>
               <div className="mt-3">
                 <Link
-                  href={`/stations/${encodeURIComponent(selectedStation.stationKey)}`}
+                  href={`/stations/${encodeURIComponent(selectedStation.id)}`}
                   className="inline-flex items-center rounded-lg border border-slate-500 px-2 py-1 text-xs text-slate-200 hover:bg-slate-700/40"
                 >
                   Open station

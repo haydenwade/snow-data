@@ -2,7 +2,7 @@ import {
   fetchStationsByStateCodes,
   findLocationByTriplet,
   normalizeStateCodes,
-  toStationSummary,
+  toMountainLocation,
 } from "@/lib/server/stations";
 import { GeoBounds } from "@/types/station";
 import { NextResponse } from "next/server";
@@ -31,16 +31,16 @@ function parseBbox(raw: string | null): GeoBounds | null {
 }
 
 function inBbox(
-  lat: number,
-  lon: number,
+  latitude: number,
+  longitude: number,
   bbox: GeoBounds,
 ) {
-  const latInRange = lat >= bbox.south && lat <= bbox.north;
-  const lonInRange =
+  const latitudeInRange = latitude >= bbox.south && latitude <= bbox.north;
+  const longitudeInRange =
     bbox.west <= bbox.east
-      ? lon >= bbox.west && lon <= bbox.east
-      : lon >= bbox.west || lon <= bbox.east;
-  return latInRange && lonInRange;
+      ? longitude >= bbox.west && longitude <= bbox.east
+      : longitude >= bbox.west || longitude <= bbox.east;
+  return latitudeInRange && longitudeInRange;
 }
 
 export async function GET(request: Request) {
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
     const data = inScope
       .map((station) => {
         const locationMatch = findLocationByTriplet(station.stationTriplet);
-        return toStationSummary(station, locationMatch);
+        return toMountainLocation(station, locationMatch);
       })
       .sort((a, b) => a.name.localeCompare(b.name));
 

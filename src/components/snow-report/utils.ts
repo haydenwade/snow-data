@@ -371,3 +371,31 @@ export function formatDateYYYYMMDD(dateStr: string) {
     timeZone: "UTC",
   });
 }
+
+export function formatWeekdayShort(dateStr: string) {
+  if (!dateStr) return "";
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", {
+    weekday: "short",
+    timeZone: "UTC",
+  });
+}
+
+export function formatMonthDay(dateStr: string) {
+  if (!dateStr) return "";
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return "";
+  const month = d.getUTCMonth() + 1;
+  const day = d.getUTCDate();
+  return `${month}/${day}`;
+}
+
+export function formatDayOfMonth(dateStr: string) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  const day = parts[2];
+  if (!day) return "";
+  const parsed = parseInt(day, 10);
+  return Number.isNaN(parsed) ? "" : parsed;
+}

@@ -45,7 +45,7 @@ export default function DataNotes(props:{location:MountainLocation}) {
           </summary>
           <div className="px-3 pb-3 text-xs text-slate-400 space-y-2">
             <p>
-              <strong className="text-slate-300">Data Source:</strong> U.S. stations use National Weather Service (NWS) via api.weather.gov. Non-U.S. stations use Open-Meteo forecast data for coordinates {location.lat}, {location.lon}.
+              <strong className="text-slate-300">Data Source:</strong> U.S. stations use National Weather Service (NWS) via api.weather.gov. Non-U.S. stations use Open-Meteo forecast data for coordinates {location.latitude}, {location.longitude}.
             </p>
             <p>
               <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snowfall values are normalized to millimeters and converted to inches (÷25.4), then aggregated into daily totals.

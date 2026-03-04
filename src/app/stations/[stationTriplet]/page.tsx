@@ -74,11 +74,11 @@ async function fetchHistoric(
 }
 
 async function fetchForecastGrid(
-  lat: number,
-  lon: number,
+  latitude: number,
+  longitude: number,
 ): Promise<ForecastGridData> {
   const response = await fetch(
-    `/api/forecasts/nws?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`,
+    `/api/forecasts/nws?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`,
     { cache: "no-store" },
   );
   if (!response.ok) {
@@ -137,8 +137,8 @@ export default function StationPage() {
         const [historicResult, forecastResult] = await Promise.allSettled([
           fetchHistoric(stationKey, 30),
           fetchForecastGrid(
-            detail.station.lat,
-            detail.station.lon,
+            detail.station.latitude,
+            detail.station.longitude,
           ),
         ]);
         if (!mounted) return;

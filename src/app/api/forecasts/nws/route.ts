@@ -20,24 +20,24 @@ function isNwsInvalidPointError(message: string) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const lat = parseCoordinate(searchParams.get("lat"));
-    const lon = parseCoordinate(searchParams.get("lon"));
+    const latitude = parseCoordinate(searchParams.get("latitude"));
+    const longitude = parseCoordinate(searchParams.get("longitude"));
 
-    if (lat == null || lon == null) {
+    if (latitude == null || longitude == null) {
       return NextResponse.json(
-        { error: "Missing or invalid lat/lon query params" },
+        { error: "Missing or invalid latitude/longitude query params" },
         { status: 400 },
       );
     }
     try {
-      const payload = await fetchNwsForecastGridData(lat, lon);
+      const payload = await fetchNwsForecastGridData(latitude, longitude);
       return NextResponse.json(payload, { status: 200 });
     } catch (error) {
       const message = (error as Error)?.message || "Failed to fetch NWS forecast";
       if (!isNwsInvalidPointError(message)) {
         throw error;
       }
-      const payload = await fetchOpenMeteoForecastGridData(lat, lon);
+      const payload = await fetchOpenMeteoForecastGridData(latitude, longitude);
       return NextResponse.json(payload, { status: 200 });
     }
   } catch (error) {

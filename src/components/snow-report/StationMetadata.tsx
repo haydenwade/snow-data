@@ -48,7 +48,7 @@ export default function StationMetadata({
     {
       icon: Compass,
       label: "Coordinates",
-      value: `${location.lat}°N, ${Math.abs(location.lon)}°W`,
+      value: `${location.latitude}°N, ${Math.abs(location.longitude)}°W`,
     },
     { icon: Layers, label: "HUC", value: location.huc },
   ];

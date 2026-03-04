@@ -12,27 +12,12 @@ import {
   LabelList,
 } from "recharts";
 import { ForecastDaily, Unit } from "@/types/forecast";
-import { inchesToMm } from "./utils";
-
-function fmtDisplay(dateStr: string) {
-  const d = new Date(`${dateStr}T00:00:00Z`);
-  return d.toLocaleDateString("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
-}
-function fmtShort(dateStr: string) {
-  const d = new Date(`${dateStr}T00:00:00Z`);
-  return d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" });
-}
-function fmtMonthDay(dateStr: string) {
-  const d = new Date(`${dateStr}T00:00:00Z`);
-  const m = d.getUTCMonth() + 1;
-  const day = d.getUTCDate();
-  return `${m}/${day}`;
-}
+import {
+  formatDateYYYYMMDD,
+  formatMonthDay,
+  formatWeekdayShort,
+  inchesToMm,
+} from "./utils";
 
 export default function ForecastChart({
   data,
@@ -45,10 +30,10 @@ export default function ForecastChart({
 }) {
   const chartData = data.map((d) => ({
     ...d,
-    displayDate: fmtDisplay(d.date),
-    shortDate: fmtShort(d.date),
-    tickDOW: fmtShort(d.date),
-    tickMD: fmtMonthDay(d.date),
+    displayDate: formatDateYYYYMMDD(d.date),
+    shortDate: formatWeekdayShort(d.date),
+    tickDOW: formatWeekdayShort(d.date),
+    tickMD: formatMonthDay(d.date),
     value: unit === "mm" ? inchesToMm(d.snowIn) : d.snowIn,
   }));
 

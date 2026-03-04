@@ -6,7 +6,6 @@ import {
 } from "@/lib/station-key";
 import { normalizeTripletInput } from "@/lib/station-triplet";
 import { CuratedLocation, MountainLocation } from "@/types/location";
-import { StationSummary } from "@/types/station";
 import { fetchAwdbJson } from "./awdb";
 
 export type AwdbStation = {
@@ -102,12 +101,12 @@ function fallbackTimeZoneFromOffset(offsetHours: number | null | undefined) {
   return `Etc/GMT${sign}${Math.abs(rounded)}`;
 }
 
-function buildDefaultRadarLink(lat: number, lon: number) {
+function buildDefaultRadarLink(latitude: number, longitude: number) {
   const settings = {
     agenda: {
       id: "weather",
-      center: [lon, lat],
-      location: [lon, lat],
+      center: [longitude, latitude],
+      location: [longitude, latitude],
       zoom: 7,
       layer: "bref_qcd",
     },
@@ -174,41 +173,6 @@ export function inferTimeZone(
   return fallbackTimeZoneFromOffset(station.dataTimeZone ?? null);
 }
 
-export function toStationSummary(
-  station: AwdbStation,
-  locationMatch: CuratedLocation | null,
-): StationSummary {
-  const derivedStationKey =
-    stationTripletToKey(station.stationTriplet) ??
-    `${station.stationId}-${station.stateCode}-${station.networkCode}`.toLowerCase();
-  const stationKey =
-    locationMatch?.id ?? derivedStationKey;
-
-  return {
-    stationKey,
-    stationTriplet: station.stationTriplet,
-    stationId: station.stationId,
-    stateCode: station.stateCode,
-    stateName: stateNameFromCode(station.stateCode),
-    networkCode: station.networkCode,
-    name: station.name,
-    countyName: station.countyName ?? "Unknown",
-    huc: station.huc ?? null,
-    elevationFt:
-      station.elevation == null || Number.isNaN(station.elevation)
-        ? null
-        : station.elevation,
-    latitude: station.latitude ?? 0,
-    longitude: station.longitude ?? 0,
-    dataTimeZone:
-      station.dataTimeZone == null || Number.isNaN(station.dataTimeZone)
-        ? null
-        : station.dataTimeZone,
-    logoUrl: locationMatch?.logoUrl ?? null,
-    hasLocationDetails: Boolean(locationMatch),
-  };
-}
-
 export function toMountainLocation(
   station: AwdbStation,
   locationMatch: CuratedLocation | null,
@@ -238,8 +202,8 @@ export function toMountainLocation(
     network: station.networkCode,
     county: station.countyName ?? "Unknown",
     elevationFt: stationElevationFt,
-    lat: latitude,
-    lon: longitude,
+    latitude,
+    longitude,
     huc: station.huc ?? "Unknown",
     timezone: inferTimeZone(station),
     stationTriplet: station.stationTriplet,

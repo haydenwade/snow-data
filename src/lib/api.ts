@@ -67,11 +67,11 @@ export async function fetchCuratedLocations(): Promise<MountainLocation[]> {
 }
 
 export async function fetchForecastGrid(
-  lat: number,
-  lon: number
+  latitude: number,
+  longitude: number
 ): Promise<ForecastGridData> {
   const res = await fetch(
-    `/api/forecasts/nws?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}`,
+    `/api/forecasts/nws?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}`,
     {
       cache: "no-store",
     }

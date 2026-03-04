@@ -14,7 +14,11 @@ import {
 } from "recharts";
 import { HistoricDay } from "@/types/historic";
 import { Unit } from "@/types/forecast";
-import { inchesToMm } from "./utils";
+import {
+  formatDayOfMonth,
+  formatWeekdayShort,
+  inchesToMm,
+} from "./utils";
 
 function fmtShort(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
@@ -39,10 +43,8 @@ export default function HistoricChart({
   const chartData = data.map((d) => ({
     ...d,
     displayDate: fmtShort(d.date),
-    shortDate: new Date(`${d.date}T00:00:00Z`).toLocaleDateString("en-US", {
-      day: "numeric",
-      timeZone: "UTC",
-    }),
+    tickDOW: formatWeekdayShort(d.date),
+    tickMD: formatDayOfMonth(d.date),
     value: unit === "mm" ? inchesToMm(d.derivedSnowfall!) : d.derivedSnowfall,
     startDepthInches: d.snowDepthAtStartOfDay,
   }));
@@ -78,6 +80,26 @@ export default function HistoricChart({
     return <HistoricChartSkeleton />;
   }
 
+  const DayTick = (props: {
+    x?: number;
+    y?: number;
+    payload?: { index?: number };
+  }) => {
+    const { x = 0, y = 0, payload } = props;
+    const idx = payload?.index ?? 0;
+    const row = chartData[idx];
+    return (
+      <g transform={`translate(${x},${y})`}>
+        <text dy={16} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+          {row?.tickDOW}
+        </text>
+        <text dy={30} textAnchor="middle" fill="#94a3b8" fontSize={10} opacity={0.85}>
+          {row?.tickMD}
+        </text>
+      </g>
+    );
+  };
+
   return (
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
       <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">
@@ -92,11 +114,11 @@ export default function HistoricChart({
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 28, right: 10, left: -10, bottom: 0 }}
+            margin={{ top: 28, right: 10, left: -10, bottom: 40 }}
           >
             <XAxis
-              dataKey="shortDate"
-              tick={{ fill: "#94a3b8", fontSize: 10 }}
+              dataKey="tickDOW"
+              tick={<DayTick />}
               axisLine={{ stroke: "#475569" }}
               tickLine={false}
             />

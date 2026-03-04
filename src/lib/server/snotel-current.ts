@@ -63,18 +63,18 @@ function getMidnightInZone(date: Date, timeZone: string): Date {
 }
 
 function getSunTimes({
-  lat,
-  lon,
+  latitude,
+  longitude,
   date,
   timeZone,
 }: {
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
   date: Date;
   timeZone: string;
 }) {
   const base = getMidnightInZone(date, timeZone);
-  const times = SunCalc.getTimes(base, lat, lon);
+  const times = SunCalc.getTimes(base, latitude, longitude);
   return {
     sunrise: times.sunrise ? times.sunrise.toISOString() : null,
     sunset: times.sunset ? times.sunset.toISOString() : null,
@@ -249,8 +249,8 @@ export async function fetchSnotelCurrentConditions({
           : snotelTemperatureF,
       sun: {
         ...getSunTimes({
-          lat: latitude,
-          lon: longitude,
+          latitude,
+          longitude,
           date: new Date(),
           timeZone: tz,
         }),

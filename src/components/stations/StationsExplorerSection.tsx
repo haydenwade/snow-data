@@ -7,7 +7,8 @@ import {
   normalizeAvalancheArchiveDate,
 } from "@/components/stations/avalanche-archive-date";
 import StationsExplorerSkeleton from "@/components/skeletons/StationsExplorerSkeleton";
-import { GeoBounds, StationSummary } from "@/types/station";
+import { MountainLocation } from "@/types/location";
+import { GeoBounds } from "@/types/station";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -69,7 +70,7 @@ async function fetchStations(
   }
 
   const json = await response.json();
-  return (json?.data ?? []) as StationSummary[];
+  return (json?.data ?? []) as MountainLocation[];
 }
 
 export default function StationsExplorerSection({
@@ -99,7 +100,7 @@ export default function StationsExplorerSection({
     stateCodes: initialStates,
     bounds: null,
   });
-  const [stations, setStations] = useState<StationSummary[]>([]);
+  const [stations, setStations] = useState<MountainLocation[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [error, setError] = useState<string | null>(null);

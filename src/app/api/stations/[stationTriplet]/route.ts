@@ -49,13 +49,13 @@ export async function GET(
     >;
     try {
       avalancheRegion = await findAvalancheRegionForPoint(
-        enrichedStation.lat,
-        enrichedStation.lon,
+        enrichedStation.latitude,
+        enrichedStation.longitude,
       );
       if (!avalancheRegion) {
         nearbyAvalancheRegions = await findNearbyAvalancheRegionsForPoint(
-          enrichedStation.lat,
-          enrichedStation.lon,
+          enrichedStation.latitude,
+          enrichedStation.longitude,
           {
             maxDistanceMiles: 50,
             limit: 3,

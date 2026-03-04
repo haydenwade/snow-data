@@ -5,8 +5,8 @@ import { Unit } from "@/types/forecast";
 const STORAGE_KEY = "snowd-user-settings";
 
 export type StoredUserLocation = {
-  lat: number;
-  lon: number;
+  latitude: number;
+  longitude: number;
   updatedAt: number;
   accuracyMeters: number | null;
 };
@@ -31,31 +31,41 @@ function normalizeLongitude(lon: number) {
   return ((lon + 180) % 360 + 360) % 360 - 180;
 }
 
-function normalizeCoordinateInput(location: { lat: number; lon: number }) {
-  if (!Number.isFinite(location.lat) || !Number.isFinite(location.lon)) return null;
+function normalizeCoordinateInput(location: {
+  latitude: number;
+  longitude: number;
+}) {
+  if (!Number.isFinite(location.latitude) || !Number.isFinite(location.longitude)) {
+    return null;
+  }
 
   return {
-    lat: clamp(location.lat, -90, 90),
-    lon: normalizeLongitude(location.lon),
+    latitude: clamp(location.latitude, -90, 90),
+    longitude: normalizeLongitude(location.longitude),
   };
 }
 
 function normalizeStoredLocation(value: unknown): StoredUserLocation | null {
   if (!value || typeof value !== "object") return null;
 
-  const candidate = value as Partial<StoredUserLocation>;
+  const candidate = value as Partial<StoredUserLocation> & {
+    lat?: number;
+    lon?: number;
+  };
+  const latitude = candidate.latitude ?? candidate.lat;
+  const longitude = candidate.longitude ?? candidate.lon;
   if (
-    typeof candidate.lat !== "number" ||
-    !Number.isFinite(candidate.lat) ||
-    typeof candidate.lon !== "number" ||
-    !Number.isFinite(candidate.lon)
+    typeof latitude !== "number" ||
+    !Number.isFinite(latitude) ||
+    typeof longitude !== "number" ||
+    !Number.isFinite(longitude)
   ) {
     return null;
   }
 
   const normalized = normalizeCoordinateInput({
-    lat: candidate.lat,
-    lon: candidate.lon,
+    latitude,
+    longitude,
   });
   if (!normalized) return null;
 
@@ -109,7 +119,7 @@ export function useUserSettings() {
   );
 
   const setPreferredLocation = useCallback(
-    (location: { lat: number; lon: number }) => {
+    (location: { latitude: number; longitude: number }) => {
       const normalized = normalizeCoordinateInput(location);
       if (!normalized) return;
 
@@ -133,7 +143,11 @@ export function useUserSettings() {
   }, [setSettings]);
 
   const setLastApprovedLocation = useCallback(
-    (location: { lat: number; lon: number; accuracyMeters?: number | null }) => {
+    (location: {
+      latitude: number;
+      longitude: number;
+      accuracyMeters?: number | null;
+    }) => {
       const normalized = normalizeCoordinateInput(location);
       if (!normalized) return;
 

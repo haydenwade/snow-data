@@ -2,7 +2,12 @@
 import { useMemo } from "react";
 import { CalendarDays, Info } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
-import { computeSnowBuckets, inchesToMm } from "./utils";
+import {
+  computeSnowBuckets,
+  formatDayOfMonth,
+  formatWeekdayShort,
+  inchesToMm,
+} from "./utils";
 import WteqEstimateIndicator from "./WteqEstimateIndicator";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, Unit } from "@/types/forecast";
@@ -63,23 +68,6 @@ export default function SnowSummaryStrip({
       type: "forecast" as const,
     },
   ];
-
-  // Helper to extract day-of-month from YYYY-MM-DD
-  const dayOfMonth = (date: string) => {
-    const parts = date.split("-");
-    const day = parts[2] ?? "01";
-    return parseInt(day, 10);
-  };
-
-  const dayOfWeek = (date: string) => {
-    if (!date) return "";
-    const parsed = new Date(`${date}T00:00:00Z`);
-    if (Number.isNaN(parsed.getTime())) return "";
-    return parsed.toLocaleDateString("en-US", {
-      weekday: "short",
-      timeZone: "UTC",
-    });
-  };
 
   // Build per-bar items with value and date for labeling
   const getBarItems = (idx: number) => {
@@ -200,7 +188,7 @@ export default function SnowSummaryStrip({
                         )}%`,
                         minHeight: "2px",
                       }}
-                      title={`${val.toFixed(2)} ${useMetric ? "in (raw)" : "in"} | DoM ${dayOfMonth(bar.date)}`}
+                      title={`${val.toFixed(2)} ${useMetric ? "in (raw)" : "in"} | DoM ${formatDayOfMonth(bar.date)}`}
                     />
                   );
                 })}
@@ -215,8 +203,8 @@ export default function SnowSummaryStrip({
                   return (
                     <div key={i} className="flex-1 text-center">
                       <div className="font-medium text-slate-300">{displayVal}</div>
-                      <div className="text-[9px] opacity-60">{dayOfWeek(bar.date)}</div>
-                      <div className="opacity-70">{dayOfMonth(bar.date)}</div>
+                      <div className="text-[9px] opacity-60">{formatWeekdayShort(bar.date)}</div>
+                      <div className="opacity-70">{formatDayOfMonth(bar.date)}</div>
                     </div>
                   );
                 })}
