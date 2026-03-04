@@ -87,7 +87,7 @@ export default function FavoriteSummaryCard({
 
           {/* Last 24h */}
           <div className="flex-1 min-w-[90px] text-center rounded-lg py-1.5 px-1 bg-slate-700/60 border border-orange-500/40">
-            <p className="text-[10px] font-medium text-orange-400 mb-0.5">Last 24h</p>
+            <p className="text-[10px] font-medium text-orange-400 mb-0.5">Yesterday</p>
             <p className="text-sm font-bold text-orange-400">
               {formatSnow(buckets.last24)}
               <span className="text-[9px] font-normal">{unitLabel}</span>
