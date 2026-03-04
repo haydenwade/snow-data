@@ -47,7 +47,7 @@ export default function FavoritesPage() {
         favorites.map(async (favoriteId) => {
           try {
             const detail = await fetchStationDetail(favoriteId);
-            return { favoriteId, location: detail.location } as FavoriteLocationEntry;
+            return { favoriteId, location: detail.station } as FavoriteLocationEntry;
           } catch {
             return null;
           }

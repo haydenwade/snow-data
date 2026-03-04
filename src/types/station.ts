@@ -1,4 +1,4 @@
-import { CuratedLocation, MountainLocation } from "./location";
+import { MountainLocation } from "./location";
 
 export type GeoBounds = {
   west: number;
@@ -50,9 +50,7 @@ export type StationNearbyAvalancheRegion = StationAvalancheRegion & {
 };
 
 export type StationDetailResponse = {
-  station: StationSummary;
-  location: MountainLocation;
-  locationMatch: CuratedLocation | null;
+  station: MountainLocation;
   avalancheRegion?: StationAvalancheRegion | null;
   nearbyAvalancheRegions?: StationNearbyAvalancheRegion[];
 };

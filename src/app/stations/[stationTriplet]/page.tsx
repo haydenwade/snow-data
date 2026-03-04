@@ -130,15 +130,15 @@ export default function StationPage() {
 
         const detail = await fetchStationDetail(stationKey);
         if (!mounted) return;
-        setLocation(detail.location);
+        setLocation(detail.station);
         setAvalancheRegion(detail.avalancheRegion ?? null);
         setNearbyAvalancheRegions(detail.nearbyAvalancheRegions ?? []);
 
         const [historicResult, forecastResult] = await Promise.allSettled([
           fetchHistoric(stationKey, 30),
           fetchForecastGrid(
-            detail.location.lat,
-            detail.location.lon,
+            detail.station.lat,
+            detail.station.lon,
           ),
         ]);
         if (!mounted) return;
@@ -152,7 +152,7 @@ export default function StationPage() {
         if (forecastResult.status === "fulfilled") {
           const dailyForecast = aggregateForecastToDaily(
             forecastResult.value,
-            detail.location.timezone,
+            detail.station.timezone,
           );
           setForecast(dailyForecast);
         } else {

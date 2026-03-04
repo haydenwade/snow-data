@@ -7,7 +7,6 @@ import {
   findLocationByTriplet,
   resolveTripletFromStationKey,
   toMountainLocation,
-  toStationSummary,
 } from "@/lib/server/stations";
 import { StationDetailResponse } from "@/types/station";
 import { NextResponse } from "next/server";
@@ -42,26 +41,21 @@ export async function GET(
     }
 
     const locationMatch = findLocationByTriplet(station.stationTriplet);
-    const location = toMountainLocation(station, locationMatch);
-    const stationLat =
-      typeof station.latitude === "number" && Number.isFinite(station.latitude)
-        ? station.latitude
-        : location.lat;
-    const stationLon =
-      typeof station.longitude === "number" && Number.isFinite(station.longitude)
-        ? station.longitude
-        : location.lon;
+    const enrichedStation = toMountainLocation(station, locationMatch);
 
     let avalancheRegion = null;
     let nearbyAvalancheRegions = [] as NonNullable<
       StationDetailResponse["nearbyAvalancheRegions"]
     >;
     try {
-      avalancheRegion = await findAvalancheRegionForPoint(stationLat, stationLon);
+      avalancheRegion = await findAvalancheRegionForPoint(
+        enrichedStation.lat,
+        enrichedStation.lon,
+      );
       if (!avalancheRegion) {
         nearbyAvalancheRegions = await findNearbyAvalancheRegionsForPoint(
-          stationLat,
-          stationLon,
+          enrichedStation.lat,
+          enrichedStation.lon,
           {
             maxDistanceMiles: 50,
             limit: 3,
@@ -74,9 +68,7 @@ export async function GET(
     }
 
     const response: StationDetailResponse = {
-      station: toStationSummary(station, locationMatch),
-      location,
-      locationMatch,
+      station: enrichedStation,
       avalancheRegion,
       nearbyAvalancheRegions,
     };

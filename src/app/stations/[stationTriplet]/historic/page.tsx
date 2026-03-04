@@ -96,7 +96,7 @@ export default function StationHistoricPage() {
         setError(null);
         const detail = await fetchStationDetail(stationKey);
         if (!mounted) return;
-        setLocation(detail.location);
+        setLocation(detail.station);
 
         const response = await fetchHistoric(stationKey, 30);
         if (!mounted) return;
