@@ -71,6 +71,16 @@ export default function SnowSummaryStrip({
     return parseInt(day, 10);
   };
 
+  const dayOfWeek = (date: string) => {
+    if (!date) return "";
+    const parsed = new Date(`${date}T00:00:00Z`);
+    if (Number.isNaN(parsed.getTime())) return "";
+    return parsed.toLocaleDateString("en-US", {
+      weekday: "short",
+      timeZone: "UTC",
+    });
+  };
+
   // Build per-bar items with value and date for labeling
   const getBarItems = (idx: number) => {
     // 0: Prev 1-7, 1: Prev 8-14, 2: Last 24 Hours, 3: Next 24 Hours, 4: Next 1-7
@@ -206,6 +216,7 @@ export default function SnowSummaryStrip({
                     <div key={i} className="flex-1 text-center">
                       <div className="font-medium text-slate-300">{displayVal}</div>
                       <div className="opacity-70">{dayOfMonth(bar.date)}</div>
+                      <div className="text-[9px] opacity-60">{dayOfWeek(bar.date)}</div>
                     </div>
                   );
                 })}
