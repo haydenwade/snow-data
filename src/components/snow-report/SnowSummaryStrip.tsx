@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from "react";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Info } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
 import { computeSnowBuckets } from "./utils";
 import WteqEstimateIndicator from "./WteqEstimateIndicator";
@@ -47,13 +47,13 @@ export default function SnowSummaryStrip({
       type: "historic" as const,
     },
     {
-      label: "Last 24 Hours",
+      label: "Yesterday",
       value: buckets.last24,
       type: "current" as const,
       highlight: true,
     },
     {
-      label: "Next 24 Hours",
+      label: "Today",
       value: buckets.next24,
       type: "forecast" as const,
     },
@@ -128,7 +128,22 @@ export default function SnowSummaryStrip({
     <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-4">
       <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-700/50">
         <CalendarDays className="h-5 w-5 text-blue-400" />
-        <h2 className="font-semibold text-white">Snow Summary</h2>
+        <div className="flex items-center gap-1">
+          <h2 className="font-semibold text-white">Snow Summary</h2>
+          <div className="group relative">
+            <button
+              type="button"
+              aria-label="Snow summary daily aggregation info"
+              className="rounded-full p-0.5 text-slate-400 hover:bg-slate-700/30 hover:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <Info className="h-4 w-4" />
+            </button>
+            <div className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-64 -translate-x-1/2 rounded border border-slate-700/50 bg-slate-800/95 px-2 py-1 text-[10px] leading-tight text-slate-200 shadow-lg group-hover:block group-focus-within:block">
+              Forecast values are grouped by calendar day in local timezone and
+              summed for daily totals.
+            </div>
+          </div>
+        </div>
       </div>
       <div className="flex gap-2 flex-wrap">
         {summaryItems.map((item, idx) => {
