@@ -14,11 +14,14 @@ export function isoToDate(iso: string) {
   return new Date(iso);
 }
 
-export function toInches(mm: number) {
+export function mmToInches(mm: number) {
   return mm / 25.4;
 }
 
-//TODO: consolidate - two versions of this function exist
+export function inchesToMm(inches: number) {
+  return inches * 25.4;
+}
+
 export function cToF(c: number) {
   return (c * 9) / 5 + 32;
 }
@@ -54,8 +57,16 @@ export function celsiusFromF(f: number) {
   return Math.round(((f - 32) * 5) / 9);
 }
 
-export function kphFromMph(mph: number) {
+export function mphToKph(mph: number) {
   return Math.round(mph * 1.60934);
+}
+
+export function kphToMph(kph: number) {
+  return kph * 0.621371;
+}
+
+export function msToMph(ms: number) {
+  return ms * 2.236936;
 }
 
 export function metersFromFeet(feet: number) {
@@ -158,7 +169,9 @@ export function aggregateForecastToDaily(
     : grid.snowfallAmount;
   src.points.forEach((p) => {
     const hours = Math.max(1, Math.round(p.hours));
-    const inches = useQpfFallback ? toInches(p.value) * 12 : toInches(p.value);
+    const inches = useQpfFallback
+      ? mmToInches(p.value) * 12
+      : mmToInches(p.value);
     const perHourIn = inches / hours;
     const hoursList = expandToHourly(p);
     hoursList.forEach((h) => {
@@ -274,8 +287,7 @@ export function aggregateForecastToDaily(
         0
       );
       const avgKph = sum / b.windSpeeds.length;
-      // convert km/h to mph
-      windMph = Math.round(avgKph * 0.621371);
+      windMph = Math.round(kphToMph(avgKph));
     }
 
     // weighted average wind direction (vector average)

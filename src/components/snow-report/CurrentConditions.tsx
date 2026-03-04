@@ -9,7 +9,7 @@ import {
   celsiusFromF,
   formatObservedLabel,
   formatTimeInZone,
-  kphFromMph,
+  mphToKph,
 } from "./utils";
 import { SkyIcon } from "./SkyIcon";
 
@@ -152,7 +152,7 @@ export default function CurrentConditions({
                           {current.wind?.speedMph == null
                             ? "—"
                             : unit === "mm"
-                              ? `${kphFromMph(current.wind.speedMph)} kph`
+                              ? `${mphToKph(current.wind.speedMph)} kph`
                               : `${current.wind.speedMph} mph`}
                           {current.wind?.directionText ? (
                             <span className="text-slate-400 ml-2">

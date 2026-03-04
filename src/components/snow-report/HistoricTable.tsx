@@ -4,7 +4,7 @@ import HistoricTableSkeleton from "../skeletons/HistoricTableSkeleton";
 import { History, Info } from "lucide-react";
 import SnowCell from "./SnowCell";
 import WteqEstimateIndicator from "./WteqEstimateIndicator";
-import { celsiusFromF, formatDateYYYYMMDD } from "./utils";
+import { celsiusFromF, formatDateYYYYMMDD, inchesToMm } from "./utils";
 import { HistoricDay } from "@/types/historic";
 import { Unit } from "@/types/forecast";
 
@@ -134,7 +134,7 @@ export default function HistoricTable({
                       <div className="inline-flex items-center justify-end gap-1">
                         <span>
                           {unit === "mm"
-                            ? `${Math.round(d.snowDepthAtStartOfDay * 25.4)} mm`
+                            ? `${Math.round(inchesToMm(d.snowDepthAtStartOfDay))} mm`
                             : `${d.snowDepthAtStartOfDay!.toFixed(0)}"`}
                         </span>
                         {d.depthSource === "WTEQ" && (

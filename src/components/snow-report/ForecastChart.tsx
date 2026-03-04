@@ -12,6 +12,7 @@ import {
   LabelList,
 } from "recharts";
 import { ForecastDaily, Unit } from "@/types/forecast";
+import { inchesToMm } from "./utils";
 
 function fmtDisplay(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
@@ -48,7 +49,7 @@ export default function ForecastChart({
     shortDate: fmtShort(d.date),
     tickDOW: fmtShort(d.date),
     tickMD: fmtMonthDay(d.date),
-    value: unit === "mm" ? d.snowIn * 25.4 : d.snowIn,
+    value: unit === "mm" ? inchesToMm(d.snowIn) : d.snowIn,
   }));
 
   const unitLabel = unit === "mm" ? "mm" : '"';

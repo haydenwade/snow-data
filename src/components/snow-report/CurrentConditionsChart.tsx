@@ -2,7 +2,7 @@ import { ApiResp } from "@/types/current-conditions-response";
 import { CloudSun, Droplets, Thermometer, Wind } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { celsiusFromF, kphFromMph } from "./utils";
+import { celsiusFromF, mphToKph } from "./utils";
 import { SkyIcon } from "./SkyIcon";
 import { Unit } from "@/types/forecast";
 
@@ -76,7 +76,7 @@ function ChartTooltip({
   } else if (tab === "wind") {
     const mph = p?.windSpeedMph;
     if (typeof mph === "number") {
-      valueText = unit === "mm" ? `${kphFromMph(mph)} kph` : `${mph} mph`;
+      valueText = unit === "mm" ? `${mphToKph(mph)} kph` : `${mph} mph`;
     }
   } else if (tab === "precip") {
     const pct = p?.precipChancePct;
@@ -171,7 +171,7 @@ export default function CurrentConditionsChart({
                     return unit === "mm" ? `${celsiusFromF(v)}°` : `${v}°`;
                   }
                   if (tab === "wind") {
-                    return unit === "mm" ? `${kphFromMph(v)}` : `${v}`;
+                    return unit === "mm" ? `${mphToKph(v)}` : `${v}`;
                   }
                   if (tab === "precip") return `${v}%`;
                   return `${v}`;
@@ -233,7 +233,7 @@ export default function CurrentConditionsChart({
                   ? p.windSpeedMph == null
                     ? "—"
                     : unit === "mm"
-                    ? `${kphFromMph(p.windSpeedMph)}`
+                    ? `${mphToKph(p.windSpeedMph)}`
                     : `${p.windSpeedMph}`
                   : p.precipChancePct == null
                   ? "—"

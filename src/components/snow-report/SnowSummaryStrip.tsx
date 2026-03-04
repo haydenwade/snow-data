@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { CalendarDays, Info } from "lucide-react";
 import SnowSummaryStripSkeleton from "../skeletons/SnowSummaryStripSkeleton";
-import { computeSnowBuckets } from "./utils";
+import { computeSnowBuckets, inchesToMm } from "./utils";
 import WteqEstimateIndicator from "./WteqEstimateIndicator";
 import { HistoricDay } from "@/types/historic";
 import { ForecastDaily, Unit } from "@/types/forecast";
@@ -30,7 +30,7 @@ export default function SnowSummaryStrip({
   );
 
   const formatSnow = (value: number) => {
-    if (useMetric) return `${Math.round(value * 25.4)}`;
+    if (useMetric) return `${Math.round(inchesToMm(value))}`;
     return value.toFixed(1);
   };
   const unitLabel = useMetric ? "mm" : '"';
@@ -208,7 +208,7 @@ export default function SnowSummaryStrip({
               <div className="flex gap-0.5 text-[10px] leading-tight text-slate-400">
                 {barItems.map((bar, i) => {
                   const displayVal = useMetric
-                    ? Math.round(bar.value * 25.4)
+                    ? Math.round(inchesToMm(bar.value))
                     : Number.isInteger(bar.value)
                     ? bar.value
                     : parseFloat(bar.value.toFixed(1));

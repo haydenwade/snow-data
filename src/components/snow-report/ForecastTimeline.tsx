@@ -8,6 +8,7 @@ import {
   skyCoverLabel,
   celsiusFromF,
   cToF,
+  mphToKph,
 } from "./utils";
 import { ForecastDaily, Unit } from "@/types/forecast";
 
@@ -113,7 +114,7 @@ export default function ForecastTimeline({
                   {d.windMph != null ? (
                     unit === "mm" ? (
                       <span className="font-medium">
-                        {Math.round(d.windMph * 1.60934)} kph
+                        {mphToKph(d.windMph)} kph
                       </span>
                     ) : (
                       <span className="font-medium">{d.windMph} mph</span>

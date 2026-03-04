@@ -1,5 +1,5 @@
 import { ApiResp, TimeseriesPoint } from "@/types/current-conditions-response";
-import { cToF } from "@/components/snow-report/utils";
+import { cToF, kphToMph } from "@/components/snow-report/utils";
 
 type OpenMeteoCurrent = {
   time?: number | string;
@@ -34,10 +34,6 @@ function minutesSince(iso?: string | null): number | null {
   const ts = Date.parse(iso);
   if (Number.isNaN(ts)) return null;
   return Math.max(0, Math.round((Date.now() - ts) / 60000));
-}
-
-function kphToMph(kph: number) {
-  return kph * 0.621371;
 }
 
 function windLabel(mph?: number | null) {

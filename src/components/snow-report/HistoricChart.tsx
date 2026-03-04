@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { HistoricDay } from "@/types/historic";
 import { Unit } from "@/types/forecast";
+import { inchesToMm } from "./utils";
 
 function fmtShort(dateStr: string) {
   const d = new Date(`${dateStr}T00:00:00Z`);
@@ -42,7 +43,7 @@ export default function HistoricChart({
       day: "numeric",
       timeZone: "UTC",
     }),
-    value: unit === "mm" ? d.derivedSnowfall! * 25.4 : d.derivedSnowfall,
+    value: unit === "mm" ? inchesToMm(d.derivedSnowfall!) : d.derivedSnowfall,
     startDepthInches: d.snowDepthAtStartOfDay,
   }));
 
@@ -63,7 +64,7 @@ export default function HistoricChart({
             <p className="text-xs text-slate-400">
               Snow Depth:{" "}
               {unit === "mm"
-                ? `${Math.round(item.startDepthInches * 25.4)} mm`
+                ? `${Math.round(inchesToMm(item.startDepthInches))} mm`
                 : `${Math.round(item.startDepthInches)}"`}
             </p>
           )}

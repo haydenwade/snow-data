@@ -1,7 +1,12 @@
 "use client";
 import { CloudSnow } from "lucide-react";
 import SnowCell from "./SnowCell";
-import { formatDateYYYYMMDD, degToCompass, skyCoverLabel } from "./utils";
+import {
+  formatDateYYYYMMDD,
+  degToCompass,
+  skyCoverLabel,
+  mphToKph,
+} from "./utils";
 import ForecastTableSkeleton from "../skeletons/ForecastTableSkeleton";
 import { ForecastDaily, Unit } from "@/types/forecast";
 
@@ -99,7 +104,7 @@ export default function ForecastTable({
                     {d.windMph != null ? (
                       unit === "mm" ? (
                         <span className="font-medium">
-                          {Math.round(d.windMph * 1.60934)} kph{" "}
+                          {mphToKph(d.windMph)} kph{" "}
                           {degToCompass(d.windDirDeg)}
                         </span>
                       ) : (

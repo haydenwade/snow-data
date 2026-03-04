@@ -1,5 +1,5 @@
 import { TimeseriesPoint, ApiResp } from "@/types/current-conditions-response";
-import { cToF } from "@/components/snow-report/utils";
+import { cToF, kphToMph, msToMph } from "@/components/snow-report/utils";
 
 const NWS_USER_AGENT = "snow-data (github.com)";
 const NWS_OBSERVATION_STALE_MINUTES = 60;
@@ -27,11 +27,6 @@ function minutesSince(iso?: string | null): number | null {
   const ts = Date.parse(iso);
   if (Number.isNaN(ts)) return null;
   return Math.max(0, Math.round((Date.now() - ts) / 60000));
-}
-
-function msToMph(ms?: number | null) {
-  if (ms == null || Number.isNaN(ms)) return null;
-  return ms * 2.236936;
 }
 
 function windLabel(mph?: number | null) {
@@ -133,7 +128,7 @@ function parseWindSpeedToMph(text?: string | null): number | null {
   }
   const maxValue = Math.max(...values);
   if (lower.includes("kt") || lower.includes("knot")) return maxValue * 1.15078;
-  if (lower.includes("km/h") || lower.includes("kph")) return maxValue * 0.621371;
+  if (lower.includes("km/h") || lower.includes("kph")) return kphToMph(maxValue);
   return maxValue;
 }
 
