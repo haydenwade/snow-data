@@ -16,7 +16,7 @@ import {
   formatDateYYYYMMDD,
   formatMonthDay,
   formatWeekdayShort,
-  inchesToMm,
+  inchesToCm,
 } from "./utils";
 
 export default function ForecastChart({
@@ -34,10 +34,10 @@ export default function ForecastChart({
     shortDate: formatWeekdayShort(d.date),
     tickDOW: formatWeekdayShort(d.date),
     tickMD: formatMonthDay(d.date),
-    value: unit === "mm" ? inchesToMm(d.snowIn) : d.snowIn,
+    value: unit === "mm" ? inchesToCm(d.snowIn) : d.snowIn,
   }));
 
-  const unitLabel = unit === "mm" ? "mm" : '"';
+  const unitLabel = unit === "mm" ? "cm" : '"';
   const maxValue = Math.max(...chartData.map((d) => d.value), 1);
 
   const CustomTooltip = ({ active, payload }: any) => {

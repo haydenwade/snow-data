@@ -6,7 +6,7 @@ import {
   computeSnowBuckets,
   formatDayOfMonth,
   formatWeekdayShort,
-  inchesToMm,
+  inchesToCm,
 } from "./utils";
 import WteqEstimateIndicator from "./WteqEstimateIndicator";
 import { HistoricDay } from "@/types/historic";
@@ -35,10 +35,10 @@ export default function SnowSummaryStrip({
   );
 
   const formatSnow = (value: number) => {
-    if (useMetric) return `${Math.round(inchesToMm(value))}`;
+    if (useMetric) return `${Math.round(inchesToCm(value))}`;
     return value.toFixed(1);
   };
-  const unitLabel = useMetric ? "mm" : '"';
+  const unitLabel = useMetric ? "cm" : '"';
 
   const summaryItems = [
     {
@@ -188,7 +188,7 @@ export default function SnowSummaryStrip({
                         )}%`,
                         minHeight: "2px",
                       }}
-                      title={`${val.toFixed(2)} ${useMetric ? "in (raw)" : "in"} | DoM ${formatDayOfMonth(bar.date)}`}
+                      title={`${useMetric ? `${Math.round(inchesToCm(val))} cm` : `${val.toFixed(2)} in`} | DoM ${formatDayOfMonth(bar.date)}`}
                     />
                   );
                 })}
@@ -196,7 +196,7 @@ export default function SnowSummaryStrip({
               <div className="flex gap-0.5 text-[10px] leading-tight text-slate-400">
                 {barItems.map((bar, i) => {
                   const displayVal = useMetric
-                    ? Math.round(inchesToMm(bar.value))
+                    ? Math.round(inchesToCm(bar.value))
                     : Number.isInteger(bar.value)
                     ? bar.value
                     : parseFloat(bar.value.toFixed(1));

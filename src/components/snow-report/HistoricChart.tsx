@@ -17,7 +17,7 @@ import { Unit } from "@/types/forecast";
 import {
   formatDayOfMonth,
   formatWeekdayShort,
-  inchesToMm,
+  inchesToCm,
 } from "./utils";
 
 function fmtShort(dateStr: string) {
@@ -45,11 +45,11 @@ export default function HistoricChart({
     displayDate: fmtShort(d.date),
     tickDOW: formatWeekdayShort(d.date),
     tickMD: formatDayOfMonth(d.date),
-    value: unit === "mm" ? inchesToMm(d.derivedSnowfall!) : d.derivedSnowfall,
+    value: unit === "mm" ? inchesToCm(d.derivedSnowfall!) : d.derivedSnowfall,
     startDepthInches: d.snowDepthAtStartOfDay,
   }));
 
-  const unitLabel = unit === "mm" ? "mm" : '"';
+  const unitLabel = unit === "mm" ? "cm" : '"';
   const maxValue = Math.max(...chartData.map((d) => d.value!), 1);
 
   const CustomTooltip = ({ active, payload }: any) => {
@@ -66,7 +66,7 @@ export default function HistoricChart({
             <p className="text-xs text-slate-400">
               Snow Depth:{" "}
               {unit === "mm"
-                ? `${Math.round(inchesToMm(item.startDepthInches))} mm`
+                ? `${Math.round(inchesToCm(item.startDepthInches))} cm`
                 : `${Math.round(item.startDepthInches)}"`}
             </p>
           )}

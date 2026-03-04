@@ -1,7 +1,7 @@
 "use client";
 import { Unit } from "@/types/forecast";
 import { Snowflake } from "lucide-react";
-import { inchesToMm } from "./utils";
+import { inchesToCm } from "./utils";
 
 export default function SnowCell({
   valueInInches,
@@ -17,7 +17,7 @@ export default function SnowCell({
   const text =
     unit === "in"
       ? `${safeValue.toFixed(1)}"`
-      : `${Math.round(inchesToMm(safeValue))} mm`;
+      : `${Math.round(inchesToCm(safeValue))} cm`;
   const color = isNonZero
     ? tone === "historic"
       ? "text-orange-400"

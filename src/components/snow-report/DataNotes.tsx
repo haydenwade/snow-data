@@ -48,7 +48,7 @@ export default function DataNotes(props:{location:MountainLocation}) {
               <strong className="text-slate-300">Data Source:</strong> U.S. stations use National Weather Service (NWS) via api.weather.gov. Non-U.S. stations use Open-Meteo forecast data for coordinates {location.latitude}, {location.longitude}.
             </p>
             <p>
-              <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snowfall values are normalized to millimeters and converted to inches (÷25.4), then aggregated into daily totals.
+              <strong className="text-slate-300">Snowfall Amount:</strong> Forecast snowfall values are normalized to millimeters, aggregated into daily totals, and displayed in inches (imperial) or centimeters (metric).
             </p>
             <p>
               <strong className="text-slate-300">PoP (Probability of Precipitation):</strong> The maximum probability of precipitation for each forecast period within the day.

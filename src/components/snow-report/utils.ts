@@ -18,8 +18,8 @@ export function mmToInches(mm: number) {
   return mm / 25.4;
 }
 
-export function inchesToMm(inches: number) {
-  return inches * 25.4;
+export function inchesToCm(inches: number) {
+  return inches * 2.54;
 }
 
 export function cToF(c: number) {

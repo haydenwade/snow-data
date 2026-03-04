@@ -33,6 +33,7 @@ import {
   getLocalIsoDate,
   normalizeAvalancheArchiveDate,
 } from "@/components/stations/avalanche-archive-date";
+import { formatElevationForUnit } from "@/components/snow-report/utils";
 
 const TILE_SIZE = 256;
 const MIN_ZOOM = 4;
@@ -677,6 +678,7 @@ export default function StationsExplorerMap({
 }: StationsExplorerMapProps) {
   const {
     isClient,
+    unit,
     preferredLocation,
     lastApprovedLocation,
     setLastApprovedLocation,
@@ -1611,7 +1613,7 @@ export default function StationsExplorerMap({
               <div className="text-xs text-slate-400 mt-1">
                 {selectedStation.county}
                 {selectedStation.elevationFt != null
-                  ? ` · ${Math.round(selectedStation.elevationFt).toLocaleString()} ft`
+                  ? ` · ${formatElevationForUnit(selectedStation.elevationFt, unit)}`
                   : ""}
               </div>
               <div className="mt-3">

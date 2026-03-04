@@ -31,10 +31,10 @@ export default function FavoriteSummaryCard({
 
   const useMetric = unit === "mm";
   const formatSnow = (value: number) => {
-    if (useMetric) return `${Math.round(value * 25.4)}`;
+    if (useMetric) return `${Math.round(value * 2.54)}`;
     return value.toFixed(1);
   };
-  const unitLabel = useMetric ? "mm" : '"';
+  const unitLabel = useMetric ? "cm" : '"';
 
   // Next 7 individual days from forecast (today + 6 more)
   const next7Days = forecast.slice(0, 7);
