@@ -1,9 +1,7 @@
 # SNOWD
-
 A snow conditions and forecasting app. Built with Next.js and powered by public data from the National Weather Service and USDA SNOTEL stations.
 
 ## Tech Stack
-
 - **Framework:** Next.js 16 (App Router) with TypeScript
 - **Styling:** Tailwind CSS 4
 - **Charts:** Recharts
