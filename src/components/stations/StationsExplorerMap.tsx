@@ -745,6 +745,8 @@ export default function StationsExplorerMap({
   const isViewingAvalancheArchive = selectedAvalancheArchiveDate != null;
   const canAdvanceAvalancheArchiveDate =
     visibleAvalancheForecastDate < todayAvalancheArchiveDate;
+  const showAvalancheArchiveControls =
+    enableAvalancheArchive && isAvalancheLayerVisible;
   const avalancheMapLayerRequestUrl = selectedAvalancheArchiveDate
     ? `/api/avalanche/map-layer?date=${encodeURIComponent(selectedAvalancheArchiveDate)}`
     : "/api/avalanche/map-layer";
@@ -1825,7 +1827,7 @@ export default function StationsExplorerMap({
           ) : null}
         </div>
 
-        {enableAvalancheArchive ? (
+        {showAvalancheArchiveControls ? (
           <>
             {isViewingAvalancheArchive ? (
               <div className="pointer-events-none absolute inset-x-0 top-3 z-[60] flex justify-center px-3 sm:top-4">
