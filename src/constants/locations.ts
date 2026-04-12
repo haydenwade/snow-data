@@ -742,7 +742,7 @@ export const LOCATIONS: CuratedLocation[] = [
     resortInfoLinks: [
       {
         label: "Snow Report",
-        url: "https://tellurideskiresort.com/snow-report-scrape/",
+        url: "https://tellurideskiresort.com/snow-report",
       },
       {
         label: "Mountain Info",
