@@ -843,7 +843,7 @@ export const LOCATIONS: CuratedLocation[] = [
     trafficInfoLinks: [],
   },
   {
-    id: "aspenHighlands",
+    id: "aspen-highlands",
     name: "Aspen Highlands",
     stationTriplet: "1326:CO:SNTL",
     logoUrl: "/aspen-logo.jpg",

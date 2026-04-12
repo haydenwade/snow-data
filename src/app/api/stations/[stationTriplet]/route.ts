@@ -4,6 +4,7 @@ import {
 } from "@/lib/server/avalanche-map-layer";
 import {
   fetchStationByTriplet,
+  findLocationById,
   findLocationByTriplet,
   resolveTripletFromStationKey,
   toMountainLocation,
@@ -40,7 +41,12 @@ export async function GET(
       );
     }
 
-    const locationMatch = findLocationByTriplet(station.stationTriplet);
+    // Prefer a location matched by the original slug/id so that two curated
+    // locations sharing the same stationTriplet (e.g. Keystone & A-Basin) each
+    // render their own metadata rather than always returning the first match.
+    const locationMatch =
+      findLocationById(params.stationTriplet) ??
+      findLocationByTriplet(station.stationTriplet);
     const enrichedStation = toMountainLocation(station, locationMatch);
 
     let avalancheRegion = null;
