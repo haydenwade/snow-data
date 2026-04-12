@@ -517,4 +517,250 @@ export const LOCATIONS: CuratedLocation[] = [
     ],
     trafficInfoLinks: [],
   },
+  {
+    id: "vail",
+    name: "Vail",
+    stationTriplet: "842:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/vailmtn/",
+      },
+      { label: "X", url: "https://x.com/vailmtn" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.vail.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.vail.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.vail.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.vail.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.vail.com/explore-the-resort/about-the-resort/getting-here.aspx",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
+  {
+    id: "beavercreek",
+    name: "Beaver Creek",
+    stationTriplet: "1041:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/beavercreek/",
+      },
+      { label: "X", url: "https://x.com/beavercreekmtn" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.beavercreek.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.beavercreek.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.beavercreek.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.beavercreek.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.beavercreek.com/explore-the-resort/about-the-resort/getting-around.aspx",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
+  {
+    id: "breckenridge",
+    name: "Breckenridge",
+    stationTriplet: "531:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/breckenridgemtn/",
+      },
+      { label: "X", url: "https://x.com/breckenridgemtn" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.breckenridge.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.breckenridge.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.breckenridge.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.breckenridge.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.breckenridge.com/explore-the-resort/about-the-resort/getting-here.aspx",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
+  {
+    id: "keystone",
+    name: "Keystone",
+    stationTriplet: "505:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/keystone_resort/",
+      },
+      { label: "X", url: "https://x.com/KeystoneMtn" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.keystoneresort.com/the-mountain/mountain-conditions/terrain-and-lift-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.keystoneresort.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.keystoneresort.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.keystoneresort.com/the-mountain/about-the-mountain/trail-map.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.keystoneresort.com/explore-the-resort/about-the-resort/getting-here.aspx",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
+  {
+    id: "crestedbutte",
+    name: "Crested Butte",
+    stationTriplet: "737:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/skicrestedbutte/",
+      },
+      { label: "X", url: "https://x.com/skicrestedbutte" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Terrain Status",
+        url: "https://www.skicb.com/the-mountain/mountain-conditions/lift-and-terrain-status.aspx",
+      },
+      {
+        label: "Hours of Operation",
+        url: "https://www.skicb.com/explore-the-resort/about-the-resort/hours-of-operation.aspx",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.skicb.com/the-mountain/mountain-conditions/mountain-cams.aspx",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.skicb.com/the-mountain/about-the-mountain/trail-maps.aspx",
+      },
+      {
+        label: "Parking",
+        url: "https://www.skicb.com/explore-the-resort/about-the-resort/getting-here.aspx",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "telluride",
+    name: "Telluride",
+    stationTriplet: "538:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/tellurideski/",
+      },
+      { label: "X", url: "https://x.com/Telluride" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Snow Report",
+        url: "https://tellurideskiresort.com/snow-report-scrape/",
+      },
+      {
+        label: "Mountain Info",
+        url: "https://tellurideskiresort.com/mountain/",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://tellurideskiresort.com/webcams/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://tellurideskiresort.com/wp-content/uploads/2425_TSR_Trail-Map_web.pdf",
+      },
+      {
+        label: "Ski Info",
+        url: "https://tellurideskiresort.com/ski/",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
 ];
