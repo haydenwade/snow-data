@@ -935,13 +935,14 @@ export default function StationsExplorerMap({
 
   useEffect(() => {
     if (!mapState) return;
+    if (!isStationLayerVisible) return;
     const roundedBounds = roundBounds(mapState.bounds);
     const stateCodes = getVisibleStates(roundedBounds);
     const key = `${stateCodes.join(",")}|${roundedBounds.west},${roundedBounds.south},${roundedBounds.east},${roundedBounds.north}`;
     if (key === lastViewportKeyRef.current) return;
     lastViewportKeyRef.current = key;
     onViewportChange({ stateCodes, bounds: roundedBounds });
-  }, [mapState, onViewportChange]);
+  }, [mapState, onViewportChange, isStationLayerVisible]);
 
   const selectedCluster = useMemo(
     () =>
@@ -1382,7 +1383,10 @@ export default function StationsExplorerMap({
                   onClick={() => {
                     setIsStationLayerVisible((current) => {
                       const next = !current;
-                      if (!next) setSelectedStationTriplet(null);
+                      if (!next) {
+                        setSelectedStationTriplet(null);
+                        lastViewportKeyRef.current = null;
+                      }
                       return next;
                     });
                   }}
@@ -1963,7 +1967,7 @@ export default function StationsExplorerMap({
           </div>
         ) : null}
 
-        {!isRefreshing && stations.length === 0 ? (
+        {isStationLayerVisible && !isRefreshing && stations.length === 0 ? (
           <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border border-slate-600 bg-slate-900/90 px-3 py-1 text-xs text-slate-300">
             No stations found in the current viewport.
           </div>
