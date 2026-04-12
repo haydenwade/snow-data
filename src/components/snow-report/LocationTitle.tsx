@@ -42,13 +42,11 @@ export default function LocationTitle({
                 className="relative inline-block focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
               >
                 {location.logoUrl ? (
-                  <div className="relative bg-white p-2 rounded-2xl flex items-center justify-center w-14 h-14 border border-slate-200">
                     <img
                       src={location.logoUrl}
                       alt={stationName + " logo"}
-                      className="max-h-10 max-w-10 object-contain"
+                      className="h-12 w-12 object-contain rounded-full shrink-0 overflow-hidden"
                     />
-                  </div>
                 ) : (
                   <>
                     <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full" />
