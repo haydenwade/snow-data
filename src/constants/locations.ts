@@ -763,4 +763,193 @@ export const LOCATIONS: CuratedLocation[] = [
     ],
     trafficInfoLinks: [],
   },
+  {
+    id: "coppermountain",
+    name: "Copper Mountain",
+    stationTriplet: "415:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/coppermtn/",
+      },
+      { label: "X", url: "https://x.com/CopperMtn" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift and Trail Report",
+        url: "https://www.coppercolorado.com/the-mountain/trail-lift-info/winter-trail-report/",
+      },
+      {
+        label: "Activity Status",
+        url: "https://www.coppercolorado.com/the-mountain/trail-lift-info/activity-status/",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.coppercolorado.com/the-mountain/webcams/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.coppercolorado.com/the-mountain/trail-area-maps/winter-trail-map/",
+      },
+      {
+        label: "Parking",
+        url: "https://www.coppercolorado.com/the-mountain/getting-to-around-copper/parking/",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
+  {
+    id: "snowmass",
+    name: "Snowmass",
+    stationTriplet: "542:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/aspensnowmass/",
+      },
+      { label: "X", url: "https://x.com/AspenSnowmass" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift Status",
+        url: "https://www.aspensnowmass.com/four-mountains/snowmass/lift-status",
+      },
+      {
+        label: "Snow and Grooming Report",
+        url: "https://www.aspensnowmass.com/four-mountains/snowmass/snow-and-grooming-report",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.aspensnowmass.com/four-mountains/mountain-cams",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.aspensnowmass.com/four-mountains/snowmass/trail-maps",
+      },
+      {
+        label: "Parking",
+        url: "https://www.aspensnowmass.com/visit/parking-and-getting-around",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "aspenHighlands",
+    name: "Aspen Highlands",
+    stationTriplet: "547:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/aspensnowmass/",
+      },
+      { label: "X", url: "https://x.com/AspenSnowmass" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift Status",
+        url: "https://www.aspensnowmass.com/four-mountains/aspen-highlands/lift-status",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.aspensnowmass.com/four-mountains/mountain-cams",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.aspensnowmass.com/four-mountains/aspen-highlands/trail-maps",
+      },
+      {
+        label: "Parking",
+        url: "https://www.aspensnowmass.com/visit/parking-and-getting-around",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "buttermilk",
+    name: "Buttermilk",
+    stationTriplet: "669:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/aspensnowmass/",
+      },
+      { label: "X", url: "https://x.com/AspenSnowmass" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Lift Status",
+        url: "https://www.aspensnowmass.com/four-mountains/buttermilk/lift-status",
+      },
+      {
+        label: "Snow and Grooming Report",
+        url: "https://www.aspensnowmass.com/four-mountains/buttermilk/snow-and-grooming-report",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.aspensnowmass.com/four-mountains/mountain-cams",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.aspensnowmass.com/four-mountains/buttermilk/trail-maps",
+      },
+      {
+        label: "Parking",
+        url: "https://www.aspensnowmass.com/visit/parking-and-getting-around",
+      },
+    ],
+    trafficInfoLinks: [],
+  },
+  {
+    id: "arapahoebasin",
+    name: "Arapahoe Basin",
+    stationTriplet: "602:CO:SNTL",
+    socialMediaLinks: [
+      {
+        label: "Instagram",
+        url: "https://www.instagram.com/arapahoe_basin/",
+      },
+      { label: "X", url: "https://x.com/Arapahoe_Basin" },
+    ],
+    resortInfoLinks: [
+      {
+        label: "Snow Report",
+        url: "https://www.arapahoebasin.com/snow-report/",
+      },
+      {
+        label: "Operating Hours",
+        url: "https://www.arapahoebasin.com/operating-hours-/",
+      },
+      {
+        label: "Mountain Cameras",
+        url: "https://www.arapahoebasin.com/mountain-cams/",
+      },
+      {
+        label: "Trail Map",
+        url: "https://www.arapahoebasin.com/trail-maps/",
+      },
+      {
+        label: "Parking (The Beach)",
+        url: "https://www.arapahoebasin.com/the-beach/",
+      },
+    ],
+    trafficInfoLinks: [
+      {
+        label: "I-70 Mountain Corridor | CDOT",
+        url: "https://www.codot.gov/travel/i70mountain",
+      },
+      {
+        label: "I-70 Travel Forecast | GoI70",
+        url: "https://goi70.com/travel/",
+      },
+    ],
+  },
 ];
