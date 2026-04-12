@@ -521,6 +521,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "vail",
     name: "Vail",
     stationTriplet: "842:CO:SNTL",
+    logoUrl: "/vail-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -565,6 +566,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "beavercreek",
     name: "Beaver Creek",
     stationTriplet: "1041:CO:SNTL",
+    logoUrl: "/beavercreek-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -609,6 +611,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "breckenridge",
     name: "Breckenridge",
     stationTriplet: "531:CO:SNTL",
+    logoUrl: "/breckenridge-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -653,6 +656,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "keystone",
     name: "Keystone",
     stationTriplet: "505:CO:SNTL",
+    logoUrl: "/keystone-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -696,7 +700,8 @@ export const LOCATIONS: CuratedLocation[] = [
   {
     id: "crestedbutte",
     name: "Crested Butte",
-    stationTriplet: "737:CO:SNTL",
+    stationTriplet: "380:CO:SNTL",
+    logoUrl: "/crestedbutte-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -731,7 +736,8 @@ export const LOCATIONS: CuratedLocation[] = [
   {
     id: "telluride",
     name: "Telluride",
-    stationTriplet: "538:CO:SNTL",
+    stationTriplet: "1344:CO:SNTL",
+    logoUrl: "/telluride-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -755,7 +761,7 @@ export const LOCATIONS: CuratedLocation[] = [
       {
         label: "Trail Map",
         url: "https://tellurideskiresort.com/wp-content/uploads/2425_TSR_Trail-Map_web.pdf",
-      }
+      },
     ],
     trafficInfoLinks: [],
   },
@@ -763,6 +769,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "coppermountain",
     name: "Copper Mountain",
     stationTriplet: "415:CO:SNTL",
+    logoUrl: "/copper-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -774,10 +781,6 @@ export const LOCATIONS: CuratedLocation[] = [
       {
         label: "Lift and Trail Report",
         url: "https://www.coppercolorado.com/the-mountain/trail-lift-info/winter-trail-report/",
-      },
-      {
-        label: "Activity Status",
-        url: "https://www.coppercolorado.com/the-mountain/trail-lift-info/activity-status/",
       },
       {
         label: "Mountain Cameras",
@@ -807,6 +810,7 @@ export const LOCATIONS: CuratedLocation[] = [
     id: "snowmass",
     name: "Snowmass",
     stationTriplet: "542:CO:SNTL",
+    logoUrl: "/aspen-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -841,7 +845,8 @@ export const LOCATIONS: CuratedLocation[] = [
   {
     id: "aspenHighlands",
     name: "Aspen Highlands",
-    stationTriplet: "547:CO:SNTL",
+    stationTriplet: "1326:CO:SNTL",
+    logoUrl: "/aspen-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -872,7 +877,8 @@ export const LOCATIONS: CuratedLocation[] = [
   {
     id: "buttermilk",
     name: "Buttermilk",
-    stationTriplet: "669:CO:SNTL",
+    stationTriplet: "542:CO:SNTL",
+    logoUrl: "/aspen-logo.jpg",
     socialMediaLinks: [
       {
         label: "Instagram",
@@ -907,7 +913,8 @@ export const LOCATIONS: CuratedLocation[] = [
   {
     id: "arapahoebasin",
     name: "Arapahoe Basin",
-    stationTriplet: "602:CO:SNTL",
+    stationTriplet: "505:CO:SNTL",
+    logoUrl: "/abasin-logo.svg",
     socialMediaLinks: [
       {
         label: "Instagram",
