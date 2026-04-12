@@ -755,11 +755,7 @@ export const LOCATIONS: CuratedLocation[] = [
       {
         label: "Trail Map",
         url: "https://tellurideskiresort.com/wp-content/uploads/2425_TSR_Trail-Map_web.pdf",
-      },
-      {
-        label: "Ski Info",
-        url: "https://tellurideskiresort.com/ski/",
-      },
+      }
     ],
     trafficInfoLinks: [],
   },
