@@ -1385,7 +1385,7 @@ export default function StationsExplorerMap({
                       const next = !current;
                       if (!next) {
                         setSelectedStationTriplet(null);
-                        lastViewportKeyRef.current = null;
+                        lastViewportKeyRef.current = "";
                       }
                       return next;
                     });
