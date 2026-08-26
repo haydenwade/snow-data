@@ -184,7 +184,10 @@ export default function Home() {
             <StationsExplorerSection />
           </Suspense>
         </div>
-        <Footer textOverride={"Don't see the location you are looking for?"} />
+        <Footer
+          textOverride={"Don't see the location you are looking for?"}
+          showSupport={false}
+        />
       </div>
     </div>
   );
