@@ -7,6 +7,7 @@ import SubmitPrompt from "@/components/snow-report/SubmitPrompt";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Mountain, Search } from "lucide-react";
 import RotatingFeatures from "@/components/RotatingFeatures";
+import SummerBanner from "@/components/SummerBanner";
 import StationsExplorerSection from "@/components/stations/StationsExplorerSection";
 import { fetchCuratedLocations } from "@/lib/api";
 import { MountainLocation } from "@/types/location";
@@ -70,6 +71,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100">
       <div className="max-w-6xl mx-auto px-4 pt-4 pb-28">
+        <SummerBanner />
+
         {/* Hero */}
         <div className="text-center mb-6">
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4">
