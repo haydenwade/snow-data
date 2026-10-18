@@ -397,6 +397,22 @@ export type SnowBuckets = {
   next1_7: number;
 };
 
+/**
+ * Centered 3-point rolling median. Hourly snow depth sensors jitter by an inch
+ * or two, so this keeps single-hour spikes from reading as snowfall. Gaps stay
+ * null; neighbors that are null are skipped.
+ */
+export function medianSmooth(values: Array<number | null>): Array<number | null> {
+  return values.map((value, i) => {
+    if (value == null) return null;
+    const window = [values[i - 1], value, values[i + 1]]
+      .filter((v): v is number => v != null)
+      .sort((a, b) => a - b);
+    const mid = Math.floor(window.length / 2);
+    return window.length % 2 ? window[mid] : (window[mid - 1] + window[mid]) / 2;
+  });
+}
+
 export function computeSnowBuckets(
   historic: { date: string; derivedSnowfall?: number | null }[],
   forecast: { date: string; snowIn: number }[]

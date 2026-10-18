@@ -1,12 +1,16 @@
 import {
   fetchHistoricByStationTriplet,
-  fetchHourlyTemperatureByStationTriplet,
+  fetchHourlyObservationsByStationTriplet,
 } from "@/lib/server/historic";
 import {
   fetchStationByTriplet,
   resolveTripletFromStationKey,
 } from "@/lib/server/stations";
-import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
+import {
+  HistoricDay,
+  HistoricHourlySnowDepthPoint,
+  HistoricHourlyTemperaturePoint,
+} from "@/types/historic";
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -19,6 +23,7 @@ interface GetResponseType {
   error?: string;
   data?: HistoricDay[];
   hourlyTemperature?: HistoricHourlyTemperaturePoint[];
+  hourlySnowDepth?: HistoricHourlySnowDepthPoint[];
 }
 
 export async function GET(
@@ -49,21 +54,28 @@ export async function GET(
   const endDate = searchParams.get("endDate");
 
   try {
-    const [data, hourlyTemperature] = await Promise.all([
+    const [data, hourly] = await Promise.all([
       fetchHistoricByStationTriplet({
         stationTriplet: station.stationTriplet,
         days,
         beginDate,
         endDate,
       }),
-      fetchHourlyTemperatureByStationTriplet({
+      fetchHourlyObservationsByStationTriplet({
         stationTriplet: station.stationTriplet,
         dataTimeZoneHours: station.dataTimeZone,
         pastHours: 24 * 7,
-      }).catch(() => []),
+      }).catch(() => ({ temperature: [], snowDepth: [] })),
     ]);
 
-    return NextResponse.json({ data, hourlyTemperature }, { status: 200 });
+    return NextResponse.json(
+      {
+        data,
+        hourlyTemperature: hourly.temperature,
+        hourlySnowDepth: hourly.snowDepth,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     return NextResponse.json(
       { error: (error as Error)?.message || "Failed to fetch historic data" },

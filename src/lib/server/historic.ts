@@ -1,4 +1,8 @@
-import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
+import {
+  HistoricDay,
+  HistoricHourlySnowDepthPoint,
+  HistoricHourlyTemperaturePoint,
+} from "@/types/historic";
 import { awdbDateToIso, fetchAwdbJson, parseAwdbDate, toIsoDate } from "./awdb";
 
 type DailyRecord = {
@@ -165,7 +169,8 @@ export async function fetchHistoricByStationTriplet({
   return out;
 }
 
-export async function fetchHourlyTemperatureByStationTriplet({
+/** Hourly temperature and snow depth observations for the past `pastHours`. */
+export async function fetchHourlyObservationsByStationTriplet({
   stationTriplet,
   dataTimeZoneHours,
   pastHours = 168,
@@ -173,12 +178,15 @@ export async function fetchHourlyTemperatureByStationTriplet({
   stationTriplet: string;
   dataTimeZoneHours?: number | null;
   pastHours?: number;
-}): Promise<HistoricHourlyTemperaturePoint[]> {
+}): Promise<{
+  temperature: HistoricHourlyTemperaturePoint[];
+  snowDepth: HistoricHourlySnowDepthPoint[];
+}> {
   const safeHours = Math.max(1, Math.min(24 * 14, Math.round(pastHours)));
 
   const json = await fetchAwdbJson<StationDataResponse>("/data", {
     stationTriplets: stationTriplet,
-    elements: "TOBS",
+    elements: "TOBS,SNWD",
     duration: "HOURLY",
     beginDate: -safeHours,
     endDate: 0,
@@ -186,7 +194,8 @@ export async function fetchHourlyTemperatureByStationTriplet({
   });
 
   const stationData = Array.isArray(json) ? json : [];
-  const out: HistoricHourlyTemperaturePoint[] = [];
+  const temperature: HistoricHourlyTemperaturePoint[] = [];
+  const snowDepth: HistoricHourlySnowDepthPoint[] = [];
 
   for (const station of stationData) {
     for (const elementRecord of station.data ?? []) {
@@ -196,7 +205,7 @@ export async function fetchHourlyTemperatureByStationTriplet({
           elementRecord.elementCode ??
           "",
       ).toUpperCase();
-      if (elementCode !== "TOBS") continue;
+      if (elementCode !== "TOBS" && elementCode !== "SNWD") continue;
 
       for (const valueRecord of elementRecord.values ?? []) {
         const rawDate = String(valueRecord.date ?? "");
@@ -206,14 +215,20 @@ export async function fetchHourlyTemperatureByStationTriplet({
           valueRecord.value == null || valueRecord.value === ""
             ? null
             : Number(valueRecord.value);
-        out.push({
-          timestamp,
-          temperatureF: Number.isFinite(numeric as number) ? (numeric as number) : null,
-        });
+        const value = Number.isFinite(numeric as number) ? (numeric as number) : null;
+        if (elementCode === "TOBS") {
+          temperature.push({ timestamp, temperatureF: value });
+        } else {
+          snowDepth.push({
+            timestamp,
+            snowDepthIn: value == null ? null : Math.max(0, value),
+          });
+        }
       }
     }
   }
 
-  out.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-  return out;
+  temperature.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  snowDepth.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  return { temperature, snowDepth };
 }

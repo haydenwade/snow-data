@@ -6,13 +6,13 @@ import { Thermometer } from "lucide-react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { celsiusFromF } from "@/components/snow-report/utils";
 
-function formatAxisLabel(timestamp: string) {
+export function formatAxisLabel(timestamp: string) {
   const date = new Date(timestamp);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleTimeString("en-US", { hour: "numeric" });
 }
 
-function formatTooltipLabel(timestamp: string) {
+export function formatTooltipLabel(timestamp: string) {
   const date = new Date(timestamp);
   if (Number.isNaN(date.getTime())) return timestamp;
   return date.toLocaleString("en-US", {

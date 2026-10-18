@@ -1,5 +1,5 @@
 import { ForecastGridData } from '@/types/forecast';
-import { aggregateForecastToDaily } from './utils';
+import { aggregateForecastToDaily, medianSmooth } from './utils';
 
 const grid: ForecastGridData = {
   snowfallAmount: {
@@ -208,5 +208,19 @@ describe('aggregateForecastToDaily', () => {
     expect(byDate['2026-01-02'].tMaxC).toBe(1);
     expect(byDate['2026-01-02'].tMinF).toBe(18);
     expect(byDate['2026-01-02'].tMaxF).toBe(34);
+  });
+});
+
+describe('medianSmooth', () => {
+  it('drops single-hour spikes', () => {
+    expect(medianSmooth([40, 40, 46, 40, 41])).toEqual([40, 40, 40, 41, 40.5]);
+  });
+
+  it('keeps a real step up', () => {
+    expect(medianSmooth([40, 40, 44, 44, 44])).toEqual([40, 40, 44, 44, 44]);
+  });
+
+  it('keeps gaps as null and skips null neighbors', () => {
+    expect(medianSmooth([40, null, 42, 44])).toEqual([40, null, 43, 43]);
   });
 });

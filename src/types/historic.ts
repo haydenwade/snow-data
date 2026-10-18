@@ -13,3 +13,8 @@ export type HistoricHourlyTemperaturePoint = {
   timestamp: string;
   temperatureF: number | null;
 };
+
+export type HistoricHourlySnowDepthPoint = {
+  timestamp: string;
+  snowDepthIn: number | null;
+};

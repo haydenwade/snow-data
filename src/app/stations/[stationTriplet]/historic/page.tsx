@@ -10,10 +10,15 @@ import HistoricTable from "@/components/snow-report/HistoricTable";
 import DataNotes from "@/components/snow-report/DataNotes";
 import Footer from "@/components/snow-report/Footer";
 import HistoricTemperatureChart from "@/components/stations/HistoricTemperatureChart";
+import HistoricSnowDepthChart from "@/components/stations/HistoricSnowDepthChart";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { normalizeStationKeyInput } from "@/lib/station-key";
-import { HistoricDay, HistoricHourlyTemperaturePoint } from "@/types/historic";
+import {
+  HistoricDay,
+  HistoricHourlySnowDepthPoint,
+  HistoricHourlyTemperaturePoint,
+} from "@/types/historic";
 import { MountainLocation } from "@/types/location";
 import { StationDetailResponse } from "@/types/station";
 
@@ -42,6 +47,7 @@ async function fetchHistoric(
 ): Promise<{
   data: HistoricDay[];
   hourlyTemperature: HistoricHourlyTemperaturePoint[];
+  hourlySnowDepth: HistoricHourlySnowDepthPoint[];
 }> {
   const response = await fetch(
     `/api/stations/${encodeURIComponent(stationKey)}/historic?days=${days}`,
@@ -64,6 +70,8 @@ async function fetchHistoric(
     data: (payload.data ?? []) as HistoricDay[],
     hourlyTemperature:
       (payload.hourlyTemperature ?? []) as HistoricHourlyTemperaturePoint[],
+    hourlySnowDepth:
+      (payload.hourlySnowDepth ?? []) as HistoricHourlySnowDepthPoint[],
   };
 }
 
@@ -77,6 +85,9 @@ export default function StationHistoricPage() {
   const [historic, setHistoric] = useState<HistoricDay[]>([]);
   const [hourlyTemperature, setHourlyTemperature] = useState<
     HistoricHourlyTemperaturePoint[]
+  >([]);
+  const [hourlySnowDepth, setHourlySnowDepth] = useState<
+    HistoricHourlySnowDepthPoint[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +113,7 @@ export default function StationHistoricPage() {
         if (!mounted) return;
         setHistoric(response.data);
         setHourlyTemperature(response.hourlyTemperature);
+        setHourlySnowDepth(response.hourlySnowDepth);
       } catch (err) {
         if (!mounted) return;
         setError((err as Error)?.message || "Failed to load data");
@@ -170,6 +182,11 @@ export default function StationHistoricPage() {
       </div>
 
       <main className="max-w-6xl mx-auto px-4 py-6 pb-28 space-y-6">
+        <HistoricSnowDepthChart
+          data={hourlySnowDepth}
+          unit={unit}
+          loading={loading}
+        />
         <section className="grid md:grid-cols-2 gap-6">
           <HistoricChart data={lastNDerived} unit={unit} loading={loading} />
           <HistoricTable
