@@ -3,17 +3,14 @@
 import Link from "next/link";
 import {
   AlertTriangle,
-  CalendarDays,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   LoaderCircle,
   Layers,
   LocateFixed,
   MapPin,
+  Maximize2,
+  Minimize2,
   Minus,
   Plus,
-  Satellite,
   Snowflake,
   X,
 } from "lucide-react";
@@ -45,6 +42,7 @@ import {
   radarOverlaySource,
   satelliteOverlaySources,
 } from "@/components/stations/map-overlays";
+import MapDateDock from "@/components/stations/MapDateDock";
 import MapLayerSwitch from "@/components/stations/MapLayerSwitch";
 import MapOverlayLegend from "@/components/stations/MapOverlayLegend";
 import RadarPlayer from "@/components/stations/RadarPlayer";
@@ -163,15 +161,17 @@ const BASEMAP_ORDER: BasemapKey[] = ["light", "satellite", "topo"];
 
 const AVALANCHE_DANGER_LEGEND_ITEMS: Array<{
   label: string;
+  /** Fits the single-row bar on phones. */
+  shortLabel: string;
   color: string;
   textColor?: string;
 }> = [
-  { label: "General Info", color: "#6ea4db" },
-  { label: "1 Low", color: "#00C346" },
-  { label: "2 Moderate", color: "#FCFC00", textColor: "#111827" },
-  { label: "3 Considerable", color: "#FF9100", textColor: "#111827" },
-  { label: "4 High", color: "#CC332C" },
-  { label: "5 Extreme", color: "#222222" },
+  { label: "General Info", shortLabel: "Info", color: "#6ea4db" },
+  { label: "1 Low", shortLabel: "1 Low", color: "#00C346" },
+  { label: "2 Moderate", shortLabel: "2 Mod", color: "#FCFC00", textColor: "#111827" },
+  { label: "3 Considerable", shortLabel: "3 Cons", color: "#FF9100", textColor: "#111827" },
+  { label: "4 High", shortLabel: "4 High", color: "#CC332C" },
+  { label: "5 Extreme", shortLabel: "5 Ext", color: "#222222" },
 ];
 
 type ProjectedStation = {
@@ -735,7 +735,8 @@ export default function StationsExplorerMap({
   const initialCenterLocation = preferredCenterLocation ?? cachedCurrentLocation;
   const mapRef = useRef<HTMLDivElement | null>(null);
   const avalanchePopupRef = useRef<HTMLDivElement | null>(null);
-  const avalancheArchiveDateInputRef = useRef<HTMLInputElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [scrubPreviewDate, setScrubPreviewDate] = useState<string | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const [avalanchePopupSize, setAvalanchePopupSize] = useState({
     width: 0,
@@ -838,24 +839,20 @@ export default function StationsExplorerMap({
     setAvalancheArchiveDate(nextDate);
   };
 
-  const openAvalancheArchiveDatePicker = () => {
-    const input = avalancheArchiveDateInputRef.current as
-      | (HTMLInputElement & { showPicker?: () => void })
-      | null;
-    if (!input) return;
-
-    try {
-      if (typeof input.showPicker === "function") {
-        input.showPicker();
-        return;
-      }
-    } catch {
-      // Fallback below for browsers that block showPicker()
-    }
-
-    input.focus();
-    input.click();
-  };
+  // CSS fullscreen rather than the Fullscreen API, which iPhone Safari lacks for non-video elements.
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsFullscreen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isFullscreen]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -1488,7 +1485,14 @@ export default function StationsExplorerMap({
   const canUseLocateButton = Boolean(currentLocation) || canRequestBrowserLocation;
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden">
+    <div
+      className={
+        isFullscreen
+          ? // svh = visible height with browser toolbars shown, so iOS Safari's bottom bar can't cover the dock.
+            "fixed inset-0 z-[100] flex max-h-[100svh] flex-col overflow-hidden bg-slate-900"
+          : "bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 overflow-hidden"
+      }
+    >
       <div className="relative z-40 min-h-[60px] px-4 py-3 border-b border-slate-700/70 bg-slate-900/95 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-slate-200">
           <MapPin className="h-5 w-5 text-orange-400" />
@@ -1737,7 +1741,13 @@ export default function StationsExplorerMap({
         </div>
       </div>
 
-      <div className="relative h-[600px] w-full overflow-hidden z-0" onWheelCapture={onWheel}>
+      <div
+        className={[
+          "relative w-full overflow-hidden z-0",
+          isFullscreen ? "min-h-0 flex-1" : "h-[600px]",
+        ].join(" ")}
+        onWheelCapture={onWheel}
+      >
         <div
           ref={mapRef}
           className="absolute inset-0 touch-none bg-slate-900"
@@ -2169,205 +2179,142 @@ export default function StationsExplorerMap({
           ) : null}
         </div>
 
+        <MapOverlayLegend
+          satelliteMode={satelliteMode}
+          satelliteDate={satelliteDate}
+          showSnowDepth={isSnowDepthLayerVisible}
+          showRadar={isRadarLayerVisible}
+          showSceneKey={showDateControls && satelliteMode === "hls" && canSearchClearScenes}
+        />
+
+        {/* Bottom-center stack: notices sit here, not top-center, so they never land under the legend. */}
         <div
           className={[
-            "absolute left-0 z-50",
-            showDateControls && isAvalancheLayerVisible && isViewingAvalancheArchive
-              ? "top-14"
-              : "top-0",
+            "pointer-events-none absolute inset-x-0 z-[60] flex flex-col items-center gap-2 px-3",
+            isAvalancheLayerVisible ? "bottom-11 sm:bottom-12" : "bottom-6",
           ].join(" ")}
         >
-          <MapOverlayLegend
-            satelliteMode={satelliteMode}
-            satelliteDate={satelliteDate}
-            showSnowDepth={isSnowDepthLayerVisible}
-            showRadar={isRadarLayerVisible}
-          />
-        </div>
-
-        {showDateControls || isRadarLayerVisible ? (
-          <>
-            {showDateControls && isAvalancheLayerVisible && isViewingAvalancheArchive ? (
-              <div className="pointer-events-none absolute inset-x-0 top-3 z-[60] flex justify-center px-3 sm:top-4">
-                <div
-                  data-map-interactive="true"
-                  className="pointer-events-auto flex w-full max-w-2xl items-center gap-2 rounded-lg border border-red-300/30 bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xl"
-                  onPointerDown={(event) => event.stopPropagation()}
-                >
-                  <AlertTriangle className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0 flex-1 truncate">
-                    Not the current avalanche danger.
-                  </span>
-                  <button
-                    type="button"
-                    className="underline underline-offset-2 hover:text-red-100"
-                    onClick={() => setAvalancheArchiveDate(null)}
-                  >
-                    View today
-                  </button>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-16 z-[60] flex flex-col items-center gap-2 px-3 sm:bottom-10">
-              {isRadarLayerVisible ? (
-                <div
-                  data-map-interactive="true"
-                  className="pointer-events-auto w-full max-w-[22rem]"
-                  onPointerDown={(event) => event.stopPropagation()}
-                >
-                  <RadarPlayer
-                    status={radar.status}
-                    frames={radar.frames}
-                    index={radarPlayback.index}
-                    isPlaying={radarPlayback.isPlaying}
-                    isBuffering={isRadarBuffering}
-                    onTogglePlay={() => radarPlayback.setIsPlaying(!radarPlayback.isPlaying)}
-                    onSeek={radarPlayback.seek}
-                  />
-                </div>
-              ) : null}
-              {showDateControls && isSatelliteLayerVisible ? (
-                <div
-                  data-map-interactive="true"
-                  className="pointer-events-auto flex flex-col items-center gap-1"
-                  onPointerDown={(event) => event.stopPropagation()}
-                >
-                  {satelliteHint ? (
-                    <div className="max-w-[92vw] rounded-md border border-slate-600 bg-slate-900/90 px-2 py-1 text-center text-[11px] text-slate-200 shadow-lg">
-                      {satelliteHint}
-                    </div>
-                  ) : null}
-                  <SatelliteDateScrubber
-                    today={todayAvalancheArchiveDate}
-                    selectedDate={visibleAvalancheForecastDate}
-                    showSceneDays={satelliteMode === "hls" && canSearchClearScenes}
-                    sceneDays={clearScenes.days}
-                    onCommit={(date) => {
-                      setLatestClearMessage(null);
-                      setAvalancheArchiveDate(date);
-                    }}
-                  />
-                </div>
-              ) : null}
-              {showDateControls ? (
-                <div
-                  data-map-interactive="true"
-                  className="pointer-events-auto flex items-center gap-2"
-                  onPointerDown={(event) => event.stopPropagation()}
-                >
-                  <button
-                    type="button"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 shadow-lg hover:bg-slate-800"
-                    onClick={() => {
-                      setLatestClearMessage(null);
-                      stepAvalancheArchiveDate(-1);
-                    }}
-                    aria-label="Previous map day"
-                    title="Previous day"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-
-                  <label
-                    className="relative flex h-9 min-w-[10.75rem] cursor-pointer items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-900/90 px-2.5 text-slate-100 shadow-lg sm:min-w-[11.75rem]"
-                    title="Select map date"
-                    onClick={() => openAvalancheArchiveDatePicker()}
-                  >
-                    <CalendarDays className="h-4 w-4 shrink-0 text-slate-300" />
-                    <span className="truncate text-sm font-bold tracking-wide">
-                      {formatAvalancheArchiveDateLabel(visibleAvalancheForecastDate)}
-                    </span>
-                    <ChevronDown className="ml-auto h-3.5 w-3.5 shrink-0 text-slate-400" />
-                    <input
-                      ref={avalancheArchiveDateInputRef}
-                      type="date"
-                      value={visibleAvalancheForecastDate}
-                      max={todayAvalancheArchiveDate}
-                      onChange={(event) => {
-                        setLatestClearMessage(null);
-                        setAvalancheArchiveDate(event.target.value || null);
-                      }}
-                      className="pointer-events-none absolute inset-0 opacity-0"
-                      aria-label="Select map date"
-                      data-map-interactive="true"
-                      onPointerDown={(event) => event.stopPropagation()}
-                    />
-                  </label>
-
-                  <button
-                    type="button"
-                    className={[
-                      "inline-flex h-9 w-9 items-center justify-center rounded-lg border shadow-lg",
-                      canAdvanceAvalancheArchiveDate
-                        ? "border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
-                        : "cursor-not-allowed border-slate-700 bg-slate-900/70 text-slate-500",
-                    ].join(" ")}
-                    onClick={() => {
-                      setLatestClearMessage(null);
-                      stepAvalancheArchiveDate(1);
-                    }}
-                    disabled={!canAdvanceAvalancheArchiveDate}
-                    aria-label="Next map day"
-                    title={canAdvanceAvalancheArchiveDate ? "Next day" : "Already viewing today"}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-
-                  {isSatelliteLayerVisible ? (
-                    <button
-                      type="button"
-                      className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-300/50 bg-slate-900/90 px-2.5 text-xs font-semibold text-amber-100 shadow-lg hover:bg-slate-800 disabled:cursor-wait disabled:opacity-70"
-                      onClick={requestLatestClear}
-                      disabled={isLatestClearPending}
-                      title="Jump to the newest clear 30 m scene for this view"
-                    >
-                      {isLatestClearPending ? (
-                        <LoaderCircle className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Satellite className="h-4 w-4" />
-                      )}
-                      <span className="hidden sm:inline">Latest clear</span>
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+          {basemapNotice ? (
+            <div className="max-w-full rounded-lg border border-amber-400/40 bg-slate-900/90 px-3 py-1 text-center text-xs text-amber-100">
+              {basemapNotice}
             </div>
-          </>
-        ) : null}
+          ) : null}
+          {isStationLayerVisible && !isRefreshing && stations.length === 0 ? (
+            <div className="max-w-full rounded-lg border border-slate-600 bg-slate-900/90 px-3 py-1 text-center text-xs text-slate-300">
+              No stations found in the current viewport.
+            </div>
+          ) : null}
+          {isRadarLayerVisible ? (
+            <div
+              data-map-interactive="true"
+              className="pointer-events-auto w-full max-w-[24rem]"
+              onPointerDown={(event) => event.stopPropagation()}
+            >
+              <RadarPlayer
+                status={radar.status}
+                frames={radar.frames}
+                index={radarPlayback.index}
+                isPlaying={radarPlayback.isPlaying}
+                isBuffering={isRadarBuffering}
+                onTogglePlay={() => radarPlayback.setIsPlaying(!radarPlayback.isPlaying)}
+                onSeek={radarPlayback.seek}
+              />
+            </div>
+          ) : null}
+          {showDateControls ? (
+            <MapDateDock
+              date={visibleAvalancheForecastDate}
+              previewDate={scrubPreviewDate}
+              maxDate={todayAvalancheArchiveDate}
+              canAdvance={canAdvanceAvalancheArchiveDate}
+              showArchiveWarning={isAvalancheLayerVisible && isViewingAvalancheArchive}
+              hint={isSatelliteLayerVisible ? satelliteHint : null}
+              showLatestClear={isSatelliteLayerVisible}
+              isLatestClearPending={isLatestClearPending}
+              onStep={(days) => {
+                setLatestClearMessage(null);
+                stepAvalancheArchiveDate(days);
+              }}
+              onPickDate={(date) => {
+                setLatestClearMessage(null);
+                setAvalancheArchiveDate(date);
+              }}
+              onViewToday={() => setAvalancheArchiveDate(null)}
+              onLatestClear={requestLatestClear}
+            >
+              {isSatelliteLayerVisible ? (
+                <SatelliteDateScrubber
+                  today={todayAvalancheArchiveDate}
+                  selectedDate={visibleAvalancheForecastDate}
+                  showSceneDays={satelliteMode === "hls" && canSearchClearScenes}
+                  sceneDays={clearScenes.days}
+                  onPreview={setScrubPreviewDate}
+                  onCommit={(date) => {
+                    setLatestClearMessage(null);
+                    setAvalancheArchiveDate(date);
+                  }}
+                />
+              ) : null}
+            </MapDateDock>
+          ) : null}
+        </div>
 
         <div className="absolute right-3 top-3 z-50 flex flex-col gap-2">
           <button
             type="button"
             data-map-interactive="true"
             className="h-9 w-9 rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
-            onClick={() =>
-              setZoom((current) => clamp(current + 1, MIN_ZOOM, maxZoom))
-            }
-            aria-label="Zoom in"
+            onClick={() => setIsFullscreen((current) => !current)}
+            aria-label={isFullscreen ? "Exit full screen map" : "Full screen map"}
+            aria-pressed={isFullscreen}
+            title={isFullscreen ? "Exit full screen (Esc)" : "Full screen"}
           >
-            <Plus className="mx-auto h-4 w-4" />
+            {isFullscreen ? (
+              <Minimize2 className="mx-auto h-4 w-4" />
+            ) : (
+              <Maximize2 className="mx-auto h-4 w-4" />
+            )}
           </button>
-          <button
-            type="button"
-            data-map-interactive="true"
-            className="h-9 w-9 rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
-            onClick={() =>
-              setZoom((current) => clamp(current - 1, MIN_ZOOM, maxZoom))
-            }
-            aria-label="Zoom out"
-          >
-            <Minus className="mx-auto h-4 w-4" />
-          </button>
+          {/* Touch screens pinch to zoom, so the buttons only earn their space on desktop. */}
+          <div className="hidden flex-col gap-2 sm:flex">
+            <button
+              type="button"
+              data-map-interactive="true"
+              className="h-9 w-9 rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
+              onClick={() =>
+                setZoom((current) => clamp(current + 1, MIN_ZOOM, maxZoom))
+              }
+              aria-label="Zoom in"
+            >
+              <Plus className="mx-auto h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              data-map-interactive="true"
+              className="h-9 w-9 rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
+              onClick={() =>
+                setZoom((current) => clamp(current - 1, MIN_ZOOM, maxZoom))
+              }
+              aria-label="Zoom out"
+            >
+              <Minus className="mx-auto h-4 w-4" />
+            </button>
+          </div>
         </div>
 
-        <div className="absolute left-3 bottom-20 z-50 rounded-lg border border-slate-600 bg-slate-900/85 px-2 py-1 text-[11px] text-slate-400 sm:bottom-12">
+        {/* Kept expanded (not behind an "i") per OSM attribution guidance; just unboxed and small. */}
+        <div
+          className={[
+            "pointer-events-none absolute right-1.5 z-50 text-[10px] leading-none text-slate-700 [text-shadow:0_0_3px_rgba(255,255,255,0.9)]",
+            isAvalancheLayerVisible ? "bottom-6 sm:bottom-7" : "bottom-1",
+          ].join(" ")}
+        >
           {BASEMAPS[basemap].attributionUrl ? (
             <a
               href={BASEMAPS[basemap].attributionUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-slate-200"
+              className="pointer-events-auto hover:text-slate-800"
               data-map-interactive="true"
             >
               {BASEMAPS[basemap].attribution}
@@ -2379,7 +2326,7 @@ export default function StationsExplorerMap({
 
         {isAvalancheLayerVisible ? (
           <div className="absolute inset-x-0 bottom-0 z-50 border-t border-slate-700/70 bg-slate-900/90 shadow-xl">
-            <div className="grid grid-cols-3 sm:grid-cols-6">
+            <div className="grid grid-cols-6">
               {AVALANCHE_DANGER_LEGEND_ITEMS.map((item) => (
                 <div
                   key={item.label}
@@ -2391,7 +2338,8 @@ export default function StationsExplorerMap({
                     className="text-[8px] font-bold uppercase leading-tight tracking-wide sm:text-[9px]"
                     style={{ color: item.textColor ?? "#ffffff" }}
                   >
-                    {item.label}
+                    <span className="sm:hidden">{item.shortLabel}</span>
+                    <span className="hidden sm:inline">{item.label}</span>
                   </span>
                 </div>
               ))}
@@ -2399,17 +2347,6 @@ export default function StationsExplorerMap({
           </div>
         ) : null}
 
-        {isStationLayerVisible && !isRefreshing && stations.length === 0 ? (
-          <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border border-slate-600 bg-slate-900/90 px-3 py-1 text-xs text-slate-300">
-            No stations found in the current viewport.
-          </div>
-        ) : null}
-
-        {basemapNotice ? (
-          <div className="absolute left-1/2 top-12 z-50 -translate-x-1/2 rounded-lg border border-amber-400/40 bg-slate-900/90 px-3 py-1 text-xs text-amber-100">
-            {basemapNotice}
-          </div>
-        ) : null}
       </div>
     </div>
   );
