@@ -156,10 +156,11 @@ function toTemperatureHistorySeries(
   }));
 }
 
-function getLatestObservedTemperaturePoint(
+function getLatestObservedPoint(
   byElement: Map<string, Array<{ ts: string; value: number | null }>>,
+  elementCode: "TOBS" | "SNWD",
 ) {
-  const points = byElement.get("TOBS") ?? [];
+  const points = byElement.get(elementCode) ?? [];
   for (let idx = points.length - 1; idx >= 0; idx -= 1) {
     const point = points[idx];
     if (point?.value == null) continue;
@@ -181,7 +182,7 @@ export async function fetchSnotelCurrentConditions({
 
   const hourlyData = await fetchAwdbJson<StationDataResponse>("/data", {
     stationTriplets: station.stationTriplet,
-    elements: "TOBS",
+    elements: "TOBS,SNWD",
     duration: "HOURLY",
     beginDate: -168,
     endDate: 0,
@@ -191,7 +192,9 @@ export async function fetchSnotelCurrentConditions({
   const tz = inferTimeZone(station);
   const byElement = toSeriesMap(hourlyData, station.dataTimeZone ?? null);
   const temperatureHistoryData = toTemperatureHistorySeries(byElement, tz);
-  const latestTemp = getLatestObservedTemperaturePoint(byElement);
+  const latestTemp = getLatestObservedPoint(byElement, "TOBS");
+  // Not every SNOTEL station has a depth sensor; null when none reported.
+  const latestDepth = getLatestObservedPoint(byElement, "SNWD");
 
   const weatherData = await (async () => {
     try {
@@ -247,6 +250,12 @@ export async function fetchSnotelCurrentConditions({
         snotelTemperatureF == null
           ? baseCurrent.temperatureF
           : snotelTemperatureF,
+      snowDepthIn:
+        latestDepth?.value == null ? null : Math.max(0, Math.round(latestDepth.value)),
+      snowDepthObservedAt: latestDepth?.ts ?? null,
+      isSnowDepthStale: latestDepth
+        ? (minutesSince(latestDepth.ts) ?? 0) > 180
+        : null,
       sun: {
         ...getSunTimes({
           latitude,

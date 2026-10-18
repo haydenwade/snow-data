@@ -25,6 +25,10 @@ export type ApiResp = {
     isObservationStale: boolean | null;
 
     temperatureF: number | null;
+    // latest hourly SNOTEL snow depth; null when the station has no depth sensor
+    snowDepthIn?: number | null;
+    snowDepthObservedAt?: string | null;
+    isSnowDepthStale?: boolean | null;
     conditionText: string | null;
 
     wind: {

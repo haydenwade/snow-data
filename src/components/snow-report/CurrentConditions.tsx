@@ -1,6 +1,6 @@
 "use client";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { Wind, Sunrise, Sunset, Thermometer } from "lucide-react";
+import { Wind, Sunrise, Sunset, Thermometer, Snowflake } from "lucide-react";
 import CurrentConditionsSkeleton from "../skeletons/CurrentConditionsSkeleton";
 import CurrentConditionsChart from "./CurrentConditionsChart";
 import { Unit } from "@/types/forecast";
@@ -9,6 +9,7 @@ import {
   celsiusFromF,
   formatObservedLabel,
   formatTimeInZone,
+  inchesToCm,
   mphToKph,
 } from "./utils";
 import { SkyIcon } from "./SkyIcon";
@@ -80,6 +81,18 @@ export default function CurrentConditions({
       : "Temperature from weather station observation.";
   }, [resp?.lastUpdatedAt]);
 
+  const snowDepthLabel = useMemo(() => {
+    if (current?.snowDepthIn == null) return null;
+    const depth =
+      unit === "mm"
+        ? `${Math.round(inchesToCm(current.snowDepthIn))} cm`
+        : `${current.snowDepthIn}"`;
+    const asOf = current.isSnowDepthStale
+      ? formatObservedLabel(current.snowDepthObservedAt)
+      : null;
+    return { depth, asOf };
+  }, [current, unit]);
+
   const sunriseLabel = useMemo(() => {
     if (!current?.sun?.sunrise) return null;
     return formatTimeInZone(
@@ -132,6 +145,23 @@ export default function CurrentConditions({
                           : `${current.temperatureF}°F`}
                     </div>
                   </div>
+
+                  {snowDepthLabel ? (
+                    <div className="mt-3 flex items-center gap-2 text-sm">
+                      <Snowflake className="h-4 w-4 text-sky-300" />
+                      <div>
+                        <div className="text-xs text-slate-400">Snow depth</div>
+                        <div className="font-medium text-slate-200">
+                          {snowDepthLabel.depth}
+                          {snowDepthLabel.asOf ? (
+                            <span className="ml-2 text-xs text-slate-400">
+                              as of {snowDepthLabel.asOf}
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm text-slate-300">
                     <div className="flex items-center gap-2">
