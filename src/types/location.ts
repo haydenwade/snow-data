@@ -32,5 +32,4 @@ export type MountainLocation = {
   socialMediaLinks: GenericLink[];
   resortInfoLinks: GenericLink[];
   trafficInfoLinks: GenericLink[];
-  radarLink: string;
 };

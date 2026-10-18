@@ -58,13 +58,32 @@ export function satelliteOverlaySources(mode: SatelliteMode, date: string): Over
     return [gibsSource("viirs-true", "VIIRS_NOAA20_CorrectedReflectance_TrueColor", date, 9, "jpg", 1)];
   }
   if (mode === "hls") {
-    // Both missions for the day; GIBS returns transparent tiles where a mission has no pass.
-    return [
-      gibsSource("hls-l30", "HLS_L30_Nadir_BRDF_Adjusted_Reflectance", date, 12, "png", 1),
-      gibsSource("hls-s30", "HLS_S30_Nadir_BRDF_Adjusted_Reflectance", date, 12, "png", 1),
-    ];
+    // Each day only has that day's swaths (transparent elsewhere), so earlier days are
+    // stacked underneath, oldest first: the newest pass wins wherever passes overlap.
+    const stack: string[] = [];
+    for (let offset = HLS_FILL_DAYS; offset >= 0; offset -= 1) {
+      const day = addDaysToIsoDate(date, -offset);
+      if (day) stack.push(day);
+    }
+    return stack.flatMap((day) => [
+      gibsSource("hls-l30", "HLS_L30_Nadir_BRDF_Adjusted_Reflectance", day, 12, "png", 1),
+      gibsSource("hls-s30", "HLS_S30_Nadir_BRDF_Adjusted_Reflectance", day, 12, "png", 1),
+    ]);
   }
   return [];
+}
+
+/**
+ * Days before the selected date drawn under 30 m imagery to fill swath gaps.
+ * Sentinel-2 repeats its ground track every 5 days, so a 5-day stack covers the map.
+ */
+export const HLS_FILL_DAYS = 4;
+
+/** The earlier days whose passes can show through where the selected date has none. */
+export function hlsFillRange(date: string) {
+  const from = addDaysToIsoDate(date, -HLS_FILL_DAYS);
+  const to = addDaysToIsoDate(date, -1);
+  return from && to ? { from, to } : null;
 }
 
 function tileBbox3857(z: number, x: number, y: number) {
@@ -82,6 +101,23 @@ export const SNOW_DEPTH_OVERLAY: OverlaySource = {
   tileUrl: (z, x, y) =>
     `${NOHRSC_EXPORT}?bbox=${tileBbox3857(z, x, y)}&bboxSR=3857&imageSR=3857&size=${TILE_SIZE},${TILE_SIZE}&format=png32&transparent=true&layers=show:3&f=image`,
 };
+
+/** The radar.weather.gov reflectivity layer (NOAA MRMS, quality controlled). CONUS only. */
+export const RADAR_WMS_URL = "https://opengeo.ncep.noaa.gov/geoserver/conus/conus_bref_qcd/ows";
+
+// At these zooms a tile pixel spans several 1 km radar cells. GeoServer's default
+// sampling keeps one cell per pixel, which breaks storms into faint specks.
+const RADAR_SMOOTH_MAX_ZOOM = 6;
+
+export function radarOverlaySource(time: string): OverlaySource {
+  return {
+    id: `radar-${time}`,
+    maxLevel: 10,
+    opacity: 0.8,
+    tileUrl: (z, x, y) =>
+      `${RADAR_WMS_URL}?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=conus_bref_qcd&STYLES=&CRS=EPSG:3857&BBOX=${tileBbox3857(z, x, y)}&WIDTH=${TILE_SIZE}&HEIGHT=${TILE_SIZE}&FORMAT=image/png&TRANSPARENT=true&TIME=${encodeURIComponent(time)}${z <= RADAR_SMOOTH_MAX_ZOOM ? "&INTERPOLATIONS=bilinear" : ""}`,
+  };
+}
 
 /**
  * Map the basemap's visible tiles onto an overlay source. Past the source's
@@ -123,6 +159,15 @@ export const SNOW_COVER_LEGEND = {
   lowLabel: "Patchy",
   highLabel: "Full",
   note: "Clouds and bare ground show no color — check True color.",
+};
+
+// Sampled from the bref_qcd style, weakest to strongest echoes.
+export const RADAR_LEGEND = {
+  gradient:
+    "linear-gradient(to right, #4660a0, #5ab9c1, #22d63f, #f2e33a, #f59b23, #e3262b, #c61fc9)",
+  lowLabel: "Light",
+  highLabel: "Heavy",
+  note: "Snow reads lighter than rain at the same rate.",
 };
 
 // NOHRSC class breaks (inches) and colors from the service legend.

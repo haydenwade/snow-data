@@ -101,39 +101,6 @@ function fallbackTimeZoneFromOffset(offsetHours: number | null | undefined) {
   return `Etc/GMT${sign}${Math.abs(rounded)}`;
 }
 
-function buildDefaultRadarLink(latitude: number, longitude: number) {
-  const settings = {
-    agenda: {
-      id: "weather",
-      center: [longitude, latitude],
-      location: [longitude, latitude],
-      zoom: 7,
-      layer: "bref_qcd",
-    },
-    animating: false,
-    base: "standard",
-    artcc: false,
-    county: false,
-    cwa: false,
-    rfc: false,
-    state: false,
-    menu: true,
-    shortFusedOnly: false,
-    opacity: {
-      alerts: 0.8,
-      local: 0.6,
-      localStations: 0.8,
-      national: 0.6,
-    },
-  };
-  const encodedSettings = Buffer.from(JSON.stringify(settings), "utf-8").toString(
-    "base64",
-  );
-  return `https://radar.weather.gov/?settings=v1_${encodeURIComponent(
-    encodedSettings,
-  )}`;
-}
-
 export function stateNameFromCode(stateCode: string) {
   const code = stateCode.toUpperCase();
   return STATE_NAME_BY_CODE[code] ?? code;
@@ -211,7 +178,6 @@ export function toMountainLocation(
     socialMediaLinks: locationMatch?.socialMediaLinks ?? [],
     resortInfoLinks: locationMatch?.resortInfoLinks ?? [],
     trafficInfoLinks: locationMatch?.trafficInfoLinks ?? [],
-    radarLink: buildDefaultRadarLink(latitude, longitude),
   };
 }
 

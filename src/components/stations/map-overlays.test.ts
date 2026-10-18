@@ -1,7 +1,9 @@
 import {
   SNOW_DEPTH_OVERLAY,
   dailyImageryDate,
+  hlsFillRange,
   overlayTilesFor,
+  radarOverlaySource,
   satelliteOverlaySources,
 } from './map-overlays';
 import { pickLatestClearDay } from './useClearScenes';
@@ -50,9 +52,24 @@ describe('overlayTilesFor', () => {
 });
 
 describe('satelliteOverlaySources', () => {
-  it('draws both HLS missions for 30 m mode', () => {
+  it('stacks both HLS missions for the prior days under the selected date, newest last', () => {
     const ids = satelliteOverlaySources('hls', '2026-10-08').map((source) => source.id);
-    expect(ids).toEqual(['hls-l30-2026-10-08', 'hls-s30-2026-10-08']);
+    expect(ids).toEqual([
+      'hls-l30-2026-10-04',
+      'hls-s30-2026-10-04',
+      'hls-l30-2026-10-05',
+      'hls-s30-2026-10-05',
+      'hls-l30-2026-10-06',
+      'hls-s30-2026-10-06',
+      'hls-l30-2026-10-07',
+      'hls-s30-2026-10-07',
+      'hls-l30-2026-10-08',
+      'hls-s30-2026-10-08',
+    ]);
+  });
+
+  it('reports the fill range across a month boundary', () => {
+    expect(hlsFillRange('2026-10-02')).toEqual({ from: '2026-09-28', to: '2026-10-01' });
   });
 
   it('returns nothing when off', () => {
@@ -87,5 +104,22 @@ describe('pickLatestClearDay', () => {
         { date: '2026-10-10', product: 'L30', cloudPct: null, sceneCount: 1 },
       ]),
     ).toBeNull();
+  });
+});
+
+describe('radarOverlaySource', () => {
+  it('requests one EPSG:3857 WMS tile at the scan time', () => {
+    const url = radarOverlaySource('2026-10-18T21:09:00.000Z').tileUrl(0, 0, 0);
+    expect(url).toContain('LAYERS=conus_bref_qcd');
+    expect(url).toContain('CRS=EPSG:3857');
+    expect(url).toContain('BBOX=-20037508.342789244,-20037508.342789244,20037508.342789244,20037508.342789244');
+    expect(url).toContain('TIME=2026-10-18T21%3A09%3A00.000Z');
+  });
+
+  it('smooths zoomed-out tiles but keeps native cells up close', () => {
+    const source = radarOverlaySource('2026-10-18T21:09:00.000Z');
+    expect(source.tileUrl(4, 3, 6)).toContain('&INTERPOLATIONS=bilinear');
+    expect(source.tileUrl(6, 13, 25)).toContain('&INTERPOLATIONS=bilinear');
+    expect(source.tileUrl(7, 26, 50)).not.toContain('INTERPOLATIONS');
   });
 });
