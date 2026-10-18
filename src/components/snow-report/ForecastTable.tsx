@@ -9,6 +9,7 @@ import {
 } from "./utils";
 import ForecastTableSkeleton from "../skeletons/ForecastTableSkeleton";
 import { ForecastDaily, Unit } from "@/types/forecast";
+import { formatSnowLevelRange } from "./snow-level";
 
 export default function ForecastTable({
   data,
@@ -52,6 +53,18 @@ export default function ForecastTable({
                 </th>
                 <th className="text-center font-medium py-2 text-slate-400 w-36 whitespace-nowrap">
                   Sky Cover
+                </th>
+                <th
+                  className="text-center font-medium py-2 pr-4 text-slate-400 w-40 whitespace-nowrap"
+                  title={
+                    data.some((d) => d.snowLevelKind === "freezing-level")
+                      ? "Freezing level (Open-Meteo). Snow usually falls ~1,000 ft lower."
+                      : "Forecast snow level (NWS)"
+                  }
+                >
+                  {data.some((d) => d.snowLevelKind === "freezing-level")
+                    ? "Freezing Level"
+                    : "Snow Level"}
                 </th>
               </tr>
             </thead>
@@ -122,6 +135,11 @@ export default function ForecastTable({
                         {skyCoverLabel(d.skyCoverPercent)}
                       </span>
                     ) : (
+                      <span className="text-slate-500">—</span>
+                    )}
+                  </td>
+                  <td className="py-2 pr-4 text-center text-slate-400 text-sm w-40 whitespace-nowrap">
+                    {formatSnowLevelRange(d, unit) ?? (
                       <span className="text-slate-500">—</span>
                     )}
                   </td>

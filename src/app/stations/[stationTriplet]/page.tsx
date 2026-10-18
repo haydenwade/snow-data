@@ -15,6 +15,8 @@ import { aggregateForecastToDaily } from "@/components/snow-report/utils";
 import ResortInfoLinks from "@/components/snow-report/ResortInfoLinks";
 import AvalancheInfo from "@/components/snow-report/AvalancheInfo";
 import TrafficInfo from "@/components/snow-report/TrafficInfo";
+import SnowpackByElevation from "@/components/snow-report/SnowpackByElevation";
+import FromAboveCard from "@/components/snow-report/FromAboveCard";
 import Footer from "@/components/snow-report/Footer";
 import SnowLoadingGraphic from "@/components/SnowLoadingGraphic";
 import { useUserSettings } from "@/hooks/useUserSettings";
@@ -241,7 +243,12 @@ export default function StationPage() {
               stationKey={stationKey}
               loading={loading}
             />
-            <ForecastTimeline data={forecast} unit={unit} loading={loading} />
+            <ForecastTimeline
+              data={forecast}
+              unit={unit}
+              loading={loading}
+              stationElevationFt={location.elevationFt}
+            />
 
             <section className="grid md:grid-cols-2 gap-6">
               <ForecastChart data={todayAndFutureForecast} unit={unit} loading={loading} />
@@ -260,6 +267,11 @@ export default function StationPage() {
             </p>
           </section>
         )}
+
+        <section className="grid md:grid-cols-2 gap-6 items-stretch">
+          <SnowpackByElevation stationKey={stationKey} unit={unit} />
+          <FromAboveCard location={location} />
+        </section>
 
         <section className="grid md:grid-cols-2 gap-6">
           <ResortInfoLinks location={location} loading={loading} />

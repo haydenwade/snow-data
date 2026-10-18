@@ -31,6 +31,24 @@ function mapSeries(properties: Record<string, any>, key: string): GridSeries {
   return { uom, points };
 }
 
+// Like mapSeries, but drops missing values instead of treating them as 0
+// (a 0 m snow level would read as "snow to sea level").
+function mapNullableSeries(properties: Record<string, unknown>, key: string): GridSeries {
+  const series = (properties[key] ?? {}) as {
+    uom?: unknown;
+    values?: Array<{ validTime?: string; value?: number | null }>;
+  };
+  const uom = typeof series.uom === "string" ? series.uom : "";
+  const values = Array.isArray(series.values) ? series.values : [];
+  const points: SeriesPoint[] = [];
+  values.forEach((value) => {
+    if (value?.value == null || !Number.isFinite(Number(value.value))) return;
+    const parsed = parseValidTime(String(value?.validTime ?? ""));
+    points.push({ start: parsed.start, hours: parsed.hours || 1, value: Number(value.value) });
+  });
+  return { uom, points };
+}
+
 async function fetchNwsJson(url: string) {
   const res = await fetch(url, {
     headers: {
@@ -70,5 +88,6 @@ export async function fetchNwsForecastGridData(
     windDirection: mapSeries(properties, "windDirection"),
     windSpeed: mapSeries(properties, "windSpeed"),
     skyCover: mapSeries(properties, "skyCover"),
+    snowLevel: mapNullableSeries(properties, "snowLevel"),
   };
 }

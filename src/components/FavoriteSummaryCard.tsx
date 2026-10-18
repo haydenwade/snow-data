@@ -7,6 +7,10 @@ import { Mountain } from "lucide-react";
 import { MountainLocation } from "@/types/location";
 import { SnowBuckets, formatDateYYYYMMDD } from "@/components/snow-report/utils";
 import { ForecastDaily, Unit } from "@/types/forecast";
+import {
+  formatSnowLevelRange,
+  snowLevelLabel,
+} from "@/components/snow-report/snow-level";
 
 type FavoriteSummaryCardProps = {
   favoriteId: string;
@@ -38,6 +42,8 @@ export default function FavoriteSummaryCard({
 
   // Next 7 individual days from forecast (today + 6 more)
   const next7Days = forecast.slice(0, 7);
+  const today = forecast[0];
+  const todaySnowLevel = today ? formatSnowLevelRange(today, unit) : null;
 
   return (
     <Link
@@ -67,6 +73,11 @@ export default function FavoriteSummaryCard({
                 {location.city}, {location.state}
               </span>
             </div>
+            {today && todaySnowLevel ? (
+              <span className="mt-1 inline-flex rounded bg-slate-700/40 px-1.5 py-0.5 text-[10px] text-slate-300">
+                {snowLevelLabel(today)} today: {todaySnowLevel}
+              </span>
+            ) : null}
           </div>
         </div>
         <FavoriteButton locationId={favoriteId} />

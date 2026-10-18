@@ -11,6 +11,11 @@ import {
   mphToKph,
 } from "./utils";
 import { ForecastDaily, Unit } from "@/types/forecast";
+import {
+  formatSnowLevelRange,
+  isRainRiskAtElevation,
+  snowLevelLabel,
+} from "./snow-level";
 
 // using degToCompass and skyCoverLabel from utils
 
@@ -28,10 +33,12 @@ export default function ForecastTimeline({
   data,
   unit,
   loading,
+  stationElevationFt,
 }: {
   data: ForecastDaily[];
   unit: Unit;
   loading: boolean;
+  stationElevationFt?: number | null;
 }) {
   const slice =  data.slice(1);
 
@@ -127,6 +134,24 @@ export default function ForecastTimeline({
                   {degToCompass(d.windDirDeg)}
                 </div>
               </div>
+
+              {formatSnowLevelRange(d, unit) ? (
+                <div className="w-full flex items-center justify-between gap-2 text-sm">
+                  <div className="text-slate-300 whitespace-nowrap">{snowLevelLabel(d)}</div>
+                  <div className="text-xs font-medium text-slate-100 text-right">
+                    {formatSnowLevelRange(d, unit)}
+                  </div>
+                </div>
+              ) : null}
+
+              {isRainRiskAtElevation(d, stationElevationFt) ? (
+                <div
+                  className="w-full rounded bg-amber-500/15 px-2 py-1 text-[11px] font-medium text-amber-300"
+                  title="Forecast snow level rises above this station while precipitation is likely"
+                >
+                  Rain possible at station
+                </div>
+              ) : null}
             </div>
           ))}
         </div>

@@ -10,6 +10,7 @@ type OpenMeteoHourly = {
   wind_direction_10m?: Array<number | null>;
   cloudcover?: Array<number | null>;
   cloud_cover?: Array<number | null>;
+  freezing_level_height?: Array<number | null>;
 };
 
 type OpenMeteoForecastResponse = {
@@ -100,7 +101,7 @@ export async function fetchOpenMeteoForecastGridData(
     latitude: String(latitude),
     longitude: String(longitude),
     hourly:
-      "snowfall,temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover",
+      "snowfall,temperature_2m,wind_speed_10m,wind_direction_10m,cloud_cover,freezing_level_height",
     timeformat: "unixtime",
   });
 
@@ -173,6 +174,10 @@ export async function fetchOpenMeteoForecastGridData(
     skyCover: {
       uom: "wmoUnit:percent",
       points: mapHourlySeries(times, skyCoverValues),
+    },
+    freezingLevel: {
+      uom: "wmoUnit:m",
+      points: mapHourlySeries(times, hourly.freezing_level_height),
     },
     quantitativePrecipitation: emptySeries("wmoUnit:mm"),
     maxTemperature: emptySeries("wmoUnit:degC"),

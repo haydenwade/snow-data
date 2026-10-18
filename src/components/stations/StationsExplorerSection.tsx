@@ -6,6 +6,7 @@ import {
   getLocalIsoDate,
   normalizeAvalancheArchiveDate,
 } from "@/components/stations/avalanche-archive-date";
+import { isSatelliteMode } from "@/components/stations/map-overlays";
 import StationsExplorerSkeleton from "@/components/skeletons/StationsExplorerSkeleton";
 import { MountainLocation } from "@/types/location";
 import { GeoBounds } from "@/types/station";
@@ -35,6 +36,18 @@ function parseStatesFromQuery(raw: string | null) {
 
 function parseAvalancheArchiveDateFromQuery(raw: string | null) {
   return normalizeAvalancheArchiveDate(raw, { maxDate: getLocalIsoDate() });
+}
+
+/** `?lat=&lon=&z=` deep link (e.g. from a station's "Open on map"). */
+function parseInitialViewFromQuery(searchParams: URLSearchParams) {
+  const lat = Number(searchParams.get("lat"));
+  const lon = Number(searchParams.get("lon"));
+  const zoom = Number(searchParams.get("z") ?? 11);
+  if (!searchParams.get("lat") || !searchParams.get("lon")) return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 85 || Math.abs(lon) > 180) {
+    return null;
+  }
+  return { lat, lon, zoom: Number.isFinite(zoom) ? Math.min(17, Math.max(4, Math.round(zoom))) : 11 };
 }
 
 function toBboxParam(bounds: GeoBounds | null) {
@@ -95,6 +108,12 @@ export default function StationsExplorerSection({
         : null,
     [enableAvalancheArchive, searchParams],
   );
+  // Read once: these only seed the map's first view.
+  const [initialView] = useState(() => parseInitialViewFromQuery(searchParams));
+  const [initialSatelliteMode] = useState(() => {
+    const raw = searchParams.get("sat");
+    return isSatelliteMode(raw) ? raw : "off";
+  });
 
   const [viewport, setViewport] = useState<RequestedViewport>({
     stateCodes: initialStates,
@@ -240,6 +259,8 @@ export default function StationsExplorerSection({
             enableAvalancheArchive={enableAvalancheArchive}
             avalancheArchiveDate={avalancheArchiveDate}
             onAvalancheArchiveDateChange={setAvalancheArchiveDate}
+            initialView={initialView}
+            initialSatelliteMode={initialSatelliteMode}
           />
         </div>
       </div>

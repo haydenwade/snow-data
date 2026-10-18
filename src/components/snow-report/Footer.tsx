@@ -37,6 +37,15 @@ export default function Footer({
 						<Link href="/privacy" className="hover:text-slate-200 transition">
 							Privacy
 						</Link>
+						<a
+							href="https://detour.teamwawe.com/"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="hover:text-slate-200 transition"
+							title="Detour: ready-made day trips, a partner site"
+						>
+							Off-season day trips: Detour ↗
+						</a>
 					</nav>
 					<Copyright />
 				</div>

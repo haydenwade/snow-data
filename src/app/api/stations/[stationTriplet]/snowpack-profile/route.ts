@@ -1,0 +1,41 @@
+import { fetchSnowpackProfile } from "@/lib/server/snowpack-profile";
+import {
+  fetchStationByTriplet,
+  resolveTripletFromStationKey,
+} from "@/lib/server/stations";
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+
+type RouteContext = {
+  params: Promise<{ stationTriplet: string }>;
+};
+
+export async function GET(_request: Request, context: RouteContext) {
+  const params = await context.params;
+  const stationTriplet = resolveTripletFromStationKey(params.stationTriplet);
+  if (!stationTriplet) {
+    return NextResponse.json(
+      { error: "Invalid station identifier format" },
+      { status: 400 },
+    );
+  }
+
+  try {
+    const station = await fetchStationByTriplet(stationTriplet);
+    if (!station) {
+      return NextResponse.json(
+        { error: "No station found matching station identifier" },
+        { status: 404 },
+      );
+    }
+
+    const payload = await fetchSnowpackProfile(station);
+    return NextResponse.json(payload, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { error: (error as Error)?.message || "Failed to fetch snowpack profile" },
+      { status: 500 },
+    );
+  }
+}
