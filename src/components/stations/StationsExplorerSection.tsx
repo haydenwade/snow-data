@@ -22,6 +22,7 @@ type StationsExplorerSectionProps = {
   title?: string;
   description?: string;
   enableAvalancheArchive?: boolean;
+  enableRadar?: boolean;
   sectionId?: string;
   showHeader?: boolean;
 };
@@ -90,6 +91,7 @@ export default function StationsExplorerSection({
   title = "Explore Weather Stations",
   description = "Pan and zoom the map to find mountain weather stations across the West. Click a marker to see current snow depth, recent snowfall, forecast, and long-term history for that spot.",
   enableAvalancheArchive = false,
+  enableRadar = false,
   sectionId = "stations",
   showHeader = true,
 }: StationsExplorerSectionProps) {
@@ -261,6 +263,7 @@ export default function StationsExplorerSection({
             onAvalancheArchiveDateChange={setAvalancheArchiveDate}
             initialView={initialView}
             initialSatelliteMode={initialSatelliteMode}
+            enableRadar={enableRadar}
           />
         </div>
       </div>

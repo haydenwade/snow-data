@@ -19,6 +19,7 @@ export default function MapPage() {
           <StationsExplorerSection
             sectionId="map"
             enableAvalancheArchive
+            enableRadar
             showHeader={false}
           />
         </Suspense>

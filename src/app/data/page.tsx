@@ -67,6 +67,7 @@ const METHODOLOGY_SECTIONS: DataSection[] = [
       "Dated satellite imagery and modeled snow depth help show coverage between stations. They are context, not avalanche information.",
     bullets: [
       "Satellite imagery: NASA Global Imagery Browse Services (GIBS). Daily VIIRS (NOAA-20) snow cover (375 m) and true color (250 m); Harmonized Landsat Sentinel-2 (HLS) 30 m imagery every 2–3 days, available a few days after capture.",
+      "Each satellite pass covers a diagonal strip, so a single day of 30 m imagery leaves gaps. The map fills those gaps with the newest pass from the 4 days before the selected date, so 30 m imagery can mix up to 5 acquisition dates.",
       "\"Latest clear\" uses the NASA CMR catalog. HLS cloud cover is rated per 110 km scene, so a \"clear\" day can still be cloudy over a given spot.",
       "Snow depth (model): NOAA NOHRSC National Snow Analysis (SNODAS), 1 km grid, latest analysis only, lower 48 U.S. states only. Each value averages a 1 km cell and is a model estimate, not a measurement.",
       "Snowpack by elevation compares the latest NRCS SNOTEL snow depth at stations within 30 miles.",

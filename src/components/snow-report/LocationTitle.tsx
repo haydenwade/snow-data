@@ -1,7 +1,7 @@
 "use client";
 import { useCallback } from "react";
 import Link from "next/link";
-import { Mountain, Radar, Share, Snowflake } from "lucide-react";
+import { Mountain, Share, Snowflake } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { shareStation } from "@/lib/share-station";
 import { Unit } from "@/types/forecast";
@@ -72,20 +72,6 @@ export default function LocationTitle({
                     {formatElevationForUnit(location.elevationFt, unit)}
                   </span>
                 </span>
-                {location.radarLink ? (
-                  <a
-                    href={location.radarLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Open NWS Radar Map"
-                    className="inline-flex items-center"
-                  >
-                    <Radar className="h-4 w-4 text-blue-400" />
-                    <span className="ml-1 text-blue-400 text-sm hover:underline flex items-center">
-                      NWS Radar
-                    </span>
-                  </a>
-                ) : null}
               </div>
             </div>
           </div>

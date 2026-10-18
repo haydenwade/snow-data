@@ -2,15 +2,18 @@
 
 import { formatAvalancheArchiveDateLabel } from "@/components/stations/avalanche-archive-date";
 import {
+  RADAR_LEGEND,
   SNOW_COVER_LEGEND,
   SNOW_DEPTH_LEGEND,
   SatelliteMode,
+  hlsFillRange,
 } from "@/components/stations/map-overlays";
 
 type MapOverlayLegendProps = {
   satelliteMode: SatelliteMode;
   satelliteDate: string;
   showSnowDepth: boolean;
+  showRadar: boolean;
 };
 
 const SATELLITE_SOURCE: Record<Exclude<SatelliteMode, "off">, string> = {
@@ -23,8 +26,10 @@ export default function MapOverlayLegend({
   satelliteMode,
   satelliteDate,
   showSnowDepth,
+  showRadar,
 }: MapOverlayLegendProps) {
-  if (satelliteMode === "off" && !showSnowDepth) return null;
+  if (satelliteMode === "off" && !showSnowDepth && !showRadar) return null;
+  const hlsFill = satelliteMode === "hls" ? hlsFillRange(satelliteDate) : null;
 
   return (
     <div
@@ -56,6 +61,13 @@ export default function MapOverlayLegend({
               <p className="mt-0.5 text-slate-400">{SNOW_COVER_LEGEND.note}</p>
             </>
           ) : null}
+          {hlsFill ? (
+            <p className="mt-0.5 text-amber-200/90">
+              Mixed dates. Where {formatAvalancheArchiveDateLabel(satelliteDate)} has no pass,
+              the newest from {formatAvalancheArchiveDateLabel(hlsFill.from)} –{" "}
+              {formatAvalancheArchiveDateLabel(hlsFill.to)} shows instead.
+            </p>
+          ) : null}
           <p className="mt-0.5 text-slate-500">{SATELLITE_SOURCE[satelliteMode]}</p>
         </div>
       ) : null}
@@ -80,6 +92,26 @@ export default function MapOverlayLegend({
           </div>
           <p className="mt-0.5 text-slate-400">Tap the map for a point value.</p>
           <p className="mt-0.5 text-slate-500">Model · NOAA SNODAS · 1 km · US only</p>
+        </div>
+      ) : null}
+
+      {showRadar ? (
+        <div>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-[11px] font-semibold text-slate-100">Radar</span>
+            <span className="font-semibold text-teal-300">Last 2 hrs</span>
+          </div>
+          <div
+            className="mt-1 h-2 w-full rounded-sm"
+            style={{ background: RADAR_LEGEND.gradient }}
+            aria-hidden="true"
+          />
+          <div className="mt-0.5 flex justify-between text-slate-400">
+            <span>{RADAR_LEGEND.lowLabel}</span>
+            <span>{RADAR_LEGEND.highLabel}</span>
+          </div>
+          <p className="mt-0.5 text-slate-400">{RADAR_LEGEND.note}</p>
+          <p className="mt-0.5 text-slate-500">Radar · NOAA MRMS · US only</p>
         </div>
       ) : null}
     </div>
