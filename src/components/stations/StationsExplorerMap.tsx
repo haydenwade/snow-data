@@ -61,6 +61,7 @@ const DEFAULT_ZOOM = 7;
 const WHEEL_ZOOM_COOLDOWN_MS = 180;
 const PINCH_ZOOM_SENSITIVITY = 1.6;
 const TAP_SLOP_PX = 6;
+const BASEMAP_FALLBACK_AFTER_ERRORS = 3;
 const LATEST_CLEAR_ZOOM = 10;
 
 type StateBounds = {
@@ -746,6 +747,18 @@ export default function StationsExplorerMap({
   const [basemap, setBasemap] = useState<BasemapKey>(
     initialSatelliteMode === "off" ? "light" : "topo",
   );
+  const [basemapNotice, setBasemapNotice] = useState<string | null>(null);
+  const basemapTileErrorsRef = useRef(0);
+  // CARTO tiles fail when the key is missing, over quota, or the domain isn't
+  // allowed for it. After a few failures, fall back to keyless Topo.
+  const onBasemapTileError = () => {
+    if (basemap !== "light") return;
+    basemapTileErrorsRef.current += 1;
+    if (basemapTileErrorsRef.current !== BASEMAP_FALLBACK_AFTER_ERRORS) return;
+    setBasemap("topo");
+    setZoom((current) => clamp(current, MIN_ZOOM, BASEMAPS.topo.maxZoom));
+    setBasemapNotice("Standard map tiles are unavailable right now. Showing Topo.");
+  };
   const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false);
   const [isStationLayerVisible, setIsStationLayerVisible] = useState(true);
   const [isAvalancheLayerVisible, setIsAvalancheLayerVisible] = useState(true);
@@ -1469,6 +1482,8 @@ export default function StationsExplorerMap({
                 data-map-interactive="true"
                 onPointerDown={(event) => event.stopPropagation()}
                 onClick={() => {
+                  basemapTileErrorsRef.current = 0;
+                  setBasemapNotice(null);
                   setBasemap(key);
                   setZoom((current) =>
                     clamp(current, MIN_ZOOM, BASEMAPS[key].maxZoom),
@@ -1708,6 +1723,10 @@ export default function StationsExplorerMap({
                   opacity: layer.opacity ?? 1,
                 }}
                 draggable={false}
+                onError={(event) => {
+                  event.currentTarget.style.visibility = "hidden";
+                  onBasemapTileError();
+                }}
               />
             )),
           )}
@@ -2299,6 +2318,12 @@ export default function StationsExplorerMap({
         {isStationLayerVisible && !isRefreshing && stations.length === 0 ? (
           <div className="absolute left-1/2 top-4 -translate-x-1/2 rounded-lg border border-slate-600 bg-slate-900/90 px-3 py-1 text-xs text-slate-300">
             No stations found in the current viewport.
+          </div>
+        ) : null}
+
+        {basemapNotice ? (
+          <div className="absolute left-1/2 top-12 z-50 -translate-x-1/2 rounded-lg border border-amber-400/40 bg-slate-900/90 px-3 py-1 text-xs text-amber-100">
+            {basemapNotice}
           </div>
         ) : null}
       </div>
