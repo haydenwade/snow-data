@@ -13,6 +13,7 @@ import {
   MapPin,
   Minus,
   Plus,
+  Satellite,
   Snowflake,
   X,
 } from "lucide-react";
@@ -34,6 +35,24 @@ import {
   normalizeAvalancheArchiveDate,
 } from "@/components/stations/avalanche-archive-date";
 import { formatElevationForUnit } from "@/components/snow-report/utils";
+import { config } from "@/lib/config";
+import {
+  SATELLITE_MODE_OPTIONS,
+  SNOW_DEPTH_OVERLAY,
+  SatelliteMode,
+  dailyImageryDate,
+  overlayTilesFor,
+  satelliteOverlaySources,
+} from "@/components/stations/map-overlays";
+import MapLayerSwitch from "@/components/stations/MapLayerSwitch";
+import MapOverlayLegend from "@/components/stations/MapOverlayLegend";
+import SatelliteDateScrubber from "@/components/stations/SatelliteDateScrubber";
+import SnowDepthPopup from "@/components/stations/SnowDepthPopup";
+import {
+  CLEAR_SCENE_MIN_ZOOM,
+  pickLatestClearDay,
+  useClearScenes,
+} from "@/components/stations/useClearScenes";
 
 const TILE_SIZE = 256;
 const MIN_ZOOM = 4;
@@ -41,6 +60,8 @@ const DEFAULT_CENTER = { lat: 40.7608, lon: -111.891 };
 const DEFAULT_ZOOM = 7;
 const WHEEL_ZOOM_COOLDOWN_MS = 180;
 const PINCH_ZOOM_SENSITIVITY = 1.6;
+const TAP_SLOP_PX = 6;
+const LATEST_CLEAR_ZOOM = 10;
 
 type StateBounds = {
   code: string;
@@ -86,6 +107,7 @@ type BasemapLayer = {
 type BasemapConfig = {
   label: string;
   attribution: string;
+  attributionUrl?: string;
   maxZoom: number;
   layers: BasemapLayer[];
 };
@@ -93,21 +115,25 @@ type BasemapConfig = {
 const BASEMAPS: Record<BasemapKey, BasemapConfig> = {
   light: {
     label: "Standard",
-    attribution: "Carto Positron",
+    // CARTO requires crediting both OpenStreetMap and CARTO, linked.
+    attribution: "© OpenStreetMap · © CARTO",
+    attributionUrl: "https://carto.com/attribution/",
     maxZoom: 20,
     layers: [
       {
         id: "standard",
         tileUrl: (z, x, y) => {
           const shard = ["a", "b", "c", "d"][(x + y) % 4] ?? "a";
-          return `https://${shard}.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png`;
+          const key = config.cartoApiKey ? `?key=${encodeURIComponent(config.cartoApiKey)}` : "";
+          return `https://${shard}.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png${key}`;
         },
       },
     ],
   },
   satellite: {
-    label: "Satellite",
-    attribution: "Esri World Imagery",
+    // Esri's mosaic is undated and often years old; dated imagery lives in Layers.
+    label: "Aerial",
+    attribution: "Esri World Imagery · undated",
     maxZoom: 19,
     layers: [
       {
@@ -242,6 +268,9 @@ type StationsExplorerMapProps = {
   enableAvalancheArchive?: boolean;
   avalancheArchiveDate?: string | null;
   onAvalancheArchiveDateChange?: (date: string | null) => void;
+  /** From `?lat=&lon=&z=` deep links; wins over the saved location. */
+  initialView?: { lat: number; lon: number; zoom: number } | null;
+  initialSatelliteMode?: SatelliteMode;
 };
 
 type AnchoredPopupLayout = {
@@ -675,6 +704,8 @@ export default function StationsExplorerMap({
   enableAvalancheArchive = false,
   avalancheArchiveDate = null,
   onAvalancheArchiveDateChange,
+  initialView = null,
+  initialSatelliteMode = "off",
 }: StationsExplorerMapProps) {
   const {
     isClient,
@@ -705,13 +736,26 @@ export default function StationsExplorerMap({
     height: 0,
   });
   const [center, setCenter] = useState(
-    initialCenterLocation ?? DEFAULT_CENTER,
+    initialView
+      ? { lat: initialView.lat, lon: initialView.lon }
+      : initialCenterLocation ?? DEFAULT_CENTER,
   );
-  const [zoom, setZoom] = useState(initialCenterLocation ? 10 : DEFAULT_ZOOM);
-  const [basemap, setBasemap] = useState<BasemapKey>("light");
+  const [zoom, setZoom] = useState(
+    initialView ? initialView.zoom : initialCenterLocation ? 10 : DEFAULT_ZOOM,
+  );
+  const [basemap, setBasemap] = useState<BasemapKey>(
+    initialSatelliteMode === "off" ? "light" : "topo",
+  );
   const [isLayerMenuOpen, setIsLayerMenuOpen] = useState(false);
   const [isStationLayerVisible, setIsStationLayerVisible] = useState(true);
   const [isAvalancheLayerVisible, setIsAvalancheLayerVisible] = useState(true);
+  const [satelliteMode, setSatelliteMode] = useState<SatelliteMode>(initialSatelliteMode);
+  const [isSnowDepthLayerVisible, setIsSnowDepthLayerVisible] = useState(false);
+  const [snowDepthPoint, setSnowDepthPoint] = useState<{ lat: number; lon: number } | null>(
+    null,
+  );
+  const [isLatestClearPending, setIsLatestClearPending] = useState(false);
+  const [latestClearMessage, setLatestClearMessage] = useState<string | null>(null);
   const [selectedStationTriplet, setSelectedStationTriplet] = useState<string | null>(null);
   const [selectedAvalancheRegionId, setSelectedAvalancheRegionId] = useState<string | null>(
     null,
@@ -745,8 +789,14 @@ export default function StationsExplorerMap({
   const isViewingAvalancheArchive = selectedAvalancheArchiveDate != null;
   const canAdvanceAvalancheArchiveDate =
     visibleAvalancheForecastDate < todayAvalancheArchiveDate;
-  const showAvalancheArchiveControls =
-    enableAvalancheArchive && isAvalancheLayerVisible;
+  // One map date drives every dated layer (avalanche archive + satellite imagery).
+  const isSatelliteLayerVisible = satelliteMode !== "off";
+  const showDateControls =
+    enableAvalancheArchive && (isAvalancheLayerVisible || isSatelliteLayerVisible);
+  const satelliteDate =
+    satelliteMode === "hls"
+      ? visibleAvalancheForecastDate
+      : dailyImageryDate(selectedAvalancheArchiveDate, todayAvalancheArchiveDate);
   const avalancheMapLayerRequestUrl = selectedAvalancheArchiveDate
     ? `/api/avalanche/map-layer?date=${encodeURIComponent(selectedAvalancheArchiveDate)}`
     : "/api/avalanche/map-layer";
@@ -826,6 +876,13 @@ export default function StationsExplorerMap({
   }, [avalancheMapLayerRequestUrl]);
 
   const maxZoom = BASEMAPS[basemap].maxZoom;
+  const overlaySources = useMemo(
+    () => [
+      ...satelliteOverlaySources(satelliteMode, satelliteDate),
+      ...(isSnowDepthLayerVisible ? [SNOW_DEPTH_OVERLAY] : []),
+    ],
+    [isSnowDepthLayerVisible, satelliteDate, satelliteMode],
+  );
 
   const mapState = useMemo(() => {
     if (size.width === 0 || size.height === 0) return null;
@@ -944,6 +1001,82 @@ export default function StationsExplorerMap({
     onViewportChange({ stateCodes, bounds: roundedBounds });
   }, [mapState, onViewportChange, isStationLayerVisible]);
 
+  const canSearchClearScenes = zoom >= CLEAR_SCENE_MIN_ZOOM;
+  const clearScenes = useClearScenes(
+    mapState?.bounds ?? null,
+    (satelliteMode === "hls" || isLatestClearPending) && canSearchClearScenes,
+  );
+  const hlsDayForSatelliteDate =
+    satelliteMode === "hls"
+      ? clearScenes.days.find((day) => day.date === satelliteDate) ?? null
+      : null;
+
+  useEffect(() => {
+    if (!isLatestClearPending) return;
+    if (clearScenes.status !== "ready" && clearScenes.status !== "error") return;
+    queueMicrotask(() => {
+      setIsLatestClearPending(false);
+      if (clearScenes.status === "error") {
+        setLatestClearMessage(clearScenes.error ?? "Imagery search failed. Try again.");
+        return;
+      }
+      const day = pickLatestClearDay(clearScenes.days);
+      if (!day) {
+        setLatestClearMessage("No clear 30 m scene here in the last 30 days.");
+        return;
+      }
+      const sensor = day.product === "S30" ? "Sentinel-2" : "Landsat";
+      setLatestClearMessage(
+        `Latest clear: ${formatAvalancheArchiveDateLabel(day.date)} · ${sensor} · ${Math.round(day.cloudPct ?? 0)}% scene cloud`,
+      );
+      onAvalancheArchiveDateChange?.(
+        normalizeAvalancheArchiveDate(day.date, { maxDate: todayAvalancheArchiveDate }),
+      );
+    });
+  }, [
+    clearScenes,
+    isLatestClearPending,
+    onAvalancheArchiveDateChange,
+    todayAvalancheArchiveDate,
+  ]);
+
+  const requestLatestClear = () => {
+    setLatestClearMessage(null);
+    setSatelliteMode("hls");
+    setIsLatestClearPending(true);
+    if (!canSearchClearScenes) {
+      setZoom(clamp(LATEST_CLEAR_ZOOM, MIN_ZOOM, maxZoom));
+    }
+  };
+
+  const satelliteHint = (() => {
+    if (latestClearMessage) return latestClearMessage;
+    if (isLatestClearPending) return "Searching NASA's catalog for a clear 30 m scene…";
+    if (satelliteMode !== "hls") return null;
+    if (!canSearchClearScenes) return "Zoom in to see which days have 30 m scenes.";
+    if (clearScenes.status === "error") return clearScenes.error;
+    if (clearScenes.status !== "ready") return null;
+    if (!hlsDayForSatelliteDate) {
+      return "No 30 m pass on this date. Pick a green day or use Latest clear.";
+    }
+    const sensor = hlsDayForSatelliteDate.product === "S30" ? "Sentinel-2" : "Landsat";
+    return hlsDayForSatelliteDate.cloudPct == null
+      ? sensor
+      : `${sensor} · ${Math.round(hlsDayForSatelliteDate.cloudPct)}% scene cloud`;
+  })();
+
+  const snowDepthPopupPosition =
+    snowDepthPoint && mapState
+      ? (() => {
+          const world = latLonToWorld(snowDepthPoint.lat, snowDepthPoint.lon, zoom);
+          return {
+            x: wrapWorldXNear(mapState.centerWorld.x, world.x, zoom) -
+              (mapState.centerWorld.x - size.width / 2),
+            y: world.y - (mapState.centerWorld.y - size.height / 2),
+          };
+        })()
+      : null;
+
   const selectedCluster = useMemo(
     () =>
       mapState?.clusters.find(
@@ -1061,6 +1194,7 @@ export default function StationsExplorerMap({
     setIsLayerMenuOpen(false);
     setSelectedStationTriplet(null);
     setSelectedAvalancheRegionId(null);
+    setSnowDepthPoint(null);
     activePointersRef.current.set(event.pointerId, {
       clientX: event.clientX,
       clientY: event.clientY,
@@ -1130,6 +1264,29 @@ export default function StationsExplorerMap({
   };
 
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    const tapStart = dragRef.current;
+    const isTap =
+      event.type === "pointerup" &&
+      tapStart != null &&
+      pinchRef.current == null &&
+      activePointersRef.current.size === 1 &&
+      Math.hypot(
+        event.clientX - tapStart.startClientX,
+        event.clientY - tapStart.startClientY,
+      ) < TAP_SLOP_PX;
+    if (isTap && isSnowDepthLayerVisible && mapState) {
+      const localPoint = toLocalPoint(event.clientX, event.clientY);
+      if (localPoint) {
+        setSnowDepthPoint(
+          worldToLatLon(
+            mapState.centerWorld.x - size.width / 2 + localPoint.x,
+            mapState.centerWorld.y - size.height / 2 + localPoint.y,
+            zoom,
+          ),
+        );
+      }
+    }
+
     activePointersRef.current.delete(event.pointerId);
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -1254,6 +1411,11 @@ export default function StationsExplorerMap({
     if (!isClient) return;
     if (didInitializeLocationRef.current) return;
 
+    if (initialView) {
+      didInitializeLocationRef.current = true;
+      return;
+    }
+
     if (initialCenterLocation) {
       didInitializeLocationRef.current = true;
       queueMicrotask(() => {
@@ -1268,7 +1430,7 @@ export default function StationsExplorerMap({
     queueMicrotask(() => {
       requestCurrentLocation();
     });
-  }, [initialCenterLocation, isClient, requestCurrentLocation]);
+  }, [initialCenterLocation, initialView, isClient, requestCurrentLocation]);
 
   const recenterOnCurrentLocation = () => {
     if (currentLocation) {
@@ -1368,7 +1530,7 @@ export default function StationsExplorerMap({
             {isLayerMenuOpen ? (
               <div
                 data-map-interactive="true"
-                className="absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-slate-600 bg-slate-900/95 p-2 shadow-2xl"
+                className="absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-slate-600 bg-slate-900/95 p-2 shadow-2xl"
                 onPointerDown={(event) => event.stopPropagation()}
               >
                 <div className="mb-1 px-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
@@ -1465,6 +1627,57 @@ export default function StationsExplorerMap({
                     />
                   </span>
                 </button>
+
+                <div className="my-1 border-t border-slate-700/70" />
+
+                <MapLayerSwitch
+                  label="Satellite imagery"
+                  detail="Dated · NASA, keyless"
+                  checked={isSatelliteLayerVisible}
+                  dotClassName="bg-amber-300"
+                  onToggle={() => {
+                    setLatestClearMessage(null);
+                    setIsLatestClearPending(false);
+                    setSatelliteMode((current) => (current === "off" ? "snow-cover" : "off"));
+                  }}
+                >
+                  <div className="grid grid-cols-3 gap-1">
+                    {SATELLITE_MODE_OPTIONS.filter(
+                      // 30 m scenes need the date controls to reach a day with a pass.
+                      (option) => option.key !== "hls" || enableAvalancheArchive,
+                    ).map((option) => (
+                      <button
+                        key={option.key}
+                        type="button"
+                        onClick={() => {
+                          setLatestClearMessage(null);
+                          setSatelliteMode(option.key);
+                        }}
+                        className={[
+                          "rounded-md border px-1 py-1 text-center transition",
+                          satelliteMode === option.key
+                            ? "border-amber-300/70 bg-amber-300/15 text-amber-100"
+                            : "border-slate-600 text-slate-300 hover:bg-slate-800",
+                        ].join(" ")}
+                        aria-pressed={satelliteMode === option.key}
+                      >
+                        <span className="block text-[11px] font-semibold">{option.label}</span>
+                        <span className="block text-[9px] text-slate-400">{option.detail}</span>
+                      </button>
+                    ))}
+                  </div>
+                </MapLayerSwitch>
+
+                <MapLayerSwitch
+                  label="Snow depth (model)"
+                  detail="NOAA SNODAS · latest · US only"
+                  checked={isSnowDepthLayerVisible}
+                  dotClassName="bg-violet-300"
+                  onToggle={() => {
+                    setSnowDepthPoint(null);
+                    setIsSnowDepthLayerVisible((current) => !current);
+                  }}
+                />
               </div>
             ) : null}
           </div>
@@ -1499,6 +1712,32 @@ export default function StationsExplorerMap({
             )),
           )}
 
+          {mapState
+            ? overlaySources.map((source) =>
+                overlayTilesFor(source, mapState.tiles, zoom).map((tile) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={`${tile.key}-${zoom}`}
+                    src={tile.url}
+                    alt=""
+                    className="absolute z-10 select-none pointer-events-none"
+                    style={{
+                      width: tile.size,
+                      height: tile.size,
+                      left: tile.left,
+                      top: tile.top,
+                      opacity: source.opacity,
+                    }}
+                    draggable={false}
+                    onError={(event) => {
+                      // Days outside a product's range 404; hide instead of a broken image.
+                      event.currentTarget.style.visibility = "hidden";
+                    }}
+                  />
+                )),
+              )
+            : null}
+
           {isAvalancheLayerVisible && mapState?.avalancheRegions.length ? (
             <svg
               className="absolute inset-0 z-20 pointer-events-none"
@@ -1525,7 +1764,11 @@ export default function StationsExplorerMap({
                     d={region.pathData}
                     fillRule="evenodd"
                     className={[
-                      "pointer-events-auto cursor-pointer motion-reduce:animate-none",
+                      // With snow depth on, taps go to the map for point values.
+                      isSnowDepthLayerVisible
+                        ? "pointer-events-none"
+                        : "pointer-events-auto cursor-pointer",
+                      "motion-reduce:animate-none",
                       hasWarning ? "animate-pulse [animation-duration:3s]" : "",
                     ].join(" ")}
                     fill={fillColor}
@@ -1829,11 +2072,38 @@ export default function StationsExplorerMap({
               <div className="pointer-events-none absolute inset-0 rounded-full border border-blue-300/70 scale-[1.8] opacity-70" />
             </button>
           ) : null}
+
+          {isSnowDepthLayerVisible && snowDepthPoint && snowDepthPopupPosition ? (
+            <SnowDepthPopup
+              key={`${snowDepthPoint.lat},${snowDepthPoint.lon}`}
+              lat={snowDepthPoint.lat}
+              lon={snowDepthPoint.lon}
+              x={snowDepthPopupPosition.x}
+              y={snowDepthPopupPosition.y}
+              unit={unit}
+              onClose={() => setSnowDepthPoint(null)}
+            />
+          ) : null}
         </div>
 
-        {showAvalancheArchiveControls ? (
+        <div
+          className={[
+            "absolute left-0 z-50",
+            showDateControls && isAvalancheLayerVisible && isViewingAvalancheArchive
+              ? "top-14"
+              : "top-0",
+          ].join(" ")}
+        >
+          <MapOverlayLegend
+            satelliteMode={satelliteMode}
+            satelliteDate={satelliteDate}
+            showSnowDepth={isSnowDepthLayerVisible}
+          />
+        </div>
+
+        {showDateControls ? (
           <>
-            {isViewingAvalancheArchive ? (
+            {isAvalancheLayerVisible && isViewingAvalancheArchive ? (
               <div className="pointer-events-none absolute inset-x-0 top-3 z-[60] flex justify-center px-3 sm:top-4">
                 <div
                   data-map-interactive="true"
@@ -1855,7 +2125,30 @@ export default function StationsExplorerMap({
               </div>
             ) : null}
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-16 z-[60] flex justify-center px-3 sm:bottom-10">
+            <div className="pointer-events-none absolute inset-x-0 bottom-16 z-[60] flex flex-col items-center gap-2 px-3 sm:bottom-10">
+              {isSatelliteLayerVisible ? (
+                <div
+                  data-map-interactive="true"
+                  className="pointer-events-auto flex flex-col items-center gap-1"
+                  onPointerDown={(event) => event.stopPropagation()}
+                >
+                  {satelliteHint ? (
+                    <div className="max-w-[92vw] rounded-md border border-slate-600 bg-slate-900/90 px-2 py-1 text-center text-[11px] text-slate-200 shadow-lg">
+                      {satelliteHint}
+                    </div>
+                  ) : null}
+                  <SatelliteDateScrubber
+                    today={todayAvalancheArchiveDate}
+                    selectedDate={visibleAvalancheForecastDate}
+                    showSceneDays={satelliteMode === "hls" && canSearchClearScenes}
+                    sceneDays={clearScenes.days}
+                    onCommit={(date) => {
+                      setLatestClearMessage(null);
+                      setAvalancheArchiveDate(date);
+                    }}
+                  />
+                </div>
+              ) : null}
               <div
                 data-map-interactive="true"
                 className="pointer-events-auto flex items-center gap-2"
@@ -1864,8 +2157,11 @@ export default function StationsExplorerMap({
                 <button
                   type="button"
                   className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-600 bg-slate-900/90 text-slate-100 shadow-lg hover:bg-slate-800"
-                  onClick={() => stepAvalancheArchiveDate(-1)}
-                  aria-label="Previous avalanche forecast day"
+                  onClick={() => {
+                    setLatestClearMessage(null);
+                    stepAvalancheArchiveDate(-1);
+                  }}
+                  aria-label="Previous map day"
                   title="Previous day"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -1873,7 +2169,7 @@ export default function StationsExplorerMap({
 
                 <label
                   className="relative flex h-9 min-w-[10.75rem] cursor-pointer items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-900/90 px-2.5 text-slate-100 shadow-lg sm:min-w-[11.75rem]"
-                  title="Select avalanche forecast date"
+                  title="Select map date"
                   onClick={() => openAvalancheArchiveDatePicker()}
                 >
                   <CalendarDays className="h-4 w-4 shrink-0 text-slate-300" />
@@ -1887,10 +2183,11 @@ export default function StationsExplorerMap({
                     value={visibleAvalancheForecastDate}
                     max={todayAvalancheArchiveDate}
                     onChange={(event) => {
+                      setLatestClearMessage(null);
                       setAvalancheArchiveDate(event.target.value || null);
                     }}
                     className="pointer-events-none absolute inset-0 opacity-0"
-                    aria-label="Select avalanche forecast date"
+                    aria-label="Select map date"
                     data-map-interactive="true"
                     onPointerDown={(event) => event.stopPropagation()}
                   />
@@ -1904,13 +2201,33 @@ export default function StationsExplorerMap({
                       ? "border-slate-600 bg-slate-900/90 text-slate-100 hover:bg-slate-800"
                       : "cursor-not-allowed border-slate-700 bg-slate-900/70 text-slate-500",
                   ].join(" ")}
-                  onClick={() => stepAvalancheArchiveDate(1)}
+                  onClick={() => {
+                    setLatestClearMessage(null);
+                    stepAvalancheArchiveDate(1);
+                  }}
                   disabled={!canAdvanceAvalancheArchiveDate}
-                  aria-label="Next avalanche forecast day"
+                  aria-label="Next map day"
                   title={canAdvanceAvalancheArchiveDate ? "Next day" : "Already viewing today"}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </button>
+
+                {isSatelliteLayerVisible ? (
+                  <button
+                    type="button"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-300/50 bg-slate-900/90 px-2.5 text-xs font-semibold text-amber-100 shadow-lg hover:bg-slate-800 disabled:cursor-wait disabled:opacity-70"
+                    onClick={requestLatestClear}
+                    disabled={isLatestClearPending}
+                    title="Jump to the newest clear 30 m scene for this view"
+                  >
+                    {isLatestClearPending ? (
+                      <LoaderCircle className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Satellite className="h-4 w-4" />
+                    )}
+                    <span className="hidden sm:inline">Latest clear</span>
+                  </button>
+                ) : null}
               </div>
             </div>
           </>
@@ -1942,7 +2259,19 @@ export default function StationsExplorerMap({
         </div>
 
         <div className="absolute left-3 bottom-20 z-50 rounded-lg border border-slate-600 bg-slate-900/85 px-2 py-1 text-[11px] text-slate-400 sm:bottom-12">
-          {BASEMAPS[basemap].attribution}
+          {BASEMAPS[basemap].attributionUrl ? (
+            <a
+              href={BASEMAPS[basemap].attributionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-200"
+              data-map-interactive="true"
+            >
+              {BASEMAPS[basemap].attribution}
+            </a>
+          ) : (
+            BASEMAPS[basemap].attribution
+          )}
         </div>
 
         {isAvalancheLayerVisible ? (

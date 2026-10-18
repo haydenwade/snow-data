@@ -2,8 +2,11 @@ import {
   ForecastDaily,
   ForecastGridData,
   SeriesPoint,
+  SnowLevelKind,
   Unit,
 } from "@/types/forecast";
+
+const FEET_PER_METER = 3.28084;
 
 // Return YYYY-MM-DD string for a given date in the provided IANA time zone
 export function dateKeyInZone(d: Date, timeZone: string = "America/Denver") {
@@ -143,6 +146,7 @@ export function aggregateForecastToDaily(
       windSpeeds: number[];
       windDirs: { dir: number; speed: number }[];
       skyCovers: number[];
+      levelsM: number[];
       tMaxF?: number;
       tMinF?: number;
       tMaxC?: number;
@@ -158,6 +162,7 @@ export function aggregateForecastToDaily(
         windSpeeds: [],
         windDirs: [],
         skyCovers: [],
+        levelsM: [],
       };
   };
 
@@ -235,6 +240,25 @@ export function aggregateForecastToDaily(
       });
     });
   }
+
+  // Prefer the NWS snow level; Open-Meteo only offers the freezing level.
+  const levelSeries = grid.snowLevel?.points?.length
+    ? grid.snowLevel
+    : grid.freezingLevel?.points?.length
+      ? grid.freezingLevel
+      : null;
+  const snowLevelKind: SnowLevelKind | undefined = !levelSeries
+    ? undefined
+    : levelSeries === grid.snowLevel
+      ? "snow-level"
+      : "freezing-level";
+  levelSeries?.points.forEach((p) => {
+    expandToHourly(p).forEach((h) => {
+      const day = dateKeyInZone(h, timeZone);
+      pushDay(day);
+      dayBuckets[day].levelsM.push(p.value);
+    });
+  });
 
   // max/min temperature series provide one value per day (start timestamp),
   // so map each point to its calendar day directly without expanding to hourly slots.
@@ -320,6 +344,14 @@ export function aggregateForecastToDaily(
       skyCoverPercent = Math.round(sum / b.skyCovers.length);
     }
 
+    const hasLevels = b.levelsM.length > 0;
+    const snowLevelMinFt = hasLevels
+      ? Math.round(Math.min(...b.levelsM) * FEET_PER_METER)
+      : undefined;
+    const snowLevelMaxFt = hasLevels
+      ? Math.round(Math.max(...b.levelsM) * FEET_PER_METER)
+      : undefined;
+
     return {
       date: day,
       snowIn: Number(b.snowIn.toFixed(2)),
@@ -331,6 +363,9 @@ export function aggregateForecastToDaily(
       tMaxF,
       tMinC,
       tMaxC,
+      snowLevelMinFt,
+      snowLevelMaxFt,
+      snowLevelKind: hasLevels ? snowLevelKind : undefined,
     };
   });
 }

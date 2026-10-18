@@ -18,7 +18,11 @@ export type ForecastGridData = {
   windDirection?: GridSeries; // degrees
   windSpeed?: GridSeries; // km/h
   skyCover?: GridSeries; // %
+  snowLevel?: GridSeries; // m (NWS forecast snow level)
+  freezingLevel?: GridSeries; // m (Open-Meteo fallback; ~1,000 ft above snow level)
 };
+
+export type SnowLevelKind = "snow-level" | "freezing-level";
 
 export type ForecastDaily = {
   date: string; // YYYY-MM-DD in America/Denver
@@ -33,4 +37,8 @@ export type ForecastDaily = {
   windDirDeg?: number;
   // sky cover percent (0-100)
   skyCoverPercent?: number;
+  // daily range of the forecast snow level (or freezing level fallback), feet
+  snowLevelMinFt?: number;
+  snowLevelMaxFt?: number;
+  snowLevelKind?: SnowLevelKind;
 };

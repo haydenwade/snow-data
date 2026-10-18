@@ -61,6 +61,19 @@ const METHODOLOGY_SECTIONS: DataSection[] = [
       "Avalanche.org collects and distributes this data from 20 independent forecasting operations; preserving the original meaning and context is important.",
     ],
   },
+  {
+    title: "Satellite Imagery, Snow Depth & Snow Level",
+    description:
+      "Dated satellite imagery and modeled snow depth help show coverage between stations. They are context, not avalanche information.",
+    bullets: [
+      "Satellite imagery: NASA Global Imagery Browse Services (GIBS). Daily VIIRS (NOAA-20) snow cover (375 m) and true color (250 m); Harmonized Landsat Sentinel-2 (HLS) 30 m imagery every 2–3 days, available a few days after capture.",
+      "\"Latest clear\" uses the NASA CMR catalog. HLS cloud cover is rated per 110 km scene, so a \"clear\" day can still be cloudy over a given spot.",
+      "Snow depth (model): NOAA NOHRSC National Snow Analysis (SNODAS), 1 km grid, latest analysis only, lower 48 U.S. states only. Each value averages a 1 km cell and is a model estimate, not a measurement.",
+      "Snowpack by elevation compares the latest NRCS SNOTEL snow depth at stations within 30 miles.",
+      "Snow level comes from the NWS forecast grid. Where only Open-Meteo is available, SNOWD shows the freezing level instead, which typically sits about 1,000 ft above where snow falls.",
+      "We acknowledge the use of imagery provided by services from NASA's Global Imagery Browse Services (GIBS), part of NASA's Earth Science Data and Information System (ESDIS).",
+    ],
+  },
 ];
 
 const ATTRIBUTION_SECTIONS: DataSection[] = [
@@ -93,7 +106,8 @@ const ATTRIBUTION_SECTIONS: DataSection[] = [
       "SNOWD keeps map attribution visible on map interfaces and documents providers here for reference.",
     bullets: [
       "Station and historic station pages use an embedded OpenStreetMap map (Mapnik layer) for station location display.",
-      "The Avalanche Danger Map page includes basemap options with visible on-map attribution labels: Carto Positron, Esri World Imagery, and OpenTopoMap.",
+      "The Avalanche Danger Map page includes basemap options with visible on-map attribution labels: Carto Positron, Esri World Imagery (shown as \"Aerial\"; an undated mosaic), and OpenTopoMap.",
+      "Optional map layers credit their sources in the on-map legend: NASA GIBS satellite imagery and NOAA NOHRSC SNODAS snow depth.",
       "Avalanche region overlays come from Avalanche.org map-layer GeoJSON responses.",
       "Map attribution is shown on map interfaces and summarized on this page.",
     ],
