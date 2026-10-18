@@ -31,11 +31,11 @@ export default function LocationTitle({
 
   return (
     <div className="bg-slate-900/70">
-      <div className="max-w-6xl mx-auto px-4 py-4 space-y-3">
+      <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 space-y-3">
         {/* Top branding row */}
         <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
-            <div className="flex flex-col items-center gap-1">
+          <div className="flex items-start gap-4 min-w-0">
+            <div className="flex flex-col items-center gap-1 shrink-0">
               <Link
                 href="/"
                 aria-label="Home"
@@ -56,11 +56,8 @@ export default function LocationTitle({
                   </>
                 )}
               </Link>
-              <div className="sm:hidden">
-                <FavoriteButton locationId={location.id} size="md" />
-              </div>
             </div>
-            <div>
+            <div className="min-w-0">
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                 {stationName}
               </h1>
@@ -76,11 +73,11 @@ export default function LocationTitle({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 ml-3">
             <FavoriteButton
               locationId={location.id}
               size="md"
-              className="hidden sm:inline-flex items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/50"
+              className="inline-flex items-center justify-center rounded-xl border border-slate-700/50 bg-slate-800/50"
             />
             <button
               type="button"
