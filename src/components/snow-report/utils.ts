@@ -7,6 +7,8 @@ import {
 } from "@/types/forecast";
 
 const FEET_PER_METER = 3.28084;
+// Hourly precip chance at or above this counts as "precip likely".
+export const PRECIP_LIKELY_MIN_POP = 30;
 
 // Return YYYY-MM-DD string for a given date in the provided IANA time zone
 export function dateKeyInZone(d: Date, timeZone: string = "America/Denver") {
@@ -147,6 +149,8 @@ export function aggregateForecastToDaily(
       windDirs: { dir: number; speed: number }[];
       skyCovers: number[];
       levelsM: number[];
+      // snow level during hours where precip is likely
+      wetLevelsM: number[];
       tMaxF?: number;
       tMinF?: number;
       tMaxC?: number;
@@ -163,6 +167,7 @@ export function aggregateForecastToDaily(
         windDirs: [],
         skyCovers: [],
         levelsM: [],
+        wetLevelsM: [],
       };
   };
 
@@ -186,12 +191,14 @@ export function aggregateForecastToDaily(
     });
   });
 
+  const popByHour = new Map<number, number>();
   grid.probabilityOfPrecipitation.points.forEach((p) => {
     const hoursList = expandToHourly(p);
     hoursList.forEach((h) => {
       const day = dateKeyInZone(h, timeZone);
       pushDay(day);
       dayBuckets[day].pops.push(p.value);
+      popByHour.set(h.getTime(), p.value);
     });
   });
 
@@ -257,6 +264,9 @@ export function aggregateForecastToDaily(
       const day = dateKeyInZone(h, timeZone);
       pushDay(day);
       dayBuckets[day].levelsM.push(p.value);
+      if ((popByHour.get(h.getTime()) ?? 0) >= PRECIP_LIKELY_MIN_POP) {
+        dayBuckets[day].wetLevelsM.push(p.value);
+      }
     });
   });
 
@@ -351,6 +361,13 @@ export function aggregateForecastToDaily(
     const snowLevelMaxFt = hasLevels
       ? Math.round(Math.max(...b.levelsM) * FEET_PER_METER)
       : undefined;
+    const hasWetLevels = b.wetLevelsM.length > 0;
+    const wetSnowLevelMinFt = hasWetLevels
+      ? Math.round(Math.min(...b.wetLevelsM) * FEET_PER_METER)
+      : undefined;
+    const wetSnowLevelMaxFt = hasWetLevels
+      ? Math.round(Math.max(...b.wetLevelsM) * FEET_PER_METER)
+      : undefined;
 
     return {
       date: day,
@@ -365,6 +382,8 @@ export function aggregateForecastToDaily(
       tMaxC,
       snowLevelMinFt,
       snowLevelMaxFt,
+      wetSnowLevelMinFt,
+      wetSnowLevelMaxFt,
       snowLevelKind: hasLevels ? snowLevelKind : undefined,
     };
   });

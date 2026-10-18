@@ -40,5 +40,8 @@ export type ForecastDaily = {
   // daily range of the forecast snow level (or freezing level fallback), feet
   snowLevelMinFt?: number;
   snowLevelMaxFt?: number;
+  // snow level range during hours where precip is likely, feet
+  wetSnowLevelMinFt?: number;
+  wetSnowLevelMaxFt?: number;
   snowLevelKind?: SnowLevelKind;
 };

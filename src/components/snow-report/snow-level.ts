@@ -1,8 +1,6 @@
 import { ForecastDaily, Unit } from "@/types/forecast";
 import { metersFromFeet } from "./utils";
 
-const RAIN_RISK_MIN_POP = 30;
-
 function formatLevel(feet: number, unit: Unit) {
   if (unit === "mm") return metersFromFeet(feet).toLocaleString("en-US");
   // Snow level forecasts are coarse; round to the nearest 100 ft.
@@ -26,13 +24,23 @@ export function formatSnowLevelRange(
   return low === high ? `${low} ${suffix}` : `${low}–${high} ${suffix}`;
 }
 
+export type RainRisk = "rain" | "mix";
+
 /**
- * Precipitation is likely and the NWS snow level rises above the station, so
- * some of it may fall as rain there. Only uses the true snow level, not the
+ * Compares the NWS snow level during hours where precip is likely against the
+ * station: "rain" when it stays above the station for all of those hours,
+ * "mix" when it crosses the station. Only uses the true snow level, not the
  * freezing-level fallback, which sits well above where rain changes to snow.
  */
-export function isRainRiskAtElevation(day: ForecastDaily, elevationFt: number | null | undefined) {
-  if (elevationFt == null || !Number.isFinite(elevationFt)) return false;
-  if (day.snowLevelKind !== "snow-level" || day.snowLevelMaxFt == null) return false;
-  return day.pop >= RAIN_RISK_MIN_POP && day.snowLevelMaxFt > elevationFt;
+export function rainRiskAtElevation(
+  day: ForecastDaily,
+  elevationFt: number | null | undefined,
+): RainRisk | null {
+  if (elevationFt == null || !Number.isFinite(elevationFt)) return null;
+  if (day.snowLevelKind !== "snow-level") return null;
+  const { wetSnowLevelMinFt: min, wetSnowLevelMaxFt: max } = day;
+  if (min == null || max == null) return null;
+  if (min > elevationFt) return "rain";
+  if (max > elevationFt) return "mix";
+  return null;
 }

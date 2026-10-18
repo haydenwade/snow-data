@@ -1,6 +1,6 @@
 import { ForecastDaily, ForecastGridData } from '@/types/forecast';
 import { aggregateForecastToDaily } from './utils';
-import { formatSnowLevelRange, isRainRiskAtElevation } from './snow-level';
+import { formatSnowLevelRange, rainRiskAtElevation } from './snow-level';
 
 const emptyGrid: ForecastGridData = {
   snowfallAmount: { uom: 'wmoUnit:mm', points: [] },
@@ -42,6 +42,32 @@ describe('snow level aggregation', () => {
     expect(day.snowLevelMaxFt).toBe(9843);
   });
 
+  it('tracks the snow level only during hours where precip is likely', () => {
+    const [day] = aggregateForecastToDaily(
+      {
+        ...emptyGrid,
+        probabilityOfPrecipitation: {
+          uom: 'wmoUnit:percent',
+          points: [
+            { start: '2026-10-18T12:00:00+00:00', hours: 3, value: 10 },
+            { start: '2026-10-18T15:00:00+00:00', hours: 3, value: 60 },
+          ],
+        },
+        snowLevel: {
+          uom: 'wmoUnit:m',
+          points: [
+            { start: '2026-10-18T12:00:00+00:00', hours: 3, value: 3000 },
+            { start: '2026-10-18T15:00:00+00:00', hours: 3, value: 2000 },
+          ],
+        },
+      },
+      'UTC',
+    );
+    expect(day.snowLevelMaxFt).toBe(9843);
+    expect(day.wetSnowLevelMinFt).toBe(6562);
+    expect(day.wetSnowLevelMaxFt).toBe(6562);
+  });
+
   it('leaves the range empty without level data', () => {
     const [day] = aggregateForecastToDaily(
       {
@@ -76,13 +102,25 @@ describe('snow level labels', () => {
     expect(formatSnowLevelRange(day, 'mm')).toBe('1,993–2,444 m');
   });
 
-  it('flags rain when the snow level rises above the station with precip likely', () => {
-    expect(isRainRiskAtElevation(day, 7500)).toBe(true);
-    expect(isRainRiskAtElevation(day, 8500)).toBe(false);
-    expect(isRainRiskAtElevation({ ...day, pop: 10 }, 7500)).toBe(false);
+  const wetDay: ForecastDaily = { ...day, wetSnowLevelMinFt: 7000, wetSnowLevelMaxFt: 8000 };
+
+  it('flags rain when the snow level stays above the station while precip is likely', () => {
+    expect(rainRiskAtElevation(wetDay, 6500)).toBe('rain');
+  });
+
+  it('flags a mix when the snow level crosses the station while precip is likely', () => {
+    expect(rainRiskAtElevation(wetDay, 7500)).toBe('mix');
+  });
+
+  it('does not flag when the snow level stays below the station', () => {
+    expect(rainRiskAtElevation(wetDay, 8500)).toBeNull();
+  });
+
+  it('does not flag when the snow level is only high during dry hours', () => {
+    expect(rainRiskAtElevation(day, 7500)).toBeNull();
   });
 
   it('does not flag rain from the freezing-level fallback', () => {
-    expect(isRainRiskAtElevation({ ...day, snowLevelKind: 'freezing-level' }, 7500)).toBe(false);
+    expect(rainRiskAtElevation({ ...wetDay, snowLevelKind: 'freezing-level' }, 6500)).toBeNull();
   });
 });

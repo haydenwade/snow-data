@@ -13,9 +13,34 @@ import {
 import { ForecastDaily, Unit } from "@/types/forecast";
 import {
   formatSnowLevelRange,
-  isRainRiskAtElevation,
+  rainRiskAtElevation,
+  RainRisk,
   snowLevelLabel,
 } from "./snow-level";
+
+const RAIN_RISK_COPY: Record<RainRisk, { label: string; title: string }> = {
+  rain: {
+    label: "Rain possible at station",
+    title: "Forecast snow level stays above this station while precipitation is likely",
+  },
+  mix: {
+    label: "Rain/snow mix possible",
+    title: "Forecast snow level crosses this station's elevation while precipitation is likely",
+  },
+};
+
+function RainRiskBadge({ risk }: { risk: RainRisk | null }) {
+  if (!risk) return null;
+  const { label, title } = RAIN_RISK_COPY[risk];
+  return (
+    <div
+      className="w-full rounded bg-amber-500/15 px-2 py-1 text-[11px] font-medium text-amber-300"
+      title={title}
+    >
+      {label}
+    </div>
+  );
+}
 
 // using degToCompass and skyCoverLabel from utils
 
@@ -144,14 +169,7 @@ export default function ForecastTimeline({
                 </div>
               ) : null}
 
-              {isRainRiskAtElevation(d, stationElevationFt) ? (
-                <div
-                  className="w-full rounded bg-amber-500/15 px-2 py-1 text-[11px] font-medium text-amber-300"
-                  title="Forecast snow level rises above this station while precipitation is likely"
-                >
-                  Rain possible at station
-                </div>
-              ) : null}
+              <RainRiskBadge risk={rainRiskAtElevation(d, stationElevationFt)} />
             </div>
           ))}
         </div>
