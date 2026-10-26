@@ -2275,8 +2275,7 @@ export default function StationsExplorerMap({
               <Maximize2 className="mx-auto h-4 w-4" />
             )}
           </button>
-          {/* Touch screens pinch to zoom, so the buttons only earn their space on desktop. */}
-          <div className="hidden flex-col gap-2 sm:flex">
+          <div className="flex flex-col gap-2">
             <button
               type="button"
               data-map-interactive="true"
