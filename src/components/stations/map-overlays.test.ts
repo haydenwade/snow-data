@@ -5,11 +5,12 @@ import {
   overlayTilesFor,
   radarOverlaySource,
   satelliteOverlaySources,
+  snowCoverOverlaySource,
 } from './map-overlays';
 import { pickLatestClearDay } from './useClearScenes';
 
 describe('overlayTilesFor', () => {
-  const [snowCover] = satelliteOverlaySources('snow-cover', '2026-10-17');
+  const snowCover = snowCoverOverlaySource('2026-10-17');
 
   it('uses map tiles as-is at or below the source max level', () => {
     const tiles = overlayTilesFor(snowCover, [{ x: 24, y: 11, left: 10, top: 20 }], 6);

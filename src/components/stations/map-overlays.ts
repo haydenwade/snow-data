@@ -8,20 +8,20 @@ const NOHRSC_EXPORT =
   "https://mapservices.weather.noaa.gov/raster/rest/services/snow/NOHRSC_Snow_Analysis/MapServer/export";
 const WEB_MERCATOR_HALF_WORLD = 20037508.342789244;
 
-export type SatelliteMode = "off" | "snow-cover" | "true-color" | "hls";
+export type SatelliteMode = "off" | "true-color" | "hls";
 
 export const SATELLITE_MODE_OPTIONS: Array<{
   key: Exclude<SatelliteMode, "off">;
   label: string;
   detail: string;
+  satellite: string;
 }> = [
-  { key: "snow-cover", label: "Snow cover", detail: "Daily · 375 m" },
-  { key: "true-color", label: "True color", detail: "Daily · 250 m" },
-  { key: "hls", label: "30 m", detail: "Every 2–3 days" },
+  { key: "true-color", label: "True color", detail: "Daily · 250 m", satellite: "NOAA-20 VIIRS" },
+  { key: "hls", label: "30 m", detail: "Every 2–3 days", satellite: "Landsat · Sentinel-2" },
 ];
 
 export function isSatelliteMode(value: string | null | undefined): value is SatelliteMode {
-  return value === "snow-cover" || value === "true-color" || value === "hls";
+  return value === "true-color" || value === "hls";
 }
 
 export type OverlaySource = {
@@ -50,10 +50,12 @@ function gibsSource(id: string, layer: string, date: string, maxLevel: number, f
   };
 }
 
+/** Daily VIIRS snow cover, drawn as colored NDSI values rather than imagery. */
+export function snowCoverOverlaySource(date: string): OverlaySource {
+  return gibsSource("viirs-snow", "VIIRS_NOAA20_NDSI_Snow_Cover", date, 8, "png", 0.8);
+}
+
 export function satelliteOverlaySources(mode: SatelliteMode, date: string): OverlaySource[] {
-  if (mode === "snow-cover") {
-    return [gibsSource("viirs-snow", "VIIRS_NOAA20_NDSI_Snow_Cover", date, 8, "png", 0.8)];
-  }
   if (mode === "true-color") {
     return [gibsSource("viirs-true", "VIIRS_NOAA20_CorrectedReflectance_TrueColor", date, 9, "jpg", 1)];
   }
