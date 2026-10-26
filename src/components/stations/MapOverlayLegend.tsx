@@ -52,7 +52,7 @@ function readDefaultExpanded() {
   return window.matchMedia(DESKTOP_QUERY).matches;
 }
 
-function SceneKey() {
+function SceneKey({ showNoPass }: { showNoPass: boolean }) {
   return (
     <div className="flex items-center gap-2 text-[9px] text-slate-400">
       <span className="flex items-center gap-1">
@@ -61,9 +61,11 @@ function SceneKey() {
       <span className="flex items-center gap-1">
         <span className="h-1.5 w-1.5 rounded-sm bg-slate-400" /> Cloudy
       </span>
-      <span className="flex items-center gap-1">
-        <span className="h-1.5 w-1.5 rounded-sm bg-slate-700" /> No pass
-      </span>
+      {showNoPass ? (
+        <span className="flex items-center gap-1">
+          <span className="h-1.5 w-1.5 rounded-sm bg-slate-700" /> No pass
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -130,7 +132,7 @@ export default function MapOverlayLegend({
             {satelliteMode !== "off" ? (
               <CompactRow label="Satellite" meta={satelliteDateLabel} metaClassName="text-sky-300" />
             ) : null}
-            {satelliteMode !== "off" && showSceneKey ? <SceneKey /> : null}
+            {satelliteMode !== "off" && showSceneKey ? <SceneKey showNoPass={satelliteMode === "hls"} /> : null}
             {snowCoverDate ? (
               <CompactRow
                 label="Snow cover"
@@ -178,7 +180,7 @@ export default function MapOverlayLegend({
               </div>
               {showSceneKey ? (
                 <div className="mt-1">
-                  <SceneKey />
+                  <SceneKey showNoPass={satelliteMode === "hls"} />
                 </div>
               ) : null}
               {hlsFill ? (
