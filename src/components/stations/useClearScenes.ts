@@ -31,7 +31,7 @@ export function isClearSceneDay(day: { cloudPct: number | null }) {
 }
 
 /** Newest clear day (`days` is newest first), or null when none are clear. */
-export function pickLatestClearDay(days: ClearSceneDay[]) {
+export function pickLatestClearDay<Day extends { cloudPct: number | null }>(days: Day[]) {
   return days.find(isClearSceneDay) ?? null;
 }
 

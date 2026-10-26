@@ -1052,7 +1052,7 @@ export default function StationsExplorerMap({
   const canSearchClearScenes = zoom >= CLEAR_SCENE_MIN_ZOOM;
   const clearScenes = useClearScenes(
     mapState?.bounds ?? null,
-    (satelliteMode === "hls" || isLatestClearPending) && canSearchClearScenes,
+    satelliteMode === "hls" && canSearchClearScenes,
   );
   const cloudCover = useCloudCoverDays(
     mapState?.bounds ?? null,
@@ -1067,28 +1067,42 @@ export default function StationsExplorerMap({
 
   useEffect(() => {
     if (!isLatestClearPending) return;
-    if (clearScenes.status !== "ready" && clearScenes.status !== "error") return;
+    const isTrueColor = satelliteMode === "true-color";
+    const search = isTrueColor ? cloudCover : clearScenes;
+    if (search.status !== "ready" && search.status !== "error") return;
     queueMicrotask(() => {
       setIsLatestClearPending(false);
-      if (clearScenes.status === "error") {
-        setLatestClearMessage(clearScenes.error ?? "Imagery search failed. Try again.");
+      if (search.status === "error") {
+        setLatestClearMessage(search.error ?? "Imagery search failed. Try again.");
         return;
       }
-      const day = pickLatestClearDay(clearScenes.days);
-      if (!day) {
-        setLatestClearMessage("No clear 30 m scene here in the last 30 days.");
-        return;
-      }
-      const sensor = day.product === "S30" ? "Sentinel-2" : "Landsat";
-      setLatestClearMessage(
-        `Latest clear: ${formatAvalancheArchiveDateLabel(day.date)} · ${sensor} · ${Math.round(day.cloudPct ?? 0)}% scene cloud`,
+      const day = pickLatestClearDay<{ date: string; cloudPct: number | null; product?: string }>(
+        search.days,
       );
+      if (!day) {
+        setLatestClearMessage(
+          isTrueColor
+            ? "No clear day here in the last 30 days."
+            : "No clear 30 m scene here in the last 30 days.",
+        );
+        return;
+      }
+      const dateLabel = formatAvalancheArchiveDateLabel(day.date);
+      const cloud = Math.round(day.cloudPct ?? 0);
+      if (isTrueColor) {
+        setLatestClearMessage(`Latest clear: ${dateLabel} · ${cloud}% cloud near the 1 pm pass`);
+      } else {
+        const sensor = day.product === "S30" ? "Sentinel-2" : "Landsat";
+        setLatestClearMessage(`Latest clear: ${dateLabel} · ${sensor} · ${cloud}% scene cloud`);
+      }
       onAvalancheArchiveDateChange?.(
         normalizeAvalancheArchiveDate(day.date, { maxDate: todayAvalancheArchiveDate }),
       );
     });
   }, [
     clearScenes,
+    cloudCover,
+    satelliteMode,
     isLatestClearPending,
     onAvalancheArchiveDateChange,
     todayAvalancheArchiveDate,
@@ -1096,7 +1110,6 @@ export default function StationsExplorerMap({
 
   const requestLatestClear = () => {
     setLatestClearMessage(null);
-    setSatelliteMode("hls");
     setIsLatestClearPending(true);
     if (!canSearchClearScenes) {
       setZoom(clamp(LATEST_CLEAR_ZOOM, MIN_ZOOM, maxZoom));
@@ -1105,7 +1118,11 @@ export default function StationsExplorerMap({
 
   const satelliteHint = (() => {
     if (latestClearMessage) return latestClearMessage;
-    if (isLatestClearPending) return "Searching NASA's catalog for a clear 30 m scene…";
+    if (isLatestClearPending) {
+      return satelliteMode === "true-color"
+        ? "Checking cloud cover for a clear day…"
+        : "Searching NASA's catalog for a clear 30 m scene…";
+    }
     if (satelliteMode === "true-color") {
       if (!canSearchClearScenes) return "Zoom in to see which days were clear.";
       if (cloudCover.status === "error") return cloudCover.error;
