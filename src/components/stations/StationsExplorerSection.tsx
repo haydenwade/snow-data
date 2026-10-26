@@ -116,6 +116,8 @@ export default function StationsExplorerSection({
     const raw = searchParams.get("sat");
     return isSatelliteMode(raw) ? raw : "off";
   });
+  // Snow cover used to be a satellite mode; existing links still use `?sat=snow-cover`.
+  const [initialShowSnowCover] = useState(() => searchParams.get("sat") === "snow-cover");
 
   const [viewport, setViewport] = useState<RequestedViewport>({
     stateCodes: initialStates,
@@ -263,6 +265,7 @@ export default function StationsExplorerSection({
             onAvalancheArchiveDateChange={setAvalancheArchiveDate}
             initialView={initialView}
             initialSatelliteMode={initialSatelliteMode}
+            initialShowSnowCover={initialShowSnowCover}
             enableRadar={enableRadar}
           />
         </div>
