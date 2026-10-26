@@ -14,6 +14,16 @@ export type ClearScenesResponse = {
   truncated: boolean;
 };
 
+/** Model cloud cover near the VIIRS afternoon pass for one local day. */
+export type CloudCoverDay = {
+  date: string; // YYYY-MM-DD (local day)
+  cloudPct: number | null;
+};
+
+export type CloudCoverResponse = {
+  days: CloudCoverDay[]; // newest first
+};
+
 export type SnowDepthPointResponse = {
   covered: boolean; // false outside the CONUS SNODAS grid
   depthIn: number | null;

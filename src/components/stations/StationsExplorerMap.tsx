@@ -53,6 +53,7 @@ import {
   CLEAR_SCENE_MIN_ZOOM,
   pickLatestClearDay,
   useClearScenes,
+  useCloudCoverDays,
 } from "@/components/stations/useClearScenes";
 
 const TILE_SIZE = 256;
@@ -1044,6 +1045,12 @@ export default function StationsExplorerMap({
     mapState?.bounds ?? null,
     (satelliteMode === "hls" || isLatestClearPending) && canSearchClearScenes,
   );
+  const cloudCover = useCloudCoverDays(
+    mapState?.bounds ?? null,
+    satelliteMode === "true-color" && canSearchClearScenes,
+  );
+  const showSceneDays =
+    (satelliteMode === "hls" || satelliteMode === "true-color") && canSearchClearScenes;
   const hlsDayForSatelliteDate =
     satelliteMode === "hls"
       ? clearScenes.days.find((day) => day.date === satelliteDate) ?? null
@@ -1090,6 +1097,13 @@ export default function StationsExplorerMap({
   const satelliteHint = (() => {
     if (latestClearMessage) return latestClearMessage;
     if (isLatestClearPending) return "Searching NASA's catalog for a clear 30 m scene…";
+    if (satelliteMode === "true-color") {
+      if (!canSearchClearScenes) return "Zoom in to see which days were clear.";
+      if (cloudCover.status === "error") return cloudCover.error;
+      const day = cloudCover.days.find((item) => item.date === satelliteDate);
+      if (cloudCover.status !== "ready" || day?.cloudPct == null) return null;
+      return `${Math.round(day.cloudPct)}% cloud near the 1 pm pass (forecast model)`;
+    }
     if (satelliteMode !== "hls") return null;
     if (!canSearchClearScenes) return "Zoom in to see which days have 30 m scenes.";
     if (clearScenes.status === "error") return clearScenes.error;
@@ -2184,7 +2198,7 @@ export default function StationsExplorerMap({
           satelliteDate={satelliteDate}
           showSnowDepth={isSnowDepthLayerVisible}
           showRadar={isRadarLayerVisible}
-          showSceneKey={showDateControls && satelliteMode === "hls" && canSearchClearScenes}
+          showSceneKey={showDateControls && showSceneDays}
         />
 
         {/* Bottom-center stack: notices sit here, not top-center, so they never land under the legend. */}
@@ -2246,8 +2260,8 @@ export default function StationsExplorerMap({
                 <SatelliteDateScrubber
                   today={todayAvalancheArchiveDate}
                   selectedDate={visibleAvalancheForecastDate}
-                  showSceneDays={satelliteMode === "hls" && canSearchClearScenes}
-                  sceneDays={clearScenes.days}
+                  showSceneDays={showSceneDays}
+                  sceneDays={satelliteMode === "true-color" ? cloudCover.days : clearScenes.days}
                   onPreview={setScrubPreviewDate}
                   onCommit={(date) => {
                     setLatestClearMessage(null);

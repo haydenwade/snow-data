@@ -6,7 +6,6 @@ import {
   formatAvalancheArchiveDateLabel,
 } from "@/components/stations/avalanche-archive-date";
 import { isClearSceneDay } from "@/components/stations/useClearScenes";
-import { ClearSceneDay } from "@/types/imagery";
 
 const SCRUBBER_DAYS = 30;
 
@@ -14,7 +13,8 @@ type SatelliteDateScrubberProps = {
   today: string;
   selectedDate: string;
   showSceneDays: boolean;
-  sceneDays: ClearSceneDay[];
+  /** Days with a cloud reading (HLS scenes or true color cloud cover); missing days read as no pass. */
+  sceneDays: Array<{ date: string; cloudPct: number | null }>;
   /** Fires while dragging so the dock's date label can follow; `null` when released. */
   onPreview: (date: string | null) => void;
   /** Called once the user lets go; `null` means today. */
