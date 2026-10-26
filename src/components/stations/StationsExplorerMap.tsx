@@ -798,6 +798,8 @@ export default function StationsExplorerMap({
     startClientY: number;
     startWorldX: number;
     startWorldY: number;
+    // Avalanche zone under the finger: zones don't block panning/pinching, so a tap selects them on release.
+    tapRegionId?: string | null;
   } | null>(null);
   const activePointersRef = useRef<Map<number, ActivePointer>>(new Map());
   const pinchRef = useRef<PinchGesture | null>(null);
@@ -1250,6 +1252,9 @@ export default function StationsExplorerMap({
         startClientY: event.clientY,
         startWorldX: mapState.centerWorld.x,
         startWorldY: mapState.centerWorld.y,
+        tapRegionId: target.closest("[data-avalanche-region-id]")?.getAttribute(
+          "data-avalanche-region-id",
+        ),
       };
       pinchRef.current = null;
     }
@@ -1316,7 +1321,9 @@ export default function StationsExplorerMap({
         event.clientX - tapStart.startClientX,
         event.clientY - tapStart.startClientY,
       ) < TAP_SLOP_PX;
-    if (isTap && isSnowDepthLayerVisible && mapState) {
+    if (isTap && tapStart.tapRegionId) {
+      setSelectedAvalancheRegionId(tapStart.tapRegionId);
+    } else if (isTap && isSnowDepthLayerVisible && mapState) {
       const localPoint = toLocalPoint(event.clientX, event.clientY);
       if (localPoint) {
         setSnowDepthPoint(
@@ -1866,7 +1873,7 @@ export default function StationsExplorerMap({
                 return (
                   <path
                     key={region.feature.id}
-                    data-map-interactive="true"
+                    data-avalanche-region-id={region.feature.id}
                     d={region.pathData}
                     fillRule="evenodd"
                     className={[
@@ -1884,11 +1891,6 @@ export default function StationsExplorerMap({
                     stroke={strokeColor}
                     strokeOpacity={1}
                     strokeWidth={selected ? (isExtreme ? 4.5 : 3) : isExtreme ? 3.2 : 1.8}
-                    onPointerDown={(event) => event.stopPropagation()}
-                    onClick={() => {
-                      setSelectedStationTriplet(null);
-                      setSelectedAvalancheRegionId(region.feature.id);
-                    }}
                   />
                 );
               })}
