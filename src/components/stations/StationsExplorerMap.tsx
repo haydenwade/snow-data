@@ -41,6 +41,7 @@ import {
   overlayTilesFor,
   radarOverlaySource,
   satelliteOverlaySources,
+  snowCoverOverlaySource,
 } from "@/components/stations/map-overlays";
 import MapDateDock from "@/components/stations/MapDateDock";
 import MapLayerSwitch from "@/components/stations/MapLayerSwitch";
@@ -275,6 +276,7 @@ type StationsExplorerMapProps = {
   /** From `?lat=&lon=&z=` deep links; wins over the saved location. */
   initialView?: { lat: number; lon: number; zoom: number } | null;
   initialSatelliteMode?: SatelliteMode;
+  initialShowSnowCover?: boolean;
   enableRadar?: boolean;
 };
 
@@ -711,6 +713,7 @@ export default function StationsExplorerMap({
   onAvalancheArchiveDateChange,
   initialView = null,
   initialSatelliteMode = "off",
+  initialShowSnowCover = false,
   enableRadar = false,
 }: StationsExplorerMapProps) {
   const {
@@ -751,7 +754,7 @@ export default function StationsExplorerMap({
     initialView ? initialView.zoom : initialCenterLocation ? 10 : DEFAULT_ZOOM,
   );
   const [basemap, setBasemap] = useState<BasemapKey>(
-    initialSatelliteMode === "off" ? "light" : "topo",
+    initialSatelliteMode === "off" && !initialShowSnowCover ? "light" : "topo",
   );
   const [basemapNotice, setBasemapNotice] = useState<string | null>(null);
   const basemapTileErrorsRef = useRef(0);
@@ -769,6 +772,7 @@ export default function StationsExplorerMap({
   const [isStationLayerVisible, setIsStationLayerVisible] = useState(true);
   const [isAvalancheLayerVisible, setIsAvalancheLayerVisible] = useState(true);
   const [satelliteMode, setSatelliteMode] = useState<SatelliteMode>(initialSatelliteMode);
+  const [isSnowCoverLayerVisible, setIsSnowCoverLayerVisible] = useState(initialShowSnowCover);
   const [isSnowDepthLayerVisible, setIsSnowDepthLayerVisible] = useState(false);
   const [isRadarLayerVisible, setIsRadarLayerVisible] = useState(false);
   const [settledRadarTileUrls, setSettledRadarTileUrls] = useState<Set<string>>(
@@ -812,14 +816,13 @@ export default function StationsExplorerMap({
   const isViewingAvalancheArchive = selectedAvalancheArchiveDate != null;
   const canAdvanceAvalancheArchiveDate =
     visibleAvalancheForecastDate < todayAvalancheArchiveDate;
-  // One map date drives every dated layer (avalanche archive + satellite imagery).
+  // One map date drives every dated layer (avalanche archive, satellite imagery, snow cover).
   const isSatelliteLayerVisible = satelliteMode !== "off";
+  const isDatedImageryVisible = isSatelliteLayerVisible || isSnowCoverLayerVisible;
   const showDateControls =
-    enableAvalancheArchive && (isAvalancheLayerVisible || isSatelliteLayerVisible);
-  const satelliteDate =
-    satelliteMode === "hls"
-      ? visibleAvalancheForecastDate
-      : dailyImageryDate(selectedAvalancheArchiveDate, todayAvalancheArchiveDate);
+    enableAvalancheArchive && (isAvalancheLayerVisible || isDatedImageryVisible);
+  const dailyDate = dailyImageryDate(selectedAvalancheArchiveDate, todayAvalancheArchiveDate);
+  const satelliteDate = satelliteMode === "hls" ? visibleAvalancheForecastDate : dailyDate;
   const avalancheMapLayerRequestUrl = selectedAvalancheArchiveDate
     ? `/api/avalanche/map-layer?date=${encodeURIComponent(selectedAvalancheArchiveDate)}`
     : "/api/avalanche/map-layer";
@@ -898,9 +901,10 @@ export default function StationsExplorerMap({
   const overlaySources = useMemo(
     () => [
       ...satelliteOverlaySources(satelliteMode, satelliteDate),
+      ...(isSnowCoverLayerVisible ? [snowCoverOverlaySource(dailyDate)] : []),
       ...(isSnowDepthLayerVisible ? [SNOW_DEPTH_OVERLAY] : []),
     ],
-    [isSnowDepthLayerVisible, satelliteDate, satelliteMode],
+    [dailyDate, isSnowCoverLayerVisible, isSnowDepthLayerVisible, satelliteDate, satelliteMode],
   );
 
   const mapState = useMemo(() => {
@@ -1679,16 +1683,16 @@ export default function StationsExplorerMap({
 
                 <MapLayerSwitch
                   label="Satellite imagery"
-                  detail="Dated · NASA, keyless"
+                  detail="NASA"
                   checked={isSatelliteLayerVisible}
                   dotClassName="bg-amber-300"
                   onToggle={() => {
                     setLatestClearMessage(null);
                     setIsLatestClearPending(false);
-                    setSatelliteMode((current) => (current === "off" ? "snow-cover" : "off"));
+                    setSatelliteMode((current) => (current === "off" ? "true-color" : "off"));
                   }}
                 >
-                  <div className="grid grid-cols-3 gap-1">
+                  <div className="grid grid-cols-2 gap-1">
                     {SATELLITE_MODE_OPTIONS.filter(
                       // 30 m scenes need the date controls to reach a day with a pass.
                       (option) => option.key !== "hls" || enableAvalancheArchive,
@@ -1710,10 +1714,19 @@ export default function StationsExplorerMap({
                       >
                         <span className="block text-[11px] font-semibold">{option.label}</span>
                         <span className="block text-[9px] text-slate-400">{option.detail}</span>
+                        <span className="block text-[9px] text-slate-500">{option.satellite}</span>
                       </button>
                     ))}
                   </div>
                 </MapLayerSwitch>
+
+                <MapLayerSwitch
+                  label="Snow cover"
+                  detail="NASA VIIRS · daily · 375 m"
+                  checked={isSnowCoverLayerVisible}
+                  dotClassName="bg-rose-300"
+                  onToggle={() => setIsSnowCoverLayerVisible((current) => !current)}
+                />
 
                 <MapLayerSwitch
                   label="Snow depth (model)"
@@ -2182,6 +2195,7 @@ export default function StationsExplorerMap({
         <MapOverlayLegend
           satelliteMode={satelliteMode}
           satelliteDate={satelliteDate}
+          snowCoverDate={isSnowCoverLayerVisible ? dailyDate : null}
           showSnowDepth={isSnowDepthLayerVisible}
           showRadar={isRadarLayerVisible}
           showSceneKey={showDateControls && satelliteMode === "hls" && canSearchClearScenes}
@@ -2242,7 +2256,7 @@ export default function StationsExplorerMap({
               onViewToday={() => setAvalancheArchiveDate(null)}
               onLatestClear={requestLatestClear}
             >
-              {isSatelliteLayerVisible ? (
+              {isDatedImageryVisible ? (
                 <SatelliteDateScrubber
                   today={todayAvalancheArchiveDate}
                   selectedDate={visibleAvalancheForecastDate}

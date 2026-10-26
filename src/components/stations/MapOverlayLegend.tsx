@@ -14,6 +14,8 @@ import {
 type MapOverlayLegendProps = {
   satelliteMode: SatelliteMode;
   satelliteDate: string;
+  /** Date of the snow cover layer, or null when it's off. */
+  snowCoverDate: string | null;
   showSnowDepth: boolean;
   showRadar: boolean;
   /** Key for the clear/cloudy/no-pass colors on the date strip. */
@@ -21,7 +23,6 @@ type MapOverlayLegendProps = {
 };
 
 const SATELLITE_SOURCE: Record<Exclude<SatelliteMode, "off">, string> = {
-  "snow-cover": "Imagery · NASA VIIRS (NOAA-20) · 375 m",
   "true-color": "Imagery · NASA VIIRS (NOAA-20) · 250 m",
   hls: "Imagery · NASA HLS (Sentinel-2 / Landsat) · 30 m",
 };
@@ -87,6 +88,7 @@ function CompactRow({ label, gradient, meta, metaClassName }: {
 export default function MapOverlayLegend({
   satelliteMode,
   satelliteDate,
+  snowCoverDate,
   showSnowDepth,
   showRadar,
   showSceneKey,
@@ -96,7 +98,7 @@ export default function MapOverlayLegend({
   const [userExpanded, setUserExpanded] = useState<boolean | null>(null);
   const isExpanded = userExpanded ?? defaultExpanded;
 
-  if (satelliteMode === "off" && !showSnowDepth && !showRadar) return null;
+  if (satelliteMode === "off" && !snowCoverDate && !showSnowDepth && !showRadar) return null;
   const hlsFill = satelliteMode === "hls" ? hlsFillRange(satelliteDate) : null;
   const satelliteDateLabel = formatAvalancheArchiveDateLabel(satelliteDate);
 
@@ -126,14 +128,17 @@ export default function MapOverlayLegend({
         >
           <span className="flex flex-col gap-1">
             {satelliteMode !== "off" ? (
-              <CompactRow
-                label={satelliteMode === "snow-cover" ? "Snow cover" : "Satellite"}
-                gradient={satelliteMode === "snow-cover" ? SNOW_COVER_LEGEND.gradient : undefined}
-                meta={satelliteDateLabel}
-                metaClassName="text-sky-300"
-              />
+              <CompactRow label="Satellite" meta={satelliteDateLabel} metaClassName="text-sky-300" />
             ) : null}
             {satelliteMode !== "off" && showSceneKey ? <SceneKey /> : null}
+            {snowCoverDate ? (
+              <CompactRow
+                label="Snow cover"
+                gradient={SNOW_COVER_LEGEND.gradient}
+                meta={formatAvalancheArchiveDateLabel(snowCoverDate)}
+                metaClassName="text-rose-300"
+              />
+            ) : null}
             {showSnowDepth ? (
               <CompactRow
                 label="Snow depth"
@@ -168,25 +173,9 @@ export default function MapOverlayLegend({
           {satelliteMode !== "off" ? (
             <div>
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-[11px] font-semibold text-slate-100">
-                  {satelliteMode === "snow-cover" ? SNOW_COVER_LEGEND.title : "Satellite"}
-                </span>
+                <span className="text-[11px] font-semibold text-slate-100">Satellite</span>
                 <span className="font-semibold text-sky-300">{satelliteDateLabel}</span>
               </div>
-              {satelliteMode === "snow-cover" ? (
-                <>
-                  <div
-                    className="mt-1 h-2 w-full rounded-sm"
-                    style={{ background: SNOW_COVER_LEGEND.gradient }}
-                    aria-hidden="true"
-                  />
-                  <div className="mt-0.5 flex justify-between text-slate-400">
-                    <span>{SNOW_COVER_LEGEND.lowLabel}</span>
-                    <span>{SNOW_COVER_LEGEND.highLabel}</span>
-                  </div>
-                  <p className="mt-0.5 text-slate-400">{SNOW_COVER_LEGEND.note}</p>
-                </>
-              ) : null}
               {showSceneKey ? (
                 <div className="mt-1">
                   <SceneKey />
@@ -200,6 +189,30 @@ export default function MapOverlayLegend({
                 </p>
               ) : null}
               <p className="mt-0.5 text-slate-500">{SATELLITE_SOURCE[satelliteMode]}</p>
+            </div>
+          ) : null}
+
+          {snowCoverDate ? (
+            <div>
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[11px] font-semibold text-slate-100">
+                  {SNOW_COVER_LEGEND.title}
+                </span>
+                <span className="font-semibold text-rose-300">
+                  {formatAvalancheArchiveDateLabel(snowCoverDate)}
+                </span>
+              </div>
+              <div
+                className="mt-1 h-2 w-full rounded-sm"
+                style={{ background: SNOW_COVER_LEGEND.gradient }}
+                aria-hidden="true"
+              />
+              <div className="mt-0.5 flex justify-between text-slate-400">
+                <span>{SNOW_COVER_LEGEND.lowLabel}</span>
+                <span>{SNOW_COVER_LEGEND.highLabel}</span>
+              </div>
+              <p className="mt-0.5 text-slate-400">{SNOW_COVER_LEGEND.note}</p>
+              <p className="mt-0.5 text-slate-500">NASA VIIRS (NOAA-20) · 375 m</p>
             </div>
           ) : null}
 
