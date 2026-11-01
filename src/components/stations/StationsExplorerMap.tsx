@@ -1795,7 +1795,7 @@ export default function StationsExplorerMap({
       <div
         className={[
           "relative w-full overflow-hidden z-0",
-          isFullscreen ? "min-h-0 flex-1" : "h-[600px]",
+          isFullscreen ? "min-h-0 flex-1" : "h-[min(600px,60svh)] sm:h-[600px]",
         ].join(" ")}
         onWheelCapture={onWheel}
       >
