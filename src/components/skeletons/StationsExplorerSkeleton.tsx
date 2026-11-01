@@ -34,7 +34,7 @@ export default function StationsExplorerSkeleton() {
         </div>
       </div>
 
-      <div className="relative h-[600px] w-full overflow-hidden bg-slate-900">
+      <div className="relative h-[min(600px,60svh)] w-full overflow-hidden bg-slate-900 sm:h-[600px]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(59,130,246,0.08),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(16,185,129,0.05),transparent_42%),linear-gradient(to_bottom,rgba(15,23,42,0.96),rgba(2,6,23,0.98))]" />
 
         <div className="absolute inset-0 opacity-35">
