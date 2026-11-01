@@ -115,46 +115,46 @@ export default function Header() {
         {isMobileMenuOpen && (
           <nav
             id="mobile-nav"
-            className="sm:hidden mb-3 rounded-xl border border-slate-200 bg-white p-2 text-sm shadow-lg"
+            className="sm:hidden mb-3 space-y-1 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
           >
             <Link
               href="/favorites"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <Star className="h-4 w-4" />
+              <Star className="h-5 w-5" />
               Favorites
             </Link>
             <Link
               href="/"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <Home className="h-4 w-4" />
+              <Home className="h-5 w-5" />
               Locations
             </Link>
             <Link
               href="/map"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <MapIcon className="h-4 w-4" />
+              <MapIcon className="h-5 w-5" />
               Map
             </Link>
             <Link
               href="/knowledge"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <BookOpen className="h-4 w-4" />
+              <BookOpen className="h-5 w-5" />
               Knowledge
             </Link>
             <Link
               href="/settings"
-              className="flex items-center gap-2 rounded-lg px-2 py-2 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
+              className="flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition"
               onClick={() => setMobileMenuOpenPath(null)}
             >
-              <Settings className="h-4 w-4" />
+              <Settings className="h-5 w-5" />
               Settings
             </Link>
           </nav>
